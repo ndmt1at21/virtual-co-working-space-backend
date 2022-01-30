@@ -1,0 +1,47 @@
+name: Actions for Working Space API
+on:
+    push:
+        branches: [main]
+
+    pull_request:
+        branches: [main]
+
+jobs:
+    Working-Space-API-Actions:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - name: Use Node.js ${{matrix.node-version}}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{matrix.node-version}}
+
+            - name: Deploy node server
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.SSH_HOST }}
+                  username: ${{ secrets.SSH_USERNAME }}
+                  key: ${{ secrets.SSH_KEY }}
+                  port: ${{ secrets.SSH_PORT }}
+                  passphrase: ${{ secrets.SSH_PASSPHRASE }}
+                  script: |
+                      cd ~/virtual-working-space-backend
+                      git pull origin main
+
+                      touch .env
+                      echo "${{ secrets.NODE_ENV }}" >> .env
+                      echo "${{ secrets.PORT }}" >> .env
+                      echo "${{ secrets.DB_HOST }}" >> .env
+                      echo "${{ secrets.DB_USERNAME }}" >> .env
+                      echo "${{ secrets.DB_PASSWORD }}" >> .env
+                      echo "${{ secrets.DB_PORT }}" >> .env
+                      echo "${{ secrets.DB_NAME }}" >> .env
+
+                      sudo npm ci
+                      sudo npm build
+                      sudo npm test
+                      sudo pm2 startOrRestart ecosystem.config.js --env production

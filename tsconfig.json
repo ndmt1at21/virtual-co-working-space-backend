@@ -1,27 +1,30 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "allowJs": true,
-    "target": "es6",
-    "module": "commonjs",
-    "outDir": "build",
-    "moduleResolution": "node",
-    "removeComments": true,
-    "esModuleInterop": true,
-    "isolatedModules": false,
-    "noImplicitAny": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "experimentalDecorators": true,
-    "skipLibCheck": true,
-    "baseUrl": "src",
-    "paths": {
-      "@src/*": ["./*"]
-    }
-  },
-  "include": ["./"],
-  "exclude": ["node_modules", "build/**/*"],
-  "ts-node": {
-    "files": true
-  }
+	"compileOnSave": false,
+	"compilerOptions": {
+		"allowJs": true,
+		"target": "es6",
+		"module": "commonjs",
+		"outDir": "build",
+		"moduleResolution": "node",
+		"removeComments": true,
+		"esModuleInterop": true,
+		"isolatedModules": false,
+		"noImplicitAny": true,
+		"forceConsistentCasingInFileNames": true,
+		"strictPropertyInitialization": false,
+		"strict": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"skipLibCheck": true,
+		"baseUrl": "src",
+		"paths": {
+			"@src/*": ["./*"]
+		},
+		"typeRoots": ["node_modules/@types", "src/@types"]
+	},
+	"include": ["./", "src/**/*.ts"],
+	"exclude": ["node_modules", "build/**/*"],
+	"ts-node": {
+		"files": true
+	}
 }

@@ -1,5 +1,6 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from 'typeorm';
 import { Office } from '@src/entities/Office';
+import { BaseRepository } from './BaseRepository';
 
 @EntityRepository(Office)
-export class OfficeRepository extends Repository<Office> {}
+export class OfficeRepository extends BaseRepository<Office> {}

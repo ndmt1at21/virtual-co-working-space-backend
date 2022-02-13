@@ -3,6 +3,7 @@ import {
 	Column,
 	Entity,
 	JoinColumn,
+	ManyToOne,
 	OneToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
@@ -14,17 +15,17 @@ export class ConversationMember extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@OneToOne(() => Conversation)
-	@JoinColumn({ name: 'conversationId' })
-	conversation: Conversation;
-
-	@OneToOne(() => User)
-	@JoinColumn({ name: 'memberId' })
-	member: User;
-
-	@Column()
+	@Column({ name: 'conversation_id' })
 	conversationId: number;
 
-	@Column()
+	@Column({ name: 'member_id' })
 	memberId: number;
+
+	@OneToOne(() => Conversation)
+	@JoinColumn({ name: 'conversation_id' })
+	conversation: Conversation;
+
+	@ManyToOne(() => User)
+	@JoinColumn({ name: 'member_id' })
+	member: User;
 }

@@ -3,7 +3,7 @@ import {
 	Column,
 	Entity,
 	JoinColumn,
-	OneToOne,
+	ManyToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { Office } from './Office';
@@ -14,17 +14,17 @@ export class CheckIn extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@OneToOne(() => User)
-	@JoinColumn({ name: 'userId' })
-	user: User;
-
-	@OneToOne(() => Office)
-	@JoinColumn({ name: 'officeId' })
-	office: Office;
-
-	@Column()
+	@Column({ name: 'user_id' })
 	userId: number;
 
-	@Column()
+	@Column({ name: 'office_id' })
 	officeId: number;
+
+	@ManyToOne(() => User)
+	@JoinColumn({ name: 'user_id' })
+	user: User;
+
+	@ManyToOne(() => Office)
+	@JoinColumn({ name: 'office_id' })
+	office: Office;
 }

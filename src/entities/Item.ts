@@ -8,6 +8,6 @@ export class Item extends BaseEntity {
 	@Column()
 	name: string;
 
-	@Column({ unique: true })
+	@Column({ unique: true, name: 'model_path' })
 	modelPath: string;
 }

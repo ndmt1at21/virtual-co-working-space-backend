@@ -13,11 +13,7 @@ export class Notification extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@OneToOne(() => User)
-	@JoinColumn({ name: 'userId' })
-	user: User;
-
-	@Column()
+	@Column({ name: 'user_id' })
 	userId: number;
 
 	@Column()
@@ -28,4 +24,8 @@ export class Notification extends BaseEntity {
 
 	@Column()
 	content: string;
+
+	@OneToOne(() => User)
+	@JoinColumn({ name: 'user_id' })
+	user: User;
 }

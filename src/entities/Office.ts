@@ -8,6 +8,6 @@ export class Office extends BaseEntity {
 	@Column()
 	name: string;
 
-	@Column({ unique: true })
+	@Column({ unique: true, name: 'invitation_code' })
 	invitationCode: string;
 }

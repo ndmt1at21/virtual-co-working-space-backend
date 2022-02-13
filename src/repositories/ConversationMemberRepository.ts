@@ -1,5 +1,6 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from 'typeorm';
 import { ConversationMember } from '@src/entities/ConversationMember';
+import { BaseRepository } from './BaseRepository';
 
 @EntityRepository(ConversationMember)
-export class ConversationMemberRepository extends Repository<ConversationMember> {}
+export class ConversationMemberRepository extends BaseRepository<ConversationMember> {}

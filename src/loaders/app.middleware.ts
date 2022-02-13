@@ -3,6 +3,7 @@ import express from 'express';
 import { Application } from 'express';
 import helmet from 'helmet';
 import { appConfig } from '@src/config/app';
+import { globalErrorHandler } from '@components/globalHandlerError';
 
 export const appMiddleware = (app: Application) => {
 	const isProduction = appConfig.NODE_ENV === 'production';
@@ -24,4 +25,6 @@ export const appMiddleware = (app: Application) => {
 			exposedHeaders: ['x-total-count']
 		})
 	);
+
+	app.use(globalErrorHandler);
 };

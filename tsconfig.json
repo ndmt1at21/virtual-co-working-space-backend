@@ -18,7 +18,8 @@
 		"skipLibCheck": true,
 		"baseUrl": "src",
 		"paths": {
-			"@src/*": ["./*"]
+			"@src/*": ["./*"],
+			"@components/*": ["./components/*"]
 		},
 		"typeRoots": ["node_modules/@types", "src/@types"]
 	},

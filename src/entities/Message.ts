@@ -15,18 +15,10 @@ export class Message extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@OneToOne(() => User)
-	@JoinColumn({ name: 'senderId' })
-	sender: User;
-
-	@ManyToOne(() => Conversation)
-	@JoinColumn({ name: 'conversationId' })
-	conversation: Conversation;
-
-	@Column()
+	@Column({ name: 'sender_id' })
 	senderId: number;
 
-	@Column()
+	@Column({ name: 'conversation_id' })
 	conversationId: number;
 
 	@Column()
@@ -37,4 +29,12 @@ export class Message extends BaseEntity {
 
 	@Column()
 	status: number;
+
+	@OneToOne(() => User)
+	@JoinColumn({ name: 'sender_id' })
+	sender: User;
+
+	@ManyToOne(() => Conversation)
+	@JoinColumn({ name: 'conversation_id' })
+	conversation: Conversation;
 }

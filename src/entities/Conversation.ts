@@ -13,10 +13,10 @@ export class Conversation extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@OneToOne(() => Office)
-	@JoinColumn({ name: 'officeId' })
-	office: Office;
-
-	@Column()
+	@Column({ name: 'office_id' })
 	officeId: number;
+
+	@OneToOne(() => Office)
+	@JoinColumn({ name: 'office_id' })
+	office: Office;
 }

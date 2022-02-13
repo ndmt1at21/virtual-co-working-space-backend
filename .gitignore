@@ -1,8 +1,41 @@
 .idea/
 .vscode/
-node_modules/
 build/
 tmp/
 temp/
 
 logs/
+
+# OS X
+.DS_Store*
+Icon?
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+*~
+
+
+# npm
+node_modules
+*.log
+*.gz
+
+
+# Coveralls
+coverage
+
+# Benchmarking
+benchmarks/graphs
+
+# build
+build
+dist
+
+# env
+*.env

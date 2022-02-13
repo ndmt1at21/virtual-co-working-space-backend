@@ -1,3 +1,4 @@
+import { UserStatus } from '@src/@types/UserStatus';
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'user' })
@@ -20,6 +21,6 @@ export class User extends BaseEntity {
 	@Column()
 	avatar: string;
 
-	@Column()
-	status: number;
+	@Column({ type: 'enum' })
+	status: UserStatus;
 }

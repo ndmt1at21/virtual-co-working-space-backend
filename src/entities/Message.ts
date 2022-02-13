@@ -10,6 +10,10 @@ import {
 import { Conversation } from './Conversation';
 import { User } from './User';
 
+export enum MessageType {
+	TEXT = 'text'
+}
+
 @Entity({ name: 'message' })
 export class Message extends BaseEntity {
 	@PrimaryGeneratedColumn()

@@ -1,3 +1,4 @@
+import { NotificationType } from '@src/@types/NotificationType';
 import {
 	BaseEntity,
 	Column,
@@ -16,7 +17,7 @@ export class Notification extends BaseEntity {
 	@Column({ name: 'user_id' })
 	userId: number;
 
-	@Column()
+	@Column({ nullable: true })
 	image?: string;
 
 	@Column()
@@ -24,6 +25,12 @@ export class Notification extends BaseEntity {
 
 	@Column()
 	content: string;
+
+	@Column()
+	link: string;
+
+	@Column({ type: 'enum' })
+	type: NotificationType;
 
 	@OneToOne(() => User)
 	@JoinColumn({ name: 'user_id' })

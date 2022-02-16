@@ -1,7 +1,7 @@
 import { Application } from 'express';
-import { appMiddleware } from './app.middleware';
-import { connectDatabase } from './database';
-import { appRoutes } from './app.routes';
+import { appMiddleware } from './loaders/app.middleware';
+import { connectDatabase } from './loaders/app.database';
+import { appRoutes } from './loaders/app.routes';
 import { ILogger } from '@src/@types/ILogger';
 
 export const appLoaders = async (
@@ -28,7 +28,7 @@ export const serverLoaders = (
 	});
 
 	process.on('uncaughtException', err => {
-		logger.error('UNCAUGHT ERROR: ' + err.message);
+		logger.error('UNCAUGHT EXCEPTION: ' + err.message);
 		server.close(() => {
 			process.exit(1);
 		});

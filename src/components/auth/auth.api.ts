@@ -8,10 +8,12 @@ const authService = AuthService();
 const authController = AuthController(authService);
 
 router
-	.post('login', authController.login)
-	.post('register', authController.register)
-	.get('logout', authController.logout)
-	.post('refreshToken', authController.refreshToken)
+	.post('/login', authController.login)
+	.get('/google/callback', authController.googleLoginCallback)
+	.get('/facebook/callback', authController.facebookLoginCallback)
+	.post('/register', authController.register)
+	.get('/logout', authController.logout)
+	.post('/refreshToken', authController.refreshToken)
 	.post('/forgot', authController.forgotPassword)
 	.patch('/reset/:token', authController.resetPassword);
 

@@ -1,3 +1,4 @@
+import { UserRoleType } from '@src/@types/UserRoleType';
 import { UserStatus } from '@src/@types/UserStatus';
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -20,6 +21,9 @@ export class User extends BaseEntity {
 
 	@Column()
 	avatar: string;
+
+	@Column({ type: 'enum' })
+	type: UserRoleType;
 
 	@Column({ type: 'enum' })
 	status: UserStatus;

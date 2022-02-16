@@ -4,6 +4,14 @@ import { IAuthService } from './@types/IAuthService';
 export const AuthController = (authService: IAuthService) => {
 	const login = catchAsyncRequestHandler(async (req, res, next) => {});
 
+	const googleLoginCallback = catchAsyncRequestHandler(
+		async (req, res, next) => {}
+	);
+
+	const facebookLoginCallback = catchAsyncRequestHandler(
+		async (req, res, next) => {}
+	);
+
 	const register = catchAsyncRequestHandler(async (req, res, next) => {});
 
 	const logout = catchAsyncRequestHandler(async (req, res, next) => {});
@@ -20,6 +28,8 @@ export const AuthController = (authService: IAuthService) => {
 
 	return {
 		login,
+		googleLoginCallback,
+		facebookLoginCallback,
 		register,
 		logout,
 		refreshToken,

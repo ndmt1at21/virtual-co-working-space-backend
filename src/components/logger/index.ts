@@ -12,14 +12,13 @@ const defaultFormat = format.combine(
 );
 
 const commonOptions = {
-	fileName: 'logs/log.log',
+	filename: 'logs/log.log',
 	format: defaultFormat,
 	maxFiles: 100,
 	maxsize: 10 * 1024 * 1024
 };
 
 const debugOptions = {
-	...commonOptions,
 	format: debugFormat,
 	level: 'debug'
 };

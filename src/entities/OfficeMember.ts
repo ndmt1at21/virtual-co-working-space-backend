@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Office } from './Office';
 import { OfficeRole } from './OfficeRole';
-import { User } from './User';
+import { User } from '@components/users/user.entity';
 
 @Entity({ name: 'office_member' })
 export class OfficeMember extends BaseEntity {

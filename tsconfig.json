@@ -16,10 +16,11 @@
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"skipLibCheck": true,
-		"baseUrl": "src",
+		"baseUrl": "./src",
 		"paths": {
 			"@src/*": ["./*"],
-			"@components/*": ["./components/*"]
+			"@components/*": ["./components/*"],
+			"@constant/*": ["./constant/*"]
 		},
 		"typeRoots": ["node_modules/@types", "src/@types"]
 	},

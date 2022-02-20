@@ -2,7 +2,7 @@ import { Application } from 'express';
 import { appMiddleware } from './loaders/app.middleware';
 import { connectDatabase } from './loaders/app.database';
 import { appRoutes } from './loaders/app.routes';
-import { ILogger } from '@src/@types/ILogger';
+import { ILogger } from '@components/logger/@types/ILogger';
 
 export const appLoaders = async (
 	app: Application,
@@ -11,10 +11,10 @@ export const appLoaders = async (
 	await connectDatabase();
 	logger.info('Database connection has been established successfully.');
 
-	appMiddleware(app);
+	appMiddleware(app, logger);
 	logger.info('Middleware has been loaded.');
 
-	appRoutes();
+	appRoutes(app);
 	logger.info('Routes have been loaded.');
 };
 

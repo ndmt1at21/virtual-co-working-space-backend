@@ -8,7 +8,7 @@ import {
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { Conversation } from './Conversation';
-import { User } from './User';
+import { User } from '@components/users/user.entity';
 
 @Entity({ name: 'conversation_member' })
 export class ConversationMember extends BaseEntity {

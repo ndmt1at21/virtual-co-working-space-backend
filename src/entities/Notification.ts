@@ -7,7 +7,7 @@ import {
 	OneToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
-import { User } from './User';
+import { User } from '@components/users/user.entity';
 
 @Entity({ name: 'notification' })
 export class Notification extends BaseEntity {

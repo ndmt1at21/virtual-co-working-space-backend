@@ -1,6 +1,6 @@
 import { EntityRepository } from 'typeorm';
 import { Conversation } from '@src/entities/Conversation';
-import { BaseRepository } from './BaseRepository';
+import { BaseRepository } from '../components/base/BaseRepository';
 
 @EntityRepository(Conversation)
 export class ConversationRepository extends BaseRepository<Conversation> {}

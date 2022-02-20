@@ -5,19 +5,19 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
-	host: databaseConfig.DB_HOST,
-	port: databaseConfig.DB_PORT,
-	username: databaseConfig.DB_USERNAME,
-	password: databaseConfig.DB_PASSWORD,
-	database: databaseConfig.DB_NAME,
+	host: databaseConfig.DB_POSTGRES_HOST,
+	port: databaseConfig.DB_POSTGRES_PORT,
+	username: databaseConfig.DB_POSTGRES_USERNAME,
+	password: databaseConfig.DB_POSTGRES_PASSWORD,
+	database: databaseConfig.DB_POSTGRES_NAME,
 	synchronize: true,
 	logging: false,
-	entities: ['src/entities/**/*.ts']
+	entities: ['src/components/**/*.entity.ts']
 };
 
 const ormMongoOptions: MongoConnectionOptions = {
 	type: 'mongodb',
-	host: databaseConfig.DB_HOST
+	host: databaseConfig.DB_POSTGRES_HOST
 };
 
 export const connectDatabase = async (): Promise<Connection> => {

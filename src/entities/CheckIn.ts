@@ -1,3 +1,4 @@
+import { User } from '@components/users/user.entity';
 import {
 	BaseEntity,
 	Column,
@@ -7,7 +8,6 @@ import {
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { Office } from './Office';
-import { User } from './User';
 
 @Entity({ name: 'checkin' })
 export class CheckIn extends BaseEntity {

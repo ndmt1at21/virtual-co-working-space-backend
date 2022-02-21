@@ -1,11 +1,12 @@
 import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
 import express from 'express';
 import { Application } from 'express';
-import helmet from 'helmet';
 import { appConfig } from '@src/config/app';
-import { globalErrorHandler } from '@components/globalHandlerError';
 import { ILogger } from '@components/logger/@types/ILogger';
-import morgan from 'morgan';
+import { globalErrorHandler } from '@components/globalHandlerError';
+import { createAuthMiddleware } from '@src/components/auth/auth.factory';
 
 export const appMiddleware = (app: Application, logger: ILogger) => {
 	const isProduction = appConfig.NODE_ENV === 'production';
@@ -33,6 +34,9 @@ export const appMiddleware = (app: Application, logger: ILogger) => {
 	);
 
 	app.use(morgan('combined', { stream: { write: msg => logger.info(msg) } }));
+
+	const authMiddleware = createAuthMiddleware();
+	app.use(authMiddleware.deserializeUser);
 
 	app.use(globalErrorHandler);
 };

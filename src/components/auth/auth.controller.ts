@@ -1,31 +1,39 @@
+import passport from 'passport';
+import config from '@src/config';
+import queryString from 'query-string';
+import { NextFunction, Request, Response } from 'express';
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
+import { AuthErrorMessages } from './auth.error';
+import { IAuthService } from './@types/IAuthService';
+import { ILogger } from '@components/logger/@types/ILogger';
 import { IllegalArgumentError, UnauthorizedError } from '@src/utils/appError';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
-import passport from 'passport';
 import { IAuthTokenService } from '@components/authToken/@types/IAuthTokenService';
-import { AuthTokenService } from '@components/authToken/authToken.service';
-import { IAuthService } from './@types/IAuthService';
-import { User } from '../users/user.entity';
-import { UserLoginProvider } from '../users/@types/UserLoginProvider';
 
 export const AuthController = (
 	authService: IAuthService,
-	authTokenService: IAuthTokenService
+	authTokenService: IAuthTokenService,
+	logger: ILogger
 ) => {
 	const login = catchAsyncRequestHandler(async (req, res, next) => {
 		const { email, password } = req.body;
 
 		if (!email || !password) {
-			throw new IllegalArgumentError('Email and password are required.');
+			logger.error('Cannot delete user: missing email or password');
+			throw new IllegalArgumentError(
+				AuthErrorMessages.LOGIN_MISSING_EMAIL_PASSWORD
+			);
 		}
 
-		const user = await authService.validateLocalUser({
+		const user = await authService.localLogin({
 			email,
 			password
 		});
 
 		const [accessToken, refreshToken] =
 			await authTokenService.createAccessTokenAndRefreshToken(user.id);
+
+		logger.info(`User with id ${user.id} logged in successfully`);
 
 		res.status(HttpStatusCode.OK).json({
 			accessToken,
@@ -38,6 +46,8 @@ export const AuthController = (
 			session: false,
 			scope: ['email', 'profile']
 		})(req, res, next);
+
+		logger.info('Success redirect to google login page');
 	});
 
 	const facebookLogin = catchAsyncRequestHandler(async (req, res, next) => {
@@ -45,57 +55,82 @@ export const AuthController = (
 			session: false,
 			scope: ['email', 'public_profile']
 		})(req, res, next);
+
+		logger.info('Success redirect to facebook login page');
 	});
 
 	const googleLoginCallback = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			passport.authenticate('google', { session: false });
-
-			if (!req.user) throw new UnauthorizedError('User not found.');
-
-			// @ts-ignore
-			const externalId = req.user.externalId;
-			const user = await authService.validateExternalUser(
-				externalId,
-				UserLoginProvider.GOOGLE
-			);
-
-			const [accessToken, refreshToken] =
-				await authTokenService.createAccessTokenAndRefreshToken(
-					user.id
-				);
-
-			res.status(HttpStatusCode.OK).json({
-				accessToken,
-				refreshToken
-			});
+			oauth2LoginCallback('google', req, res, next);
 		}
 	);
 
 	const facebookLoginCallback = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			passport.authenticate(
-				'facebook',
-				{ session: false },
-				async (err, user, info, status) => {
-					if (err) next(err);
-
-					if (!user) throw new UnauthorizedError('User not found.');
-
-					// @ts-ignore
-					const [accessToken, refreshToken] =
-						await authTokenService.createAccessTokenAndRefreshToken(
-							user.id
-						);
-
-					res.status(HttpStatusCode.OK).json({
-						accessToken,
-						refreshToken
-					});
-				}
-			)(req, res, next);
+			oauth2LoginCallback('facebook', req, res, next);
 		}
 	);
+
+	function oauth2LoginCallback(
+		provider: string,
+		req: Request,
+		res: Response,
+		next: NextFunction
+	) {
+		passport.authenticate(
+			provider,
+			{ session: false },
+			(err, user, info, status) => {
+				if (err) {
+					logger.error(
+						`Authenticating external user with provider ${provider} failed. Message ${err.message}`
+					);
+					next(err);
+				}
+
+				if (!user || !user.externalId || !user.provider) {
+					logger.error(
+						`Invalid external user information. Message ${err.message}`
+					);
+					throw new UnauthorizedError(
+						AuthErrorMessages.UNAUTHORIZED_INCORRECT_EXTERNAL
+					);
+				}
+
+				authTokenService
+					.createAccessTokenAndRefreshToken(user.id)
+					.then(([accessToken, refreshToken]) => {
+						const redirectUrl = queryString.stringifyUrl({
+							url: config.auth.BASE_FRONTEND_URL,
+							query: {
+								access_token: accessToken,
+								refresh_token: refreshToken
+							}
+						});
+
+						logger.info(
+							`User with id ${user.id} logged in (oauth2, provider: ${provider}) successfully`
+						);
+
+						res.redirect(redirectUrl);
+					})
+					.catch(err => {
+						const redirectUrl = queryString.stringifyUrl({
+							url: config.auth.BASE_FRONTEND_URL,
+							query: {
+								error: err.message.toLowerCase()
+							}
+						});
+
+						logger.error(
+							`User with id ${user.id} logged in (oauth2, provider: ${provider}) failed. Message: ${err.message}`
+						);
+
+						res.redirect(redirectUrl);
+					});
+			}
+		)(req, res, next);
+	}
 
 	const register = catchAsyncRequestHandler(async (req, res, next) => {});
 

@@ -1,18 +1,22 @@
-import { UserDto } from '@src/components/users/@types/dto/User.dto';
-import { UserLoginProvider } from '@src/components/users/@types/UserLoginProvider';
+import { CreateUserDto } from '@components/users/@types/dto/CreateUser.dto';
+import { UserDto } from '@components/users/@types/dto/User.dto';
+import { UserLoginProvider } from '@components/users/@types/UserLoginProvider';
+import { ForgotPasswordDto } from './dto/ForgotPassword.dto';
 import { LoginDto } from './dto/Login.dto';
+import { OAuth2Profile } from './dto/OAuth2Profile';
+import { ResetPasswordDto } from './dto/ResetPassword.dto';
 
 export interface IAuthService {
-	validateLocalUser: (loginDto: LoginDto) => Promise<UserDto>;
+	localLogin: (loginDto: LoginDto) => Promise<UserDto>;
 
-	validateExternalUser: (
-		externalId: string,
+	oauth2ProfileFindOrCreate: (
+		profile: OAuth2Profile,
 		provider: UserLoginProvider
 	) => Promise<UserDto>;
 
-	register: () => {};
+	register: (createUserDto: CreateUserDto) => {};
 
-	forgotPassword: () => {};
+	forgotPassword: (forgotPasswordDto: ForgotPasswordDto) => {};
 
-	resetPassword: () => {};
+	resetPassword: (resetPasswordDto: ResetPasswordDto) => {};
 }

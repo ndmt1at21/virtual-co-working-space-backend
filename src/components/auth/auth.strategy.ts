@@ -2,10 +2,12 @@ import passport from 'passport';
 import config from '@src/config';
 import { Strategy as PassportGoogleStrategy } from 'passport-google-oauth2';
 import { Strategy as PassportFacebookStrategy } from 'passport-facebook';
-import { IUserService } from '@components/users/@types/IUserService';
 import { UserLoginProvider } from '@components/users/@types/UserLoginProvider';
+import { IAuthService } from './@types/IAuthService';
+import { OAuth2Profile } from './@types/dto/OAuth2Profile';
+import { AuthErrorMessages } from './auth.error';
 
-const GoogleStrategy = (userService: IUserService) => {
+const GoogleStrategy = (authService: IAuthService) => {
 	const strategy = new PassportGoogleStrategy(
 		{
 			callbackURL: '/api/v1/auth/google/callback',
@@ -13,27 +15,34 @@ const GoogleStrategy = (userService: IUserService) => {
 			clientSecret: config.auth.GOOGLE_CLIENT_SECRET
 		},
 		(accessToken, refreshToken, profile: any, done) => {
-			userService
-				.findOrCreateUserByExternal({
-					email: profile.emails[0],
-					avatar: profile.picture,
-					externalId: profile.id,
-					provider: UserLoginProvider.GOOGLE,
-					name: profile.displayName
-				})
-				.then(user => {
-					done(null, user);
-				})
-				.catch(err => {
-					done(err, null);
-				});
+			if (profile.emails.length === 0)
+				return done(
+					AuthErrorMessages.LOGIN_EXTERNAL_USER_NOT_FOUND,
+					null
+				);
+
+			const convertedProfile: OAuth2Profile = {
+				email: profile.emails[0],
+				avatar: profile.picture,
+				profileId: profile.id,
+				phone: profile.phone,
+				name: profile.displayName
+			};
+
+			authService
+				.oauth2ProfileFindOrCreate(
+					convertedProfile,
+					UserLoginProvider.GOOGLE
+				)
+				.then(user => done(null, user))
+				.catch(err => done(err, null));
 		}
 	);
 
 	passport.use('google', strategy);
 };
 
-const FacebookStrategy = (userService: IUserService) => {
+const FacebookStrategy = (authService: IAuthService) => {
 	const strategy = new PassportFacebookStrategy(
 		{
 			callbackURL: '/api/v1/auth/facebook/callback',
@@ -41,23 +50,35 @@ const FacebookStrategy = (userService: IUserService) => {
 			clientSecret: config.auth.FACEBOOK_CLIENT_SECRET,
 			profileFields: ['id', 'email', 'displayName', 'name', 'photos']
 		},
-		async function verify(accessToken, refreshToken, profile: any, done) {
-			const user = await userService.findOrCreateUserByExternal({
+		(accessToken, refreshToken, profile: any, done) => {
+			if (profile.emails.length === 0)
+				return done(
+					AuthErrorMessages.LOGIN_EXTERNAL_USER_NOT_FOUND,
+					null
+				);
+
+			const convertedProfile: OAuth2Profile = {
 				email: profile.emails[0].value,
 				avatar: profile.photos[0].value,
-				externalId: profile.id,
-				provider: UserLoginProvider.FACEBOOK,
+				profileId: profile.id,
+				phone: profile.phone,
 				name: profile.displayName
-			});
+			};
 
-			return done(null, user);
+			authService
+				.oauth2ProfileFindOrCreate(
+					convertedProfile,
+					UserLoginProvider.FACEBOOK
+				)
+				.then(user => done(null, user))
+				.catch(err => done(err, null));
 		}
 	);
 
 	passport.use('facebook', strategy);
 };
 
-export const loadStrategies = (userService: IUserService) => {
-	GoogleStrategy(userService);
-	FacebookStrategy(userService);
+export const loadStrategies = (authService: IAuthService) => {
+	GoogleStrategy(authService);
+	FacebookStrategy(authService);
 };

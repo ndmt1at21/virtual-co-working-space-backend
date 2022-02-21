@@ -1,90 +1,56 @@
-import { UserRepository } from '../users/user.repository';
+import { UserRepository } from '@components/users/user.repository';
 import { IAuthService } from './@types/IAuthService';
 import { LoginDto } from './@types/dto/Login.dto';
-import { compareSync } from 'bcrypt';
-import { UnauthorizedError } from '@src/utils/appError';
-import { AuthError } from './auth.error';
 import { IAuthValidate } from './@types/IAuthValidate';
-import { UserStatus } from '@src/@types/UserStatus';
-import { UserLoginProvider } from '../users/@types/UserLoginProvider';
-import { UserDto } from '../users/@types/dto/User.dto';
+import { UserLoginProvider } from '@components/users/@types/UserLoginProvider';
+import { OAuth2Profile } from './@types/dto/OAuth2Profile';
+import { UserDto } from '@components/users/@types/dto/User.dto';
+import { UnauthorizedError } from '@src/utils/appError';
+import { CreateUserDto } from '../users/@types/dto/CreateUser.dto';
+import { ForgotPasswordDto } from './@types/dto/ForgotPassword.dto';
+import { ResetPasswordDto } from './@types/dto/ResetPassword.dto';
 
 export const AuthService = (
 	userRepository: UserRepository,
 	authValidate: IAuthValidate
 ): IAuthService => {
-	const validateLocalUser = async (loginDto: LoginDto): Promise<UserDto> => {
+	const localLogin = async (loginDto: LoginDto): Promise<UserDto> => {
 		const { email, password } = loginDto;
 
+		await authValidate.validateLocalUser(email, password);
 		const user = await userRepository.findUserByEmail(email);
 
-		// check user exists
-		if (!user) {
-			throw new UnauthorizedError(
-				AuthError.UNAUTHORIZED_INCORRECT_EMAIL_OR_PASSWORD
-			);
-		}
-
-		// check login provider
-		if (user.provider !== UserLoginProvider.LOCAL) {
-			throw new UnauthorizedError(
-				AuthError.UNAUTHORIZED_INCORRECT_EMAIL_OR_PASSWORD
-			);
-		}
-
-		// check user status
-		if (user.status === UserStatus.BLOCKED) {
-			throw new UnauthorizedError(AuthError.UNAUTHORIZED_USER_BLOCKED);
-		}
-
-		// TODO: check time that password was updated
-
-		// check password
-		if (!compareSync(password, user!.password!)) {
-			throw new UnauthorizedError(
-				AuthError.UNAUTHORIZED_INCORRECT_EMAIL_OR_PASSWORD
-			);
-		}
-
-		return user;
+		return user!;
 	};
 
-	const validateExternalUser = async (
-		externalId: string,
+	const oauth2ProfileFindOrCreate = async (
+		profile: OAuth2Profile,
 		provider: UserLoginProvider
 	): Promise<UserDto> => {
-		const user = await userRepository.findUserByExternalId(externalId);
+		const { profileId, email } = profile;
 
-		if (!user) {
-			throw new UnauthorizedError(
-				AuthError.UNAUTHORIZED_INCORRECT_EXTERNAL
-			);
-		}
+		const user = await userRepository.findUserByExternalId(
+			profileId,
+			provider
+		);
 
-		// check login provider
-		if (user.provider === provider) {
-			throw new UnauthorizedError(
-				AuthError.UNAUTHORIZED_INCORRECT_EXTERNAL
-			);
-		}
+		if (user) return user;
 
-		// check user status
-		if (user.status === UserStatus.BLOCKED) {
-			throw new UnauthorizedError(AuthError.UNAUTHORIZED_USER_BLOCKED);
-		}
+		const emailExisted = await userRepository.existsUserByEmail(email);
+		if (emailExisted) throw new UnauthorizedError('email existed');
 
-		return user;
+		return await userRepository.save({ ...profile });
 	};
 
-	const register = async () => {};
+	const register = async (createUserDto: CreateUserDto) => {};
 
-	const forgotPassword = async () => {};
+	const forgotPassword = async (forgotPasswordDto: ForgotPasswordDto) => {};
 
-	const resetPassword = async () => {};
+	const resetPassword = async (resetPasswordDto: ResetPasswordDto) => {};
 
 	return {
-		validateLocalUser,
-		validateExternalUser,
+		localLogin,
+		oauth2ProfileFindOrCreate,
 		register,
 		forgotPassword,
 		resetPassword

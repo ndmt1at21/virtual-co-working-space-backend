@@ -19,12 +19,21 @@ export const AuthTokenService = (
 
 	const createAccessToken = (userId: number): string => {
 		return jwt.sign({ userId }, config.auth.JWT_SECRET, {
+			issuer: config.auth.JWT_ISSUER,
 			expiresIn: Date.now() + config.auth.JWT_ACCESS_TOKEN_EXPIRES_TIME,
 			algorithm: 'HS256'
 		});
 	};
 
 	const createRefreshToken = async (userId: number): Promise<string> => {
+		const tokenExisted = await refreshTokenRepository.existsTokenWithUserId(
+			userId
+		);
+
+		if (tokenExisted) {
+			throw new UnauthorizedError('Refresh token existed');
+		}
+
 		const token = crypto
 			.randomBytes(config.auth.REFRESH_TOKEN_LENGTH)
 			.toString('hex');

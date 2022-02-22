@@ -9,13 +9,15 @@ import { ILogger } from '@components/logger/@types/ILogger';
 import { IllegalArgumentError, UnauthorizedError } from '@src/utils/appError';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { IAuthTokenService } from '@components/authToken/@types/IAuthTokenService';
+import { IUserService } from '@components/users/@types/IUserService';
 
 export const AuthController = (
 	authService: IAuthService,
 	authTokenService: IAuthTokenService,
+	userService: IUserService,
 	logger: ILogger
 ) => {
-	const login = catchAsyncRequestHandler(async (req, res, next) => {
+	const localLogin = catchAsyncRequestHandler(async (req, res, next) => {
 		const { email, password } = req.body;
 
 		if (!email || !password) {
@@ -38,6 +40,58 @@ export const AuthController = (
 		res.status(HttpStatusCode.OK).json({
 			accessToken,
 			refreshToken
+		});
+	});
+
+	const localRegister = catchAsyncRequestHandler(async (req, res, next) => {
+		if (!req.body) {
+			logger.error(
+				'Cannot create user: missing information in request body'
+			);
+			throw new IllegalArgumentError(
+				AuthErrorMessages.REGISTER_MISSING_EMAIL
+			);
+		}
+
+		const { email, displayName, password, passwordConfirm } = req.body;
+
+		if (!email) {
+			logger.error('Cannot create user: missing email');
+			throw new IllegalArgumentError(
+				AuthErrorMessages.REGISTER_MISSING_EMAIL
+			);
+		}
+
+		if (!displayName) {
+			logger.error('Cannot create user: missing display name');
+			throw new IllegalArgumentError(
+				AuthErrorMessages.REGISTER_MISSING_DISPLAY_NAME
+			);
+		}
+
+		if (!password || !passwordConfirm) {
+			logger.error(
+				'Cannot create user: missing password or password confirmation'
+			);
+			throw new IllegalArgumentError(
+				AuthErrorMessages.REGISTER_MISSING_PASSWORD_OR_CONFIRM_PASSWORD
+			);
+		}
+
+		const user = await userService.createLocalUser({
+			email,
+			name: displayName,
+			password,
+			passwordConfirm
+		});
+
+		logger.info(
+			`User with email ${email} registered successfully has id ${user.id}`
+		);
+
+		res.status(HttpStatusCode.CREATED).json({
+			user,
+			message: 'User created successfully'
 		});
 	});
 
@@ -132,8 +186,6 @@ export const AuthController = (
 		)(req, res, next);
 	}
 
-	const register = catchAsyncRequestHandler(async (req, res, next) => {});
-
 	const logout = catchAsyncRequestHandler(async (req, res, next) => {});
 
 	const refreshToken = catchAsyncRequestHandler(async (req, res, next) => {});
@@ -147,12 +199,12 @@ export const AuthController = (
 	);
 
 	return {
-		login,
+		localLogin,
+		localRegister,
 		googleLogin,
 		facebookLogin,
 		googleLoginCallback,
 		facebookLoginCallback,
-		register,
 		logout,
 		refreshToken,
 		forgotPassword,

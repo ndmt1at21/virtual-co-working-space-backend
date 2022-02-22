@@ -17,7 +17,8 @@ export const AuthRouter = () => {
 
 	router
 		.use(authMiddleware.restrictToGuest)
-		.post('/login', authController.login)
+		.post('/login', authController.localLogin)
+		.post('/register', authController.localRegister)
 		.get('/google', authController.googleLogin)
 		.get('/facebook', authController.facebookLogin)
 		.get('/google/callback', authController.googleLoginCallback)
@@ -25,7 +26,6 @@ export const AuthRouter = () => {
 
 	router
 		.use(authMiddleware.protect)
-		.post('/register', authController.register)
 		.get('/logout', authController.logout)
 		.post('/refreshToken', authController.refreshToken)
 		.post('/forgot', authController.forgotPassword)

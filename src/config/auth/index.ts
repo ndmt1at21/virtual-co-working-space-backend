@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
 
 export const authConfig = {
+	JWT_ISSUER: 'virtualspace.com',
 	JWT_SECRET: process.env.JWT_SECRET!,
 	JWT_ACCESS_TOKEN_EXPIRES_TIME: +process.env.JWT_ACCESS_TOKEN_EXPIRES_TIME!,
 	REFRESH_TOKEN_EXPIRES_TIME: +process.env.REFRESH_TOKEN_EXPIRES_TIME!,
@@ -13,5 +14,7 @@ export const authConfig = {
 	GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET!,
 
 	FACEBOOK_CLIENT_ID: process.env.FACEBOOK_CLIENT_ID!,
-	FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET!
+	FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET!,
+
+	BASE_FRONTEND_URL: process.env.BASE_FRONTEND_URL!
 };

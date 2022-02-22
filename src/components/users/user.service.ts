@@ -25,7 +25,7 @@ export const UserService = (
 			config.auth.BCRYPT_SALT_ROUNDS
 		);
 
-		const userCreated = await userRepository.create({
+		const userCreated = await userRepository.save({
 			...payload,
 			password: encryptedPassword
 		});
@@ -37,7 +37,8 @@ export const UserService = (
 		payload: CreateUserExternalDto
 	) => {
 		const user = await userRepository.findUserByExternalId(
-			payload.externalId
+			payload.externalId,
+			payload.provider
 		);
 
 		if (user) return userCreator.userEntityToUserDto(user);

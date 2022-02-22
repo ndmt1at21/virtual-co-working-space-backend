@@ -1,6 +1,7 @@
 import { EntityRepository } from 'typeorm';
 import { User } from './user.entity';
 import { BaseRepository } from '@src/components/base/BaseRepository';
+import { UserLoginProvider } from './@types/UserLoginProvider';
 
 @EntityRepository(User)
 export class UserRepository extends BaseRepository<User> {
@@ -12,10 +13,14 @@ export class UserRepository extends BaseRepository<User> {
 		});
 	}
 
-	async findUserByExternalId(externalId: string): Promise<User | undefined> {
+	async findUserByExternalId(
+		externalId: string,
+		provider: UserLoginProvider
+	): Promise<User | undefined> {
 		return await this.findOne({
 			where: {
-				externalId
+				externalId,
+				provider
 			}
 		});
 	}

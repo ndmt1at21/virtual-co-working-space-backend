@@ -22,13 +22,17 @@ export class User extends BaseEntity {
 	@Column({ nullable: true })
 	password?: string;
 
-	@Column()
-	avatar: string;
+	@Column({ nullable: true })
+	avatar?: string;
 
-	@Column({ type: 'enum', enum: UserLoginProvider })
+	@Column({
+		type: 'enum',
+		enum: UserLoginProvider,
+		default: UserLoginProvider.LOCAL
+	})
 	provider: UserLoginProvider;
 
-	@Column({ unique: true, nullable: true, name: 'external_id' })
+	@Column({ nullable: true, name: 'external_id' })
 	externalId?: string;
 
 	@Column({ unique: true, nullable: true, name: 'password_reset_token' })

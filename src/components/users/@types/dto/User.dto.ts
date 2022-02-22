@@ -3,8 +3,8 @@ export type UserDto = {
 	name: string;
 	email: string;
 	phone?: string;
-	avatar: string;
-	provider?: string;
+	avatar?: string;
+	provider: string;
 	externalId?: string;
 	status: string;
 	createdAt: Date;

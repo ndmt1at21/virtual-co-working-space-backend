@@ -4,7 +4,7 @@ import { globalErrorHandlerDev } from './globalErrorHandlerDev';
 import { globalErrorHandlerProd } from './globalErrorHandlerProd';
 
 export const globalErrorHandler: ErrorRequestHandler = (
-	err: Error,
+	err,
 	req,
 	res,
 	next

@@ -1,5 +1,9 @@
 import { ErrorRequestHandler } from 'express';
-import { NotFoundError, IllegalArgumentError } from '@src/utils/appError';
+import {
+	NotFoundError,
+	IllegalArgumentError,
+	UnauthorizedError
+} from '@src/utils/appError';
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 
 export const globalErrorHandlerDev: ErrorRequestHandler = (
@@ -14,6 +18,8 @@ export const globalErrorHandlerDev: ErrorRequestHandler = (
 			stack: err.stack,
 			error: err
 		});
+
+		return;
 	}
 
 	if (err instanceof IllegalArgumentError) {
@@ -22,9 +28,21 @@ export const globalErrorHandlerDev: ErrorRequestHandler = (
 			stack: err.stack,
 			error: err
 		});
+
+		return;
 	}
 
-	res.status(500).json({
+	if (err instanceof UnauthorizedError) {
+		res.status(HttpStatusCode.UNAUTHORIZED).json({
+			message: err.message,
+			stack: err.stack,
+			error: err
+		});
+
+		return;
+	}
+
+	res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
 		message: err.message,
 		stack: err.stack,
 		error: err

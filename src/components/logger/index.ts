@@ -14,8 +14,8 @@ const defaultFormat = format.combine(
 const commonOptions = {
 	filename: 'logs/log.log',
 	format: defaultFormat,
-	maxFiles: 100,
-	maxsize: 10 * 1024 * 1024
+	maxFiles: 1000,
+	maxsize: 5 * 1024 * 1024
 };
 
 const debugOptions = {
@@ -24,7 +24,7 @@ const debugOptions = {
 };
 
 export const serverLogger = createLogger({
-	defaultMeta: 'server',
+	defaultMeta: { service: 'server' },
 	transports: [
 		new transports.File(commonOptions),
 		new transports.Console(debugOptions)
@@ -32,7 +32,7 @@ export const serverLogger = createLogger({
 });
 
 export const userLogger = createLogger({
-	defaultMeta: 'user-service',
+	defaultMeta: { service: 'user-service' },
 	transports: [
 		new transports.File(commonOptions),
 		new transports.Console(debugOptions)
@@ -40,7 +40,7 @@ export const userLogger = createLogger({
 });
 
 export const authLogger = createLogger({
-	defaultMeta: 'auth-service',
+	defaultMeta: { service: 'auth-service' },
 	transports: [
 		new transports.File(commonOptions),
 		new transports.Console(debugOptions)
@@ -48,7 +48,7 @@ export const authLogger = createLogger({
 });
 
 export const messageService = createLogger({
-	defaultMeta: 'message-service',
+	defaultMeta: { service: 'message-service' },
 	transports: [
 		new transports.File(commonOptions),
 		new transports.Console(debugOptions)

@@ -7,9 +7,21 @@ export interface IAuthTokenService {
 
 	createRefreshToken: (userId: number) => Promise<string>;
 
+	getUserIdFromAccessToken: (token: string) => Promise<number>;
+
+	blockRefreshToken: (refreshToken: string) => Promise<void>;
+
+	deleteRefreshToken: (refreshToken: string) => Promise<void>;
+
 	validateAccessToken: (token: string) => Promise<boolean>;
 
-	validateRefreshToken: (refreshToken: string) => Promise<boolean>;
+	validateRefreshToken: (
+		userId: number,
+		refreshToken: string
+	) => Promise<boolean>;
 
-	getUserIdFromAccessToken: (token: string) => Promise<number>;
+	validateRefreshTokenCanRenewAccessToken: (
+		userId: number,
+		refreshToken: string
+	) => Promise<boolean>;
 }

@@ -45,23 +45,12 @@ export class UserRepository extends BaseRepository<User> {
 		return count === 1;
 	}
 
-	async existsUserByGoogleId(googleId: string): Promise<boolean> {
-		const count = await this.count({
-			where: {
-				googleId
+	async updatePasswordByUserId(userId: number, password: string) {
+		await this.update(
+			{ id: userId },
+			{
+				password
 			}
-		});
-
-		return count === 1;
-	}
-
-	async existsUserByFacebookId(facebookId: string): Promise<boolean> {
-		const count = await this.count({
-			where: {
-				facebookId
-			}
-		});
-
-		return count === 1;
+		);
 	}
 }

@@ -3,15 +3,18 @@ import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { IAuthTokenService } from '@components/authToken/@types/IAuthTokenService';
 import { AuthErrorMessages } from './auth.error';
 import { IAuthValidate } from './@types/IAuthValidate';
+import { HeaderConstants } from '@src/constant/headerConstants';
 
 export const AuthMiddleware = (
 	userRepository: UserRepository,
 	authTokenService: IAuthTokenService,
-	authValidateService: IAuthValidate
+	authValidate: IAuthValidate
 ) => {
 	const deserializeUser = catchAsyncRequestHandler(async (req, res, next) => {
-		const accessToken = req.headers['x-access-token'] as string;
-		const refreshToken = req.headers['x-refresh-token'] as string;
+		const accessToken = req.headers[HeaderConstants.ACCESS_TOKEN] as string;
+		const refreshToken = req.headers[
+			HeaderConstants.REFRESH_TOKEN
+		] as string;
 
 		if (!accessToken || !refreshToken) {
 			next();
@@ -27,16 +30,17 @@ export const AuthMiddleware = (
 			);
 
 			// validate refresh token
-			await authTokenService.validateRefreshToken(refreshToken);
+			await authTokenService.validateRefreshToken(userId, refreshToken);
 
 			// validate user
-			await authValidateService.validateUserById(userId);
+			await authValidate.validateUserCanAccessResourceById(userId);
 
 			// retrieve user
 			const user = await userRepository.findById(userId);
 
 			// Assign to req.user
-			req.user = user;
+			const { id, email, type } = user!;
+			req.user = { id, email, roles: [type] };
 
 			next();
 		}

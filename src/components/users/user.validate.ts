@@ -1,5 +1,6 @@
 import { IllegalArgumentError } from '@src/utils/appError';
 import { CreateUserDto } from './@types/dto/CreateUser.dto';
+import { UpdatePasswordDto } from './@types/dto/UpdatePassword.dto';
 import { IUserValidate } from './@types/IUserValidate';
 import { UserErrorMessage } from './user.error';
 import { UserRepository } from './user.repository';
@@ -10,6 +11,15 @@ export const UserValidate = (userRepository: UserRepository): IUserValidate => {
 
 		await checkPasswordMatch(password, passwordConfirm);
 		await checkUniqueEmail(email);
+	};
+
+	const checkUpdatePasswordData = async (
+		userId: number,
+		data: UpdatePasswordDto
+	) => {
+		const { password, confirmPassword } = data;
+		await checkUserExistsById(userId);
+		await checkPasswordMatch(password, confirmPassword);
 	};
 
 	const checkUserExistsById = async (id: number) => {
@@ -46,5 +56,10 @@ export const UserValidate = (userRepository: UserRepository): IUserValidate => {
 		}
 	};
 
-	return { checkCreateUserData, checkUserExistsById, checkUserExistsByEmail };
+	return {
+		checkCreateUserData,
+		checkUpdatePasswordData,
+		checkUserExistsById,
+		checkUserExistsByEmail
+	};
 };

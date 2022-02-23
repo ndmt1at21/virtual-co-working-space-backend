@@ -7,27 +7,27 @@ import { AuthController } from './auth.controller';
 import { AuthMiddleware } from './auth.middleware';
 import { AuthService } from './auth.service';
 import { AuthValidate } from './auth.validate';
+import { createPasswordResetTokenService } from '../passwordResetToken/passwordResetToken.factory';
 
 export function createAuthController() {
 	const authService = createAuthService();
-	const authTokenService = createAuthTokenService();
-	const userService = createUserService();
-
-	const authController = AuthController(
-		authService,
-		authTokenService,
-		userService,
-		authLogger
-	);
+	const authController = AuthController(authService, authLogger);
 
 	return authController;
 }
 
 export function createAuthService() {
-	const userRepository = getCustomRepository(UserRepository);
+	const userService = createUserService();
+	const passwordResetTokenService = createPasswordResetTokenService();
+	const authTokenService = createAuthTokenService();
 	const authValidate = createAuthValidate();
 
-	return AuthService(userRepository, authValidate);
+	return AuthService(
+		userService,
+		authTokenService,
+		passwordResetTokenService,
+		authValidate
+	);
 }
 
 export function createAuthMiddleware() {

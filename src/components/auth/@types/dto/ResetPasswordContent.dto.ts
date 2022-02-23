@@ -1,11 +1,7 @@
 import { Expose } from 'class-transformer';
 import { IsDefined } from 'class-validator';
 
-export class ResetPasswordDto {
-	@IsDefined()
-	@Expose()
-	resetToken: string;
-
+export class ResetPasswordContentDto {
 	@IsDefined()
 	@Expose()
 	password: string;

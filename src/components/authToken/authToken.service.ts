@@ -5,11 +5,12 @@ import util from 'util';
 import { RefreshTokenRepository } from '../refreshToken/refreshToken.repository';
 import { UnauthorizedError } from '@src/utils/appError';
 import { AuthTokenErrorMessages } from './authToken.error';
-import { RefreshTokenStatus } from '../refreshToken/@types/RefreshTokenStatus';
 import { IAuthTokenService } from './@types/IAuthTokenService';
+import { IAuthTokenValidate } from './@types/IAuthTokenValidate';
 
 export const AuthTokenService = (
-	refreshTokenRepository: RefreshTokenRepository
+	refreshTokenRepository: RefreshTokenRepository,
+	authTokenValidate: IAuthTokenValidate
 ): IAuthTokenService => {
 	const createAccessTokenAndRefreshToken = async (
 		userId: number
@@ -26,14 +27,6 @@ export const AuthTokenService = (
 	};
 
 	const createRefreshToken = async (userId: number): Promise<string> => {
-		const tokenExisted = await refreshTokenRepository.existsTokenWithUserId(
-			userId
-		);
-
-		if (tokenExisted) {
-			throw new UnauthorizedError('Refresh token existed');
-		}
-
 		const token = crypto
 			.randomBytes(config.auth.REFRESH_TOKEN_LENGTH)
 			.toString('hex');
@@ -47,6 +40,23 @@ export const AuthTokenService = (
 		});
 
 		return token;
+	};
+
+	const blockRefreshToken = async (refreshToken: string): Promise<void> => {
+		await refreshTokenRepository.blockByToken(refreshToken);
+	};
+
+	const deleteRefreshToken = async (refreshToken: string): Promise<void> => {
+		await refreshTokenRepository.deleteByToken(refreshToken);
+	};
+
+	const getUserIdFromAccessToken = async (token: string): Promise<number> => {
+		const payload = (await util.promisify(jwt.verify)(
+			token,
+			config.auth.JWT_SECRET
+		)) as jwt.JwtPayload;
+
+		return +payload.userId;
 	};
 
 	const validateAccessToken = async (token: string): Promise<boolean> => {
@@ -65,51 +75,38 @@ export const AuthTokenService = (
 	};
 
 	const validateRefreshToken = async (
+		userId: number,
 		refreshToken: string
 	): Promise<boolean> => {
-		const refreshTokenEntity = await refreshTokenRepository.findByToken(
-			refreshToken
-		);
-
-		if (!refreshTokenEntity) {
-			throw new UnauthorizedError(
-				AuthTokenErrorMessages.INVALID_REFRESH_TOKEN
+		const refreshTokenEntity =
+			await refreshTokenRepository.findByTokenAndUserId(
+				userId,
+				refreshToken
 			);
-		}
 
-		if (refreshTokenEntity.status === RefreshTokenStatus.BLOCKED) {
-			throw new UnauthorizedError(
-				AuthTokenErrorMessages.INVALID_REFRESH_TOKEN
-			);
-		}
-
-		if (
-			refreshTokenEntity.expiresAt.getMilliseconds() <
-			new Date().getMilliseconds()
-		) {
-			throw new UnauthorizedError(
-				AuthTokenErrorMessages.INVALID_REFRESH_TOKEN
-			);
-		}
+		authTokenValidate.checkRefreshTokenExists(refreshTokenEntity);
+		authTokenValidate.checkRefreshTokenActive(refreshTokenEntity!);
+		authTokenValidate.checkRefreshTokenNotExpired(refreshTokenEntity!);
 
 		return true;
 	};
 
-	const getUserIdFromAccessToken = async (token: string): Promise<number> => {
-		const payload = (await util.promisify(jwt.verify)(
-			token,
-			config.auth.JWT_SECRET
-		)) as jwt.JwtPayload;
-
-		return +payload.userId;
+	const validateRefreshTokenCanRenewAccessToken = async (
+		userId: number,
+		refreshToken: string
+	): Promise<boolean> => {
+		return await validateRefreshToken(userId, refreshToken);
 	};
 
 	return {
 		createAccessTokenAndRefreshToken,
 		createAccessToken,
 		createRefreshToken,
+		blockRefreshToken,
+		deleteRefreshToken,
 		validateAccessToken,
 		validateRefreshToken,
+		validateRefreshTokenCanRenewAccessToken,
 		getUserIdFromAccessToken
 	};
 };

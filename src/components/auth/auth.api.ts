@@ -1,35 +1,34 @@
 import { Router } from 'express';
 import { loadStrategies } from './auth.strategy';
-import {
-	createAuthController,
-	createAuthMiddleware,
-	createAuthService
-} from './auth.factory';
+import { createAuthController, createAuthMiddleware } from './auth.factory';
 
 export const AuthRouter = () => {
-	const authService = createAuthService();
-	const authMiddleware = createAuthMiddleware();
 	const authController = createAuthController();
+	const { restrictToGuest, protect } = createAuthMiddleware();
 
-	loadStrategies(authService);
+	loadStrategies();
 
 	const router = Router();
 
 	router
-		.use(authMiddleware.restrictToGuest)
-		.post('/login', authController.localLogin)
-		.post('/register', authController.localRegister)
-		.get('/google', authController.googleLogin)
-		.get('/facebook', authController.facebookLogin)
-		.get('/google/callback', authController.googleLoginCallback)
-		.get('/facebook/callback', authController.facebookLoginCallback);
-
-	router
-		.use(authMiddleware.protect)
-		.get('/logout', authController.logout)
-		.post('/refreshToken', authController.refreshToken)
-		.post('/forgot', authController.forgotPassword)
-		.patch('/reset/:token', authController.resetPassword);
+		.post('/login', restrictToGuest, authController.localLogin)
+		.post('/register', restrictToGuest, authController.localRegister)
+		.get('/google', restrictToGuest, authController.googleLogin)
+		.get('/facebook', restrictToGuest, authController.facebookLogin)
+		.get(
+			'/google/callback',
+			restrictToGuest,
+			authController.googleLoginCallback
+		)
+		.get(
+			'/facebook/callback',
+			restrictToGuest,
+			authController.facebookLoginCallback
+		)
+		.post('/forgot', restrictToGuest, authController.forgotPassword)
+		.patch('/reset/:token', restrictToGuest, authController.resetPassword)
+		.post('/refreshToken', protect, authController.refreshAccessToken)
+		.get('/logout', protect, authController.logout);
 
 	return router;
 };

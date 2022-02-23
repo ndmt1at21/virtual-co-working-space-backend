@@ -1,6 +1,7 @@
 import passport from 'passport';
 import config from '@src/config';
 import queryString from 'query-string';
+import events from 'events';
 import { NextFunction, Request, Response } from 'express';
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { AuthErrorMessages } from './auth.error';
@@ -8,86 +9,53 @@ import { IAuthService } from './@types/IAuthService';
 import { ILogger } from '@components/logger/@types/ILogger';
 import { IllegalArgumentError, UnauthorizedError } from '@src/utils/appError';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
-import { IAuthTokenService } from '@components/authToken/@types/IAuthTokenService';
-import { IUserService } from '@components/users/@types/IUserService';
+import { HeaderConstants } from '@src/constant/headerConstants';
+import { OAuth2ProfileDto } from './@types/dto/OAuth2Profile.dto';
+import { validateRequestBody } from '@src/utils/requestValidation';
+import { LoginDto } from './@types/dto/Login.dto';
+import { CreateUserDto } from '../users/@types/dto/CreateUser.dto';
+import { ResetPasswordContentDto } from './@types/dto/ResetPasswordContent.dto';
+import { ForgotPasswordDto } from './@types/dto/ForgotPassword.dto';
+import { RegisterDto } from './@types/dto/Register.dto';
 
-export const AuthController = (
-	authService: IAuthService,
-	authTokenService: IAuthTokenService,
-	userService: IUserService,
-	logger: ILogger
-) => {
+export const AuthController = (authService: IAuthService, logger: ILogger) => {
+	const eventEmitter = new events.EventEmitter();
+
 	const localLogin = catchAsyncRequestHandler(async (req, res, next) => {
-		const { email, password } = req.body;
-
-		if (!email || !password) {
-			logger.error('Cannot delete user: missing email or password');
-			throw new IllegalArgumentError(
-				AuthErrorMessages.LOGIN_MISSING_EMAIL_PASSWORD
-			);
+		const err = await validateRequestBody(LoginDto, req.body);
+		if (err) {
+			logger.error(`User cannot login: ${err}`);
+			throw new IllegalArgumentError(err);
 		}
 
-		const user = await authService.localLogin({
-			email,
-			password
-		});
-
-		const [accessToken, refreshToken] =
-			await authTokenService.createAccessTokenAndRefreshToken(user.id);
+		const loginDto = req.body as LoginDto;
+		const [user, { accessToken, refreshToken }] =
+			await authService.localLogin(loginDto);
 
 		logger.info(`User with id ${user.id} logged in successfully`);
 
 		res.status(HttpStatusCode.OK).json({
+			user,
 			accessToken,
 			refreshToken
 		});
 	});
 
 	const localRegister = catchAsyncRequestHandler(async (req, res, next) => {
-		if (!req.body) {
-			logger.error(
-				'Cannot create user: missing information in request body'
-			);
-			throw new IllegalArgumentError(
-				AuthErrorMessages.REGISTER_MISSING_EMAIL
-			);
+		const err = await validateRequestBody(RegisterDto, req.body);
+		if (err) {
+			logger.error(`User create login: ${err}`);
+			throw new IllegalArgumentError(err);
 		}
 
-		const { email, displayName, password, passwordConfirm } = req.body;
-
-		if (!email) {
-			logger.error('Cannot create user: missing email');
-			throw new IllegalArgumentError(
-				AuthErrorMessages.REGISTER_MISSING_EMAIL
-			);
-		}
-
-		if (!displayName) {
-			logger.error('Cannot create user: missing display name');
-			throw new IllegalArgumentError(
-				AuthErrorMessages.REGISTER_MISSING_DISPLAY_NAME
-			);
-		}
-
-		if (!password || !passwordConfirm) {
-			logger.error(
-				'Cannot create user: missing password or password confirmation'
-			);
-			throw new IllegalArgumentError(
-				AuthErrorMessages.REGISTER_MISSING_PASSWORD_OR_CONFIRM_PASSWORD
-			);
-		}
-
-		const user = await userService.createLocalUser({
-			email,
-			name: displayName,
-			password,
-			passwordConfirm
-		});
+		const registerDto = req.body as RegisterDto;
+		const user = await authService.localRegister(registerDto);
 
 		logger.info(
-			`User with email ${email} registered successfully has id ${user.id}`
+			`User with email ${user.email} registered successfully has id ${user.id}`
 		);
+
+		eventEmitter.emit('user registered', user);
 
 		res.status(HttpStatusCode.CREATED).json({
 			user,
@@ -125,6 +93,110 @@ export const AuthController = (
 		}
 	);
 
+	const logout = catchAsyncRequestHandler(async (req, res, next) => {
+		const refreshToken = req.headers[
+			HeaderConstants.REFRESH_TOKEN
+		] as string;
+
+		if (!refreshToken) {
+			logger.error('Cannot logout: missing refresh token');
+			throw new IllegalArgumentError(
+				AuthErrorMessages.LOGOUT_MISSING_REFRESH_TOKEN
+			);
+		}
+
+		await authService.logout(refreshToken);
+
+		res.status(HttpStatusCode.OK).json({
+			message: 'User logged out successfully'
+		});
+	});
+
+	const refreshAccessToken = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			const currentRefreshToken = req.headers[
+				HeaderConstants.REFRESH_TOKEN
+			] as string;
+
+			if (!currentRefreshToken) {
+				logger.error(
+					'Cannot refresh access token: missing refresh token'
+				);
+				throw new IllegalArgumentError(
+					AuthErrorMessages.REFRESH_ACCESS_TOKEN_MISSING_REFRESH_TOKEN
+				);
+			}
+
+			const userId = req.user!.id;
+			const { accessToken, refreshToken } =
+				await authService.refreshAccessToken(
+					userId,
+					currentRefreshToken
+				);
+
+			res.status(HttpStatusCode.OK).json({
+				message: 'Access token renew successfully',
+				accessToken,
+				refreshToken
+			});
+		}
+	);
+
+	const forgotPassword = catchAsyncRequestHandler(async (req, res, next) => {
+		const err = await validateRequestBody(ForgotPasswordDto, req.body);
+		if (err) {
+			logger.error(`Cannot reset password: ${err}`);
+			throw new IllegalArgumentError(err);
+		}
+
+		const forgotPasswordDto = req.body as ForgotPasswordDto;
+		const resetToken = await authService.forgotPassword(forgotPasswordDto);
+
+		logger.info(
+			`Reset password token sent to email ${forgotPasswordDto.email}`
+		);
+
+		eventEmitter.emit('password reset', {
+			email: forgotPasswordDto.email,
+			resetToken: resetToken.passwordResetToken
+		});
+
+		res.status(HttpStatusCode.OK).json({
+			message: 'Password reset token created successfully',
+			resetToken: resetToken.passwordResetToken
+		});
+	});
+
+	const resetPassword = catchAsyncRequestHandler(async (req, res, next) => {
+		const resetToken = req.params.token as string;
+		if (!resetToken) {
+			logger.error('Cannot reset password: missing reset token');
+			throw new IllegalArgumentError(
+				AuthErrorMessages.RESET_PASSWORD_MISSING_RESET_TOKEN
+			);
+		}
+
+		const err = await validateRequestBody(
+			ResetPasswordContentDto,
+			req.body
+		);
+		if (err) {
+			logger.error(`Cannot reset password: ${err}`);
+			throw new IllegalArgumentError(err);
+		}
+
+		const resetPasswordContentDto = req.body as ResetPasswordContentDto;
+
+		await authService.resetPassword({
+			resetToken,
+			...resetPasswordContentDto
+		});
+
+		res.status(HttpStatusCode.OK).json({
+			message: 'Password reset successfully'
+		});
+	});
+
 	function oauth2LoginCallback(
 		provider: string,
 		req: Request,
@@ -142,7 +214,9 @@ export const AuthController = (
 					next(err);
 				}
 
-				if (!user || !user.externalId || !user.provider) {
+				const profile = user as OAuth2ProfileDto;
+
+				if (!profile) {
 					logger.error(
 						`Invalid external user information. Message ${err.message}`
 					);
@@ -151,9 +225,9 @@ export const AuthController = (
 					);
 				}
 
-				authTokenService
-					.createAccessTokenAndRefreshToken(user.id)
-					.then(([accessToken, refreshToken]) => {
+				authService
+					.oauth2LoginCallback(profile)
+					.then(([user, { accessToken, refreshToken }]) => {
 						const redirectUrl = queryString.stringifyUrl({
 							url: config.auth.BASE_FRONTEND_URL,
 							query: {
@@ -163,7 +237,9 @@ export const AuthController = (
 						});
 
 						logger.info(
-							`User with id ${user.id} logged in (oauth2, provider: ${provider}) successfully`
+							`User with id ${
+								user!.id
+							} logged in (oauth2, provider: ${provider}) successfully`
 						);
 
 						res.redirect(redirectUrl);
@@ -186,18 +262,6 @@ export const AuthController = (
 		)(req, res, next);
 	}
 
-	const logout = catchAsyncRequestHandler(async (req, res, next) => {});
-
-	const refreshToken = catchAsyncRequestHandler(async (req, res, next) => {});
-
-	const forgotPassword = catchAsyncRequestHandler(
-		async (req, res, next) => {}
-	);
-
-	const resetPassword = catchAsyncRequestHandler(
-		async (req, res, next) => {}
-	);
-
 	return {
 		localLogin,
 		localRegister,
@@ -206,7 +270,7 @@ export const AuthController = (
 		googleLoginCallback,
 		facebookLoginCallback,
 		logout,
-		refreshToken,
+		refreshAccessToken,
 		forgotPassword,
 		resetPassword
 	};

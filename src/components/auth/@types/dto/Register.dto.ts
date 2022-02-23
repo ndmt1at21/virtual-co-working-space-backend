@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
-import { IsDefined, IsEmail } from 'class-validator';
+import { IsDefined } from 'class-validator';
 
-export class CreateUserDto {
+export class RegisterDto {
 	@IsDefined()
 	@Expose()
 	name: string;

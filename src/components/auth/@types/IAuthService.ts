@@ -1,22 +1,31 @@
-import { CreateUserDto } from '@components/users/@types/dto/CreateUser.dto';
 import { UserDto } from '@components/users/@types/dto/User.dto';
-import { UserLoginProvider } from '@components/users/@types/UserLoginProvider';
+import { PasswordResetTokenDto } from '@src/components/passwordResetToken/@types/dto/PasswordResetToken.dto';
+import { CreateUserDto } from '@src/components/users/@types/dto/CreateUser.dto';
+import { CredentialsDto } from './dto/Credentials.dto';
 import { ForgotPasswordDto } from './dto/ForgotPassword.dto';
 import { LoginDto } from './dto/Login.dto';
-import { OAuth2Profile } from './dto/OAuth2Profile';
+import { OAuth2ProfileDto } from './dto/OAuth2Profile.dto';
 import { ResetPasswordDto } from './dto/ResetPassword.dto';
 
 export interface IAuthService {
-	localLogin: (loginDto: LoginDto) => Promise<UserDto>;
+	localLogin: (loginDto: LoginDto) => Promise<[UserDto, CredentialsDto]>;
 
-	oauth2ProfileFindOrCreate: (
-		profile: OAuth2Profile,
-		provider: UserLoginProvider
-	) => Promise<UserDto>;
+	oauth2LoginCallback: (
+		profile: OAuth2ProfileDto
+	) => Promise<[UserDto, CredentialsDto]>;
 
-	register: (createUserDto: CreateUserDto) => {};
+	localRegister: (createUserDto: CreateUserDto) => Promise<UserDto>;
 
-	forgotPassword: (forgotPasswordDto: ForgotPasswordDto) => {};
+	refreshAccessToken: (
+		userId: number,
+		refreshToken: string
+	) => Promise<CredentialsDto>;
 
-	resetPassword: (resetPasswordDto: ResetPasswordDto) => {};
+	logout: (refreshToken: string) => Promise<void>;
+
+	forgotPassword: (
+		forgotPasswordDto: ForgotPasswordDto
+	) => Promise<PasswordResetTokenDto>;
+
+	resetPassword: (resetPasswordDto: ResetPasswordDto) => Promise<void>;
 }

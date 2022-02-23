@@ -1,8 +1,8 @@
-import { UserRoleType } from '@src/@types/UserRoleType';
-import { UserStatus } from '@src/@types/UserStatus';
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '@src/components/base/BaseEntity';
 import { UserLoginProvider } from './@types/UserLoginProvider';
+import { UserRoleType } from './@types/UserRoleType';
+import { UserStatus } from './@types/UserStatus';
 
 @Entity({ name: 'user' })
 export class User extends BaseEntity {
@@ -34,12 +34,6 @@ export class User extends BaseEntity {
 
 	@Column({ nullable: true, name: 'external_id' })
 	externalId?: string;
-
-	@Column({ unique: true, nullable: true, name: 'password_reset_token' })
-	passwordResetToken?: string;
-
-	@Column({ nullable: true, name: 'password_reset_token_expired' })
-	passwordResetTokenExpired?: Date;
 
 	@Column({ type: 'enum', enum: UserRoleType, default: UserRoleType.USER })
 	type: UserRoleType;

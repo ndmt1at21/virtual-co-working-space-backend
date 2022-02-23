@@ -1,5 +1,15 @@
-export type IAuthValidate = {
-	validateUserById: (id: number) => Promise<boolean>;
+import { LoginDto } from './dto/Login.dto';
+import { OAuth2ProfileDto } from './dto/OAuth2Profile.dto';
+import { ResetPasswordDto } from './dto/ResetPassword.dto';
 
-	validateLocalUser: (email: string, password: string) => Promise<boolean>;
+export type IAuthValidate = {
+	validateUserCanAccessResourceById: (id: number) => Promise<boolean>;
+
+	validateLocalUserCanLogin: (loginDto: LoginDto) => Promise<boolean>;
+
+	validateExternalUserCanLogin: (
+		profile: OAuth2ProfileDto
+	) => Promise<boolean>;
+
+	validateUserForgotPassword: (email: string) => Promise<boolean>;
 };

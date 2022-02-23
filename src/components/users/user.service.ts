@@ -1,4 +1,5 @@
-import { UserStatus } from '@src/@types/UserStatus';
+import config from '@src/config';
+import { hashSync } from 'bcrypt';
 import { CreateUserDto } from './@types/dto/CreateUser.dto';
 import { UpdateUserDto } from './@types/dto/UpdateUser.dto';
 import { UserDto } from './@types/dto/User.dto';
@@ -6,14 +7,16 @@ import { IUserCreator } from './@types/IUserCreator';
 import { IUserService } from './@types/IUserService';
 import { IUserValidate } from './@types/IUserValidate';
 import { UserRepository } from './user.repository';
-import { hashSync } from 'bcrypt';
-import config from '@src/config';
 import { CreateUserExternalDto } from './@types/dto/CreateUserExternal.dto';
+import { UserStatus } from './@types/UserStatus';
+import { UpdatePasswordDto } from './@types/dto/UpdatePassword.dto';
+import { IPasswordEncoder } from '../passwordEncoder/@types/IPasswordEncoder';
 
 export const UserService = (
 	userRepository: UserRepository,
 	userValidate: IUserValidate,
-	userCreator: IUserCreator
+	userCreator: IUserCreator,
+	passwordEncoder: IPasswordEncoder
 ): IUserService => {
 	const createLocalUser = async (
 		payload: CreateUserDto
@@ -76,6 +79,23 @@ export const UserService = (
 		});
 	};
 
+	const updatePasswordById = async (
+		id: number,
+		updatePasswordDto: UpdatePasswordDto
+	): Promise<UserDto> => {
+		await userValidate.checkUpdatePasswordData(id, updatePasswordDto);
+
+		const user = await userRepository.findById(id);
+		const hashPassword = passwordEncoder.encode(updatePasswordDto.password);
+
+		const updatedUser = await userRepository.save({
+			...user!,
+			password: hashPassword
+		});
+
+		return userCreator.userEntityToUserDto(updatedUser);
+	};
+
 	const deleteUserById = async (id: number): Promise<void> => {
 		await userValidate.checkUserExistsById(id);
 		await userRepository.softDelete(id);
@@ -98,6 +118,7 @@ export const UserService = (
 		findUserById,
 		findUserByEmail,
 		updateUserById,
+		updatePasswordById,
 		deleteUserById,
 		blockUserById
 	};

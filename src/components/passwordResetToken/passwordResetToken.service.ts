@@ -5,9 +5,11 @@ import { PasswordResetTokenDto } from './@types/dto/PasswordResetToken.dto';
 import { IPasswordResetTokenService } from './@types/IPasswordService';
 import { PasswordResetTokenMessages } from './passwordResetToken.error';
 import { PasswordResetTokenRepository } from './passwordResetToken.repository';
+import { IPasswordResetTokenCreator } from './@types/IPasswordResetTokenCreator';
 
 export const PasswordResetTokenService = (
-	passwordResetTokenRepository: PasswordResetTokenRepository
+	passwordResetTokenRepository: PasswordResetTokenRepository,
+	passwordResetTokenCreator: IPasswordResetTokenCreator
 ): IPasswordResetTokenService => {
 	const findByToken = async (
 		token: string
@@ -20,7 +22,9 @@ export const PasswordResetTokenService = (
 			throw new NotFoundError(PasswordResetTokenMessages.TOKEN_INVALID);
 		}
 
-		return resetToken;
+		return passwordResetTokenCreator.mapPasswordResetTokenToPasswordResetTokenDto(
+			resetToken
+		);
 	};
 
 	const createToken = async (
@@ -43,7 +47,9 @@ export const PasswordResetTokenService = (
 			)
 		});
 
-		return createdToken;
+		return passwordResetTokenCreator.mapPasswordResetTokenToPasswordResetTokenDto(
+			createdToken
+		);
 	};
 
 	const validatePasswordResetToken = async (token: string) => {

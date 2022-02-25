@@ -4,6 +4,8 @@ import { connectDatabase } from './loaders/app.database';
 import { appRoutes } from './loaders/app.routes';
 import { ILogger } from '@components/logger/@types/ILogger';
 import { globalErrorHandler } from '../globalHandlerError';
+import { Server as HttpServer } from 'http';
+import { Server as SocketServer } from 'socket.io';
 
 export const appLoaders = async (
 	app: Application,
@@ -22,13 +24,13 @@ export const appLoaders = async (
 	logger.info('Global error handler has been loaded.');
 };
 
-export const serverLoaders = (
+export const httpServerLoader = (
 	port: string | number,
-	app: Application,
+	server: HttpServer,
 	logger: ILogger
 ) => {
-	const server = app.listen(port, () => {
-		logger.info(`Server is listening on port ${port}`);
+	server.listen(port, () => {
+		logger.info(`Http server is listening on port ${port}`);
 	});
 
 	process.on('uncaughtException', err => {
@@ -37,4 +39,13 @@ export const serverLoaders = (
 			process.exit(1);
 		});
 	});
+};
+
+export const socketServerLoader = (
+	server: HttpServer,
+	logger: ILogger
+): SocketServer => {
+	const socketServer = new SocketServer(server);
+	logger.info(`Socket server is started`);
+	return socketServer;
 };

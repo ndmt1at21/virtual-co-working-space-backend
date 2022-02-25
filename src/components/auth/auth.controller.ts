@@ -156,7 +156,7 @@ export const AuthController = (authService: IAuthService, logger: ILogger) => {
 			`Reset password token sent to email ${forgotPasswordDto.email}`
 		);
 
-		eventEmitter.emit('password reset', {
+		eventEmitter.emit('forgot password', {
 			email: forgotPasswordDto.email,
 			resetToken: resetToken.passwordResetToken
 		});

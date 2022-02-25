@@ -1,4 +1,4 @@
 import mongoConfig from './mongo';
 import postgresConfig from './postgres';
 
-export { mongoConfig, postgresConfig };
+export default { mongo: mongoConfig, pg: postgresConfig };

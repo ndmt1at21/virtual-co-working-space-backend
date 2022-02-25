@@ -26,7 +26,9 @@ export const AuthRouter = () => {
 			authController.facebookLoginCallback
 		)
 		.post('/forgot', restrictToGuest, authController.forgotPassword)
-		.patch('/reset/:token', restrictToGuest, authController.resetPassword)
+		.patch('/reset/:token', restrictToGuest, authController.resetPassword);
+
+	router
 		.post('/refreshToken', protect, authController.refreshAccessToken)
 		.get('/logout', protect, authController.logout);
 

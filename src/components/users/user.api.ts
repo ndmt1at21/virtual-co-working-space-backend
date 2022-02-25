@@ -1,16 +1,10 @@
 import { Router } from 'express';
 import { UserController } from './user.controller';
-import { UserCreator } from './user.creator';
-import { UserRepository } from './user.repository';
-import { UserService } from './user.service';
-import { UserValidate } from './user.validate';
+import { createUserService } from './user.factory';
 
 const router = Router();
 
-const userRepository = new UserRepository();
-const userValidate = UserValidate(userRepository);
-const userCreator = UserCreator();
-const userService = UserService(userRepository, userValidate, userCreator);
+const userService = createUserService();
 const userController = UserController(userService);
 
 router.get('/', userController.getUsers);

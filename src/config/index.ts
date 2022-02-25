@@ -1,14 +1,13 @@
+import dbConfig from './database';
 import { appConfig } from './app';
-import { mongoConfig, postgresConfig } from './database';
 import { authConfig } from './auth';
+import { emailConfig } from './email';
 
 const config = {
 	app: appConfig,
-	db: {
-		mongo: mongoConfig,
-		postgres: postgresConfig
-	},
-	auth: authConfig
+	db: dbConfig,
+	auth: authConfig,
+	mail: emailConfig
 };
 
 export default config;

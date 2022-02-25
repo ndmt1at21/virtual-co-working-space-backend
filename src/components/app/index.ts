@@ -46,6 +46,6 @@ export const socketServerLoader = (
 	logger: ILogger
 ): SocketServer => {
 	const socketServer = new SocketServer(server);
-	logger.info(`Socket server is started`);
+	logger.info(`Socket server is initialized.`);
 	return socketServer;
 };

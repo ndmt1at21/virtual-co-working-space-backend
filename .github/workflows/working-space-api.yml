@@ -32,15 +32,6 @@ jobs:
                       cd ~/virtual-working-space-backend/virtual-co-working-space-backend
                       git pull origin main
 
-                      touch .env
-                      echo "${{ secrets.NODE_ENV }}" >> .env
-                      echo "${{ secrets.PORT }}" >> .env
-                      echo "${{ secrets.DB_HOST }}" >> .env
-                      echo "${{ secrets.DB_USERNAME }}" >> .env
-                      echo "${{ secrets.DB_PASSWORD }}" >> .env
-                      echo "${{ secrets.DB_PORT }}" >> .env
-                      echo "${{ secrets.DB_NAME }}" >> .env
-
                       sudo npm ci
                       sudo npm build
                       sudo npm test

@@ -54,3 +54,11 @@ export const messageService = createLogger({
 		new transports.Console(debugOptions)
 	]
 });
+
+export const mailLogger = createLogger({
+	defaultMeta: { service: 'mail-service' },
+	transports: [
+		new transports.File(commonOptions),
+		new transports.Console(debugOptions)
+	]
+});

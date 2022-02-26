@@ -15,8 +15,8 @@ const startServer = async () => {
 
 	try {
 		await appLoaders(app, serverLogger);
-		httpServerLoader(appConfig.PORT, server, serverLogger);
 		socketServerLoader(server, serverLogger);
+		httpServerLoader(server, appConfig.PORT, serverLogger);
 	} catch (err) {
 		serverLogger.error(err);
 	}

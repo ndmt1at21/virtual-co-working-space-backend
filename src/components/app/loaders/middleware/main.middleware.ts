@@ -1,13 +1,13 @@
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import express, { Router } from 'express';
+import express from 'express';
 import { Application } from 'express';
 import { appConfig } from '@src/config/app';
 import { ILogger } from '@components/logger/@types/ILogger';
 import { createAuthMiddleware } from '@src/components/auth/auth.factory';
 
-export const appMiddleware = (app: Application, logger: ILogger) => {
+export const mainMiddleware = (app: Application, logger: ILogger) => {
 	const isProduction = appConfig.NODE_ENV === 'production';
 
 	app.use(express.json());

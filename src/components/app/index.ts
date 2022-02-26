@@ -1,11 +1,11 @@
 import { Application } from 'express';
-import { appMiddleware } from './loaders/app.middleware';
-import { connectDatabase } from './loaders/app.database';
-import { appRoutes } from './loaders/app.routes';
-import { ILogger } from '@components/logger/@types/ILogger';
-import { globalErrorHandler } from '../globalHandlerError';
 import { Server as HttpServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
+import { globalErrorHandler } from '../globalHandlerError';
+import { ILogger } from '../logger/@types/ILogger';
+import { connectDatabase } from './loaders/database';
+import { mainMiddleware, socketMiddleware } from './loaders/middleware';
+import { mainRoutes, socketEventHandlers } from './loaders/routes';
 
 export const appLoaders = async (
 	app: Application,
@@ -14,10 +14,10 @@ export const appLoaders = async (
 	await connectDatabase();
 	logger.info('Database connection has been established successfully.');
 
-	appMiddleware(app, logger);
+	mainMiddleware(app, logger);
 	logger.info('Middleware has been loaded.');
 
-	appRoutes(app);
+	mainRoutes(app);
 	logger.info('Routes have been loaded.');
 
 	app.use(globalErrorHandler);
@@ -25,8 +25,8 @@ export const appLoaders = async (
 };
 
 export const httpServerLoader = (
-	port: string | number,
 	server: HttpServer,
+	port: string | number,
 	logger: ILogger
 ) => {
 	server.listen(port, () => {
@@ -47,5 +47,12 @@ export const socketServerLoader = (
 ): SocketServer => {
 	const socketServer = new SocketServer(server);
 	logger.info(`Socket server is initialized.`);
+
+	socketMiddleware(socketServer, logger);
+	logger.info(`Socket middleware has been loaded.`);
+
+	socketEventHandlers(socketServer, logger);
+	logger.info(`Socket event handlers has been loaded.`);
+
 	return socketServer;
 };

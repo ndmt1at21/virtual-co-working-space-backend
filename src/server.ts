@@ -1,4 +1,7 @@
 import 'reflect-metadata';
+import http from 'http';
+import express from 'express';
+import globalManager from './global';
 import { appConfig } from '@src/config/app';
 import { serverLogger } from '@components/logger';
 import {
@@ -6,8 +9,6 @@ import {
 	httpServerLoader,
 	socketServerLoader
 } from './components/app';
-import express from 'express';
-import http from 'http';
 
 const startServer = async () => {
 	const app = express();
@@ -15,8 +16,15 @@ const startServer = async () => {
 
 	try {
 		await mainAppLoaders(app, serverLogger);
-		socketServerLoader(server, serverLogger);
-		httpServerLoader(server, appConfig.PORT, serverLogger);
+		const socketServer = socketServerLoader(server, serverLogger);
+		const httpServer = httpServerLoader(
+			server,
+			appConfig.PORT,
+			serverLogger
+		);
+
+		globalManager.httpServer = httpServer;
+		globalManager.socketServer = socketServer;
 	} catch (err) {
 		serverLogger.error(err);
 	}

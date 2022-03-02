@@ -4,8 +4,8 @@ import { Server as SocketServer } from 'socket.io';
 import { globalErrorHandler } from '../globalHandlerError';
 import { ILogger } from '../logger/@types/ILogger';
 import { connectDatabase } from './loaders/database';
-import { mainMiddleware, socketMiddleware } from './loaders/middleware';
-import { mainRoutes, socketEventHandlers } from './loaders/routes';
+import { mainMiddleware, mainRoutes } from './loaders/main';
+import { socketEventHandlers, socketMiddleware } from './loaders/socket';
 
 export const mainAppLoaders = async (
 	app: Application,
@@ -28,7 +28,7 @@ export const httpServerLoader = (
 	server: HttpServer,
 	port: string | number,
 	logger: ILogger
-) => {
+): HttpServer => {
 	server.listen(port, () => {
 		logger.info(`Http server is listening on port ${port}`);
 	});
@@ -39,6 +39,8 @@ export const httpServerLoader = (
 			process.exit(1);
 		});
 	});
+
+	return server;
 };
 
 export const socketServerLoader = (

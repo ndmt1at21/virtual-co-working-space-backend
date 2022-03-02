@@ -4,6 +4,8 @@ import { IAuthTokenService } from '@components/authToken/@types/IAuthTokenServic
 import { AuthErrorMessages } from './auth.error';
 import { IAuthValidate } from './@types/IAuthValidate';
 import { HeaderConstants } from '@src/constant/headerConstants';
+import { NextFunction, Request, Response } from 'express';
+import { UserRoleType } from '../users/@types/UserRoleType';
 
 export const AuthMiddleware = (
 	userRepository: UserRepository,
@@ -66,7 +68,21 @@ export const AuthMiddleware = (
 		}
 	});
 
-	const restrictTo = (role: string) => {};
+	const restrictTo = (roles: UserRoleType[]) => {
+		return (req: Request, res: Response, next: NextFunction) => {
+			const hasPermission = roles.every(role =>
+				req.user?.roles.includes(role)
+			);
+
+			if (hasPermission) {
+				next();
+			}
+
+			if (!hasPermission) {
+				next(AuthErrorMessages.UNAUTHORIZED_PERMISSION_DENIED);
+			}
+		};
+	};
 
 	return { deserializeUser, protect, restrictTo, restrictToGuest };
 };

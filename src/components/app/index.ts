@@ -7,7 +7,7 @@ import { connectDatabase } from './loaders/database';
 import { mainMiddleware, socketMiddleware } from './loaders/middleware';
 import { mainRoutes, socketEventHandlers } from './loaders/routes';
 
-export const appLoaders = async (
+export const mainAppLoaders = async (
 	app: Application,
 	logger: ILogger
 ): Promise<void> => {

@@ -6,6 +6,8 @@ export const AuthErrorMessages = {
 	UNAUTHORIZED_MISSING_TOKEN: 'Access token and refresh token are required',
 	UNAUTHORIZED_INVALID_TOKEN: 'Access token is invalid',
 	UNAUTHORIZED_ALREADY_LOGGED_IN: 'You are already logged in',
+	UNAUTHORIZED_PERMISSION_DENIED:
+		'You do not have permission to access this resource',
 
 	LOGIN_MISSING_EMAIL_PASSWORD: 'Email and password are required',
 	LOGIN_EXTERNAL_MISSING_EMAIL: 'Email is required',

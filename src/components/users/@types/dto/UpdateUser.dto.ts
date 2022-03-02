@@ -1,6 +1,15 @@
-export type UpdateUserDto = {
+import { Expose } from 'class-transformer';
+import { IsDefined, IsPhoneNumber, IsString, IsUrl } from 'class-validator';
+
+export class UpdateUserDto {
+	@Expose()
 	name?: string;
-	email?: string;
+
+	@IsPhoneNumber()
+	@Expose()
 	phone?: string;
+
+	@IsUrl()
+	@Expose()
 	avatar?: string;
-};
+}

@@ -1,18 +1,35 @@
 import { Router } from 'express';
+import { createAuthMiddleware } from '../auth/auth.factory';
+import { UserRoleType } from './@types/UserRoleType';
 import { UserController } from './user.controller';
 import { createUserService } from './user.factory';
 
-const router = Router();
+export const UserRouter = (): Router => {
+	const router = Router();
 
-const userService = createUserService();
-const userController = UserController(userService);
+	const authMiddleware = createAuthMiddleware();
+	const userService = createUserService();
+	const userController = UserController(userService);
 
-router.get('/', userController.getUsers);
+	router.use('/', authMiddleware.protect);
 
-router.get('/profile', userController.getProfile);
+	router
+		.route('/me/profile')
+		.get(userController.getProfile)
+		.patch(userController.updateProfile);
 
-router
-	.route('/:id')
-	.get(userController.getUserById)
-	.patch(userController.updateUser)
-	.delete(userController.deleteUser);
+	router
+		.route('/:id')
+		.all(authMiddleware.restrictTo([UserRoleType.ADMIN]))
+		.get(userController.getUserById)
+		.patch(userController.updateUser)
+		.delete(userController.deleteUser);
+
+	router
+		.route('/')
+		.all(authMiddleware.restrictTo([UserRoleType.ADMIN]))
+		.post(userController.createUser)
+		.get(userController.getUsers);
+
+	return router;
+};

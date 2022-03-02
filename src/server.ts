@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { appConfig } from '@src/config/app';
 import { serverLogger } from '@components/logger';
 import {
-	appLoaders,
+	mainAppLoaders,
 	httpServerLoader,
 	socketServerLoader
 } from './components/app';
@@ -14,7 +14,7 @@ const startServer = async () => {
 	const server = http.createServer(app);
 
 	try {
-		await appLoaders(app, serverLogger);
+		await mainAppLoaders(app, serverLogger);
 		socketServerLoader(server, serverLogger);
 		httpServerLoader(server, appConfig.PORT, serverLogger);
 	} catch (err) {

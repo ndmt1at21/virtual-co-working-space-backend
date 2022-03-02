@@ -34,27 +34,26 @@ export const PasswordResetTokenService = (
 			.randomBytes(config.auth.RESET_PASSWORD_TOKEN_LENGTH)
 			.toString('hex');
 
-		const tokenEncrypt = crypto
-			.createHash('sha256')
-			.update(tokenPlain)
-			.digest('hex');
+		const tokenEncrypt = encryptToken(tokenPlain);
 
 		const createdToken = await passwordResetTokenRepository.save({
 			userId,
-			passwordResetToken: tokenEncrypt,
+			passwordResetToken: tokenPlain,
 			passwordResetTokenExpired: new Date(
 				Date.now() + config.auth.RESET_PASSWORD_TOKEN_EXPIRES_TIME
 			)
 		});
 
 		return passwordResetTokenCreator.mapPasswordResetTokenToPasswordResetTokenDto(
-			createdToken
+			{ ...createdToken, passwordResetToken: tokenEncrypt }
 		);
 	};
 
-	const validatePasswordResetToken = async (token: string) => {
+	const validateToken = async (token: string) => {
+		const tokenEncrypt = encryptToken(token);
+
 		const resetToken = await passwordResetTokenRepository.findByToken(
-			token
+			tokenEncrypt
 		);
 
 		if (!resetToken) {
@@ -76,10 +75,14 @@ export const PasswordResetTokenService = (
 		await passwordResetTokenRepository.softDelete(userId);
 	};
 
+	function encryptToken(token: string): string {
+		return crypto.createHash('sha256').update(token).digest('hex');
+	}
+
 	return {
 		findByToken,
 		createToken,
-		validatePasswordResetToken,
+		validateToken,
 		deleteByUserId
 	};
 };

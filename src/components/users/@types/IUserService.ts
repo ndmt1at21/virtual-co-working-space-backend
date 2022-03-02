@@ -24,5 +24,7 @@ export interface IUserService {
 
 	deleteUserById: (id: number) => Promise<void>;
 
-	blockUserById: (id: number) => Promise<UserDto>;
+	blockUserById: (id: number) => Promise<number>;
+
+	activeNewUser: (id: number) => Promise<UserDto>;
 }

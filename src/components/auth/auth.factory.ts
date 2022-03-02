@@ -8,6 +8,7 @@ import { AuthMiddleware } from './auth.middleware';
 import { AuthService } from './auth.service';
 import { AuthValidate } from './auth.validate';
 import { createPasswordResetTokenService } from '../passwordResetToken/passwordResetToken.factory';
+import { createActiveUserTokenService } from '../activeUserToken/activeUserToken.factory';
 
 export function createAuthController() {
 	const authService = createAuthService();
@@ -20,12 +21,14 @@ export function createAuthService() {
 	const userService = createUserService();
 	const passwordResetTokenService = createPasswordResetTokenService();
 	const authTokenService = createAuthTokenService();
+	const activeUserTokenService = createActiveUserTokenService();
 	const authValidate = createAuthValidate();
 
 	return AuthService(
 		userService,
 		authTokenService,
 		passwordResetTokenService,
+		activeUserTokenService,
 		authValidate
 	);
 }

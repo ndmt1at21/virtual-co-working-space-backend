@@ -13,7 +13,6 @@ import { HeaderConstants } from '@src/constant/headerConstants';
 import { OAuth2ProfileDto } from './@types/dto/OAuth2Profile.dto';
 import { validateRequestBody } from '@src/utils/requestValidation';
 import { LoginDto } from './@types/dto/Login.dto';
-import { CreateUserDto } from '../users/@types/dto/CreateUser.dto';
 import { ResetPasswordContentDto } from './@types/dto/ResetPasswordContent.dto';
 import { ForgotPasswordDto } from './@types/dto/ForgotPassword.dto';
 import { RegisterDto } from './@types/dto/Register.dto';
@@ -49,13 +48,15 @@ export const AuthController = (authService: IAuthService, logger: ILogger) => {
 		}
 
 		const registerDto = req.body as RegisterDto;
-		const user = await authService.localRegister(registerDto);
+		const { user, activeToken } = await authService.localRegister(
+			registerDto
+		);
 
 		logger.info(
 			`User with email ${user.email} registered successfully has id ${user.id}`
 		);
 
-		eventEmitter.emit('user registered', user);
+		eventEmitter.emit('user registered', { user, activeToken });
 
 		res.status(HttpStatusCode.CREATED).json({
 			user,
@@ -197,6 +198,17 @@ export const AuthController = (authService: IAuthService, logger: ILogger) => {
 		});
 	});
 
+	const activateNewUser = catchAsyncRequestHandler(async (req, res, next) => {
+		const userId = req.user!.id;
+		const token = req.params.token as string;
+
+		await authService.activeNewUser(userId, token);
+
+		res.status(HttpStatusCode.OK).json({
+			message: 'User activated successfully'
+		});
+	});
+
 	function oauth2LoginCallback(
 		provider: string,
 		req: Request,
@@ -272,6 +284,7 @@ export const AuthController = (authService: IAuthService, logger: ILogger) => {
 		logout,
 		refreshAccessToken,
 		forgotPassword,
-		resetPassword
+		resetPassword,
+		activateNewUser
 	};
 };

@@ -5,7 +5,7 @@ export interface IPasswordResetTokenService {
 
 	createToken: (userId: number) => Promise<PasswordResetTokenDto>;
 
-	validatePasswordResetToken: (token: string) => Promise<boolean>;
+	validateToken: (token: string) => Promise<boolean>;
 
 	deleteByUserId: (userId: number) => Promise<void>;
 }

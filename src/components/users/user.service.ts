@@ -101,15 +101,21 @@ export const UserService = (
 		await userRepository.softDelete(id);
 	};
 
-	const blockUserById = async (id: number): Promise<UserDto> => {
-		await userValidate.checkUserExistsById(id);
-
-		const user = await userRepository.findById(id);
-
-		return await userRepository.save({
-			...user!,
+	const blockUserById = async (id: number): Promise<number> => {
+		const result = await userRepository.update(id, {
 			status: UserStatus.BLOCKED
 		});
+
+		return result.affected || 0;
+	};
+
+	const activeNewUser = async (id: number): Promise<UserDto> => {
+		const updatedUser = await userRepository.save({
+			id,
+			status: UserStatus.ACTIVE
+		});
+
+		return updatedUser;
 	};
 
 	return {
@@ -120,6 +126,7 @@ export const UserService = (
 		updateUserById,
 		updatePasswordById,
 		deleteUserById,
-		blockUserById
+		blockUserById,
+		activeNewUser
 	};
 };

@@ -11,11 +11,14 @@ import { IUserService } from '../users/@types/IUserService';
 import { IPasswordResetTokenService } from '../passwordResetToken/@types/IPasswordService';
 import { PasswordResetTokenDto } from '../passwordResetToken/@types/dto/PasswordResetToken.dto';
 import { CreateUserDto } from '../users/@types/dto/CreateUser.dto';
+import { IActiveUserTokenService } from '../activeUserToken/@types/IActiveUserTokenService';
+import { LocalRegisterDto } from './@types/dto/LocalRegister.dto';
 
 export const AuthService = (
 	userService: IUserService,
 	authTokenService: IAuthTokenService,
 	passwordResetTokenService: IPasswordResetTokenService,
+	activeUserTokenService: IActiveUserTokenService,
 	authValidate: IAuthValidate
 ): IAuthService => {
 	const localLogin = async (
@@ -44,9 +47,16 @@ export const AuthService = (
 
 	const localRegister = async (
 		createUserDto: CreateUserDto
-	): Promise<UserDto> => {
+	): Promise<LocalRegisterDto> => {
 		const user = await userService.createLocalUser(createUserDto);
-		return user;
+		const { token } = await activeUserTokenService.createToken(user.id);
+		return { user, activeToken: token };
+	};
+
+	const activeNewUser = async (userId: number, token: string) => {
+		await activeUserTokenService.validateToken(userId, token);
+		await userService.activeNewUser(userId);
+		await activeUserTokenService.deleteToken(token);
 	};
 
 	const refreshAccessToken = async (
@@ -86,7 +96,7 @@ export const AuthService = (
 	): Promise<void> => {
 		const { resetToken, password, confirmPassword } = resetPasswordDto;
 
-		await passwordResetTokenService.validatePasswordResetToken(resetToken);
+		await passwordResetTokenService.validateToken(resetToken);
 
 		const resetTokenEntity = await passwordResetTokenService.findByToken(
 			resetToken
@@ -126,6 +136,7 @@ export const AuthService = (
 		refreshAccessToken,
 		logout,
 		forgotPassword,
-		resetPassword
+		resetPassword,
+		activeNewUser
 	};
 };

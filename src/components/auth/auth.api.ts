@@ -30,6 +30,7 @@ export const AuthRouter = () => {
 
 	router
 		.post('/refreshToken', protect, authController.refreshAccessToken)
+		.get('/activate/:token', protect, authController.activateNewUser)
 		.get('/logout', protect, authController.logout);
 
 	return router;

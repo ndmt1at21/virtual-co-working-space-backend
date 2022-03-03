@@ -13,39 +13,27 @@ export const AuthMiddleware = (
 	authValidate: IAuthValidate
 ) => {
 	const deserializeUser = catchAsyncRequestHandler(async (req, res, next) => {
-		const accessToken = req.headers[HeaderConstants.ACCESS_TOKEN] as string;
-		const refreshToken = req.headers[
-			HeaderConstants.REFRESH_TOKEN
-		] as string;
+		const accessToken = req.headers.authorization?.split(' ')[1];
 
-		if (!accessToken || !refreshToken) {
-			next();
+		if (!accessToken) {
+			return next();
 		}
 
-		if (accessToken && refreshToken) {
-			// validate access token
-			await authTokenService.validateAccessToken(accessToken);
+		await authTokenService.validateAccessToken(accessToken);
 
-			// decode access token
-			const userId = await authTokenService.getUserIdFromAccessToken(
-				accessToken
-			);
+		const userId = await authTokenService.getUserIdFromAccessToken(
+			accessToken
+		);
 
-			// validate refresh token
-			await authTokenService.validateRefreshToken(userId, refreshToken);
+		// await authTokenService.validateRefreshToken(userId, refreshToken);
+		await authValidate.validateUserCanAccessResourceById(userId);
 
-			// validate user
-			await authValidate.validateUserCanAccessResourceById(userId);
+		const user = await userRepository.findById(userId);
 
-			// retrieve user
-			const user = await userRepository.findById(userId);
+		const { id, email, type } = user!;
+		req.user = { id, email, roles: [type] };
 
-			// Assign to req.user
-			const { id, email, type } = user!;
-			req.user = { id, email, roles: [type] };
-
-			next();
-		}
+		next();
 	});
 
 	const protect = catchAsyncRequestHandler(async (req, res, next) => {

@@ -26,10 +26,14 @@ export const AuthRouter = () => {
 			authController.facebookLoginCallback
 		)
 		.post('/forgot', restrictToGuest, authController.forgotPassword)
-		.patch('/reset/:token', restrictToGuest, authController.resetPassword);
+		.patch('/reset/:token', restrictToGuest, authController.resetPassword)
+		.post(
+			'/refreshToken',
+			restrictToGuest,
+			authController.refreshAccessToken
+		);
 
 	router
-		.post('/refreshToken', protect, authController.refreshAccessToken)
 		.get('/activate/:token', protect, authController.activateNewUser)
 		.get('/logout', protect, authController.logout);
 

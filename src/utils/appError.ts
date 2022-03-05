@@ -2,8 +2,8 @@ import { HttpStatusCode } from '@src/constant/httpStatusCode';
 
 export class AppError extends Error {
 	isOperational: boolean;
-	httpCode: number;
-	message: string;
+	public httpCode: number;
+	public message: string;
 
 	constructor(httpCode: number, message: string) {
 		super();

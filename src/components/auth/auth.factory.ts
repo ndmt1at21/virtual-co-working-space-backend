@@ -1,4 +1,3 @@
-import { getCustomRepository } from 'typeorm';
 import { createAuthTokenService } from '@components/authToken/authToken.factory';
 import { authLogger } from '@components/logger';
 import {
@@ -15,7 +14,6 @@ import { createActiveUserTokenService } from '../activeUserToken/activeUserToken
 export function createAuthController() {
 	const authService = createAuthService();
 	const authController = AuthController(authService, authLogger);
-
 	return authController;
 }
 

@@ -1,6 +1,8 @@
 import { ActiveUserToken } from '@src/components/activeUserToken/activeUserToken.entity';
+import { Item } from '@src/components/items/item.entity';
 import { OfficeItem } from '@src/components/officeItems/officeItem.entity';
 import { OfficeMember } from '@src/components/officeMembers/officeMember.entity';
+import { OfficeRole } from '@src/components/officeRoles/officeRole.entity';
 import { Office } from '@src/components/offices/office.entity';
 import { PasswordResetToken } from '@src/components/passwordResetToken/passwordResetToken.entity';
 import { RefreshToken } from '@src/components/refreshToken/refreshToken.entity';
@@ -19,8 +21,17 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 	database: config.db.pg.DB_NAME,
 	synchronize: true,
 	logging: false,
-	name: 'main',
-	entities: [User, RefreshToken, ActiveUserToken, PasswordResetToken]
+	entities: [
+		User,
+		RefreshToken,
+		ActiveUserToken,
+		PasswordResetToken,
+		Item,
+		Office,
+		OfficeItem,
+		OfficeMember,
+		OfficeRole
+	]
 };
 
 const ormMongoOptions: MongoConnectionOptions = {
@@ -31,18 +42,16 @@ const ormMongoOptions: MongoConnectionOptions = {
 	password: config.db.mongo.DB_PASSWORD,
 	database: config.db.mongo.DB_NAME,
 	logging: false,
-	name: 'realtime',
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 	synchronize: true,
-	entities: [Office, OfficeItem, OfficeMember]
+	entities: []
 };
 
 export const connectDatabase = async (): Promise<void> => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			await createConnection(ormPostgresOptions);
-			await createConnection(ormMongoOptions);
 			resolve();
 		} catch (err: any) {
 			reject('Unable to connect to database: ' + err.message);

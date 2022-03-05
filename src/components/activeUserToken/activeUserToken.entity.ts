@@ -11,11 +11,11 @@ import { User } from '../users/user.entity';
 @Entity({ name: 'active_user_token' })
 @Index(['token'], { unique: true })
 export class ActiveUserToken extends BaseEntity {
-	@PrimaryGeneratedColumn()
-	id: number;
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
 	@Column({ name: 'user_id' })
-	userId: number;
+	userId: string;
 
 	@Column({ unique: true })
 	token: string;

@@ -4,11 +4,12 @@ import { IllegalArgumentError } from '@src/utils/appError';
 import { ActiveTokenErrorMessages } from './activeToken.error';
 import { ActiveUserTokenRepository } from './activeUserToken.repository';
 import { ActiveUserTokenDto } from './@types/dto/ActiveUserToken.dto';
+import { IActiveUserTokenService } from './@types/IActiveUserTokenService';
 
 export const ActiveUserTokenService = (
 	activeUserTokenRepository: ActiveUserTokenRepository
-) => {
-	const createToken = async (userId: number): Promise<ActiveUserTokenDto> => {
+): IActiveUserTokenService => {
+	const createToken = async (userId: string): Promise<ActiveUserTokenDto> => {
 		const token = crypto
 			.randomBytes(config.auth.ACTIVE_USER_TOKEN_LENGTH)
 			.toString('hex');
@@ -26,7 +27,7 @@ export const ActiveUserTokenService = (
 	};
 
 	const validateToken = async (
-		userId: number,
+		userId: string,
 		token: string
 	): Promise<boolean> => {
 		const activeUserToken =

@@ -14,7 +14,7 @@ export class PasswordResetTokenRepository extends BaseRepository<PasswordResetTo
 		});
 	}
 
-	async deleteByUserId(userId: number): Promise<void> {
+	async deleteByUserId(userId: string): Promise<void> {
 		await this.softDelete({ userId });
 	}
 }

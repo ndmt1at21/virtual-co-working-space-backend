@@ -11,20 +11,20 @@ export interface IUserService {
 		payload: CreateUserExternalDto
 	) => Promise<UserDto>;
 
-	findUserById: (id: number) => Promise<UserDto>;
+	findUserById: (id: string) => Promise<UserDto>;
 
 	findUserByEmail: (email: string) => Promise<UserDto>;
 
-	updateUserById: (id: number, payload: UpdateUserDto) => Promise<UserDto>;
+	updateUserById: (id: string, payload: UpdateUserDto) => Promise<UserDto>;
 
 	updatePasswordById: (
-		id: number,
+		id: string,
 		updatePasswordDto: UpdatePasswordDto
 	) => Promise<UserDto>;
 
-	deleteUserById: (id: number) => Promise<void>;
+	deleteUserById: (id: string) => Promise<void>;
 
-	blockUserById: (id: number) => Promise<number>;
+	blockUserById: (id: string) => Promise<number>;
 
-	activeNewUser: (id: number) => Promise<UserDto>;
+	activeNewUser: (id: string) => Promise<UserDto>;
 }

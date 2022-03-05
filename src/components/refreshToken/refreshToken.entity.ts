@@ -13,14 +13,14 @@ import { BaseEntity } from '@components/base/BaseEntity';
 @Entity({ name: 'refresh_token' })
 @Index(['token', 'userId'], { unique: true })
 export class RefreshToken extends BaseEntity {
-	@PrimaryGeneratedColumn()
-	id: number;
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
 	@Column()
 	token: string;
 
 	@Column({ name: 'user_id' })
-	userId: number;
+	userId: string;
 
 	@Column({
 		type: 'enum',

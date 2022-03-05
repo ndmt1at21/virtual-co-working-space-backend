@@ -6,4 +6,5 @@ export class HttpStatusCode {
 	static readonly UNAUTHORIZED = 401;
 	static readonly FORBIDDEN = 403;
 	static readonly NOT_FOUND = 404;
+	static readonly TOO_MANY_REQUESTS = 429;
 }

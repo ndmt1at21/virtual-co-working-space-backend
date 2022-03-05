@@ -10,11 +10,11 @@ import { User } from '../users/user.entity';
 
 @Entity({ name: 'password_reset_token' })
 export class PasswordResetToken extends BaseEntity {
-	@PrimaryGeneratedColumn()
-	id: number;
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
 	@Column({ name: 'user_id' })
-	userId: number;
+	userId: string;
 
 	@Column({ unique: true, name: 'password_reset_token' })
 	passwordResetToken: string;

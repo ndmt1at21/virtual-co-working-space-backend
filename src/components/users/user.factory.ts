@@ -5,8 +5,12 @@ import { UserRepository } from './user.repository';
 import { UserService } from './user.service';
 import { UserValidate } from './user.validate';
 
+export function createUserRepository() {
+	return getCustomRepository(UserRepository, 'main');
+}
+
 export function createUserService() {
-	const userRepository = getCustomRepository(UserRepository);
+	const userRepository = createUserRepository();
 	const userValidate = createUserValidate();
 	const userCreator = createUserCreator();
 	const passwordEncoder = PasswordEncoder();
@@ -24,6 +28,6 @@ export function createUserCreator() {
 }
 
 export function createUserValidate() {
-	const userRepository = getCustomRepository(UserRepository);
+	const userRepository = createUserRepository();
 	return UserValidate(userRepository);
 }

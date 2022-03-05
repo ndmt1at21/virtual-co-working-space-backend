@@ -13,12 +13,12 @@ export const AuthTokenService = (
 	authTokenValidate: IAuthTokenValidate
 ): IAuthTokenService => {
 	const createAccessTokenAndRefreshToken = async (
-		userId: number
+		userId: string
 	): Promise<[string, string]> => {
 		return [createAccessToken(userId), await createRefreshToken(userId)];
 	};
 
-	const createAccessToken = (userId: number): string => {
+	const createAccessToken = (userId: string): string => {
 		return jwt.sign({ userId }, config.auth.JWT_SECRET, {
 			issuer: config.auth.JWT_ISSUER,
 			expiresIn: Date.now() + config.auth.JWT_ACCESS_TOKEN_EXPIRES_TIME,
@@ -26,7 +26,7 @@ export const AuthTokenService = (
 		});
 	};
 
-	const createRefreshToken = async (userId: number): Promise<string> => {
+	const createRefreshToken = async (userId: string): Promise<string> => {
 		const token = crypto
 			.randomBytes(config.auth.REFRESH_TOKEN_LENGTH)
 			.toString('hex');
@@ -75,7 +75,7 @@ export const AuthTokenService = (
 	};
 
 	const validateRefreshToken = async (
-		userId: number,
+		userId: string,
 		refreshToken: string
 	): Promise<boolean> => {
 		const refreshTokenEntity =
@@ -92,7 +92,7 @@ export const AuthTokenService = (
 	};
 
 	const validateRefreshTokenCanRenewAccessToken = async (
-		userId: number,
+		userId: string,
 		refreshToken: string
 	): Promise<boolean> => {
 		return await validateRefreshToken(userId, refreshToken);

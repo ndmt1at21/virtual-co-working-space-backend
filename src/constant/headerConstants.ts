@@ -3,5 +3,6 @@ export const HeaderConstants = {
 	PAGE_NUMBER: 'x-page-number',
 	PAGE_SIZE: 'x-page-size',
 	REFRESH_TOKEN: 'x-refresh-token',
-	ACCESS_TOKEN: 'x-access-token'
+	ACCESS_TOKEN: 'Authorization',
+	X_FORWARDED_FOR: 'x-forwarded-for'
 };

@@ -3,7 +3,6 @@ import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { IAuthTokenService } from '@components/authToken/@types/IAuthTokenService';
 import { AuthErrorMessages } from './auth.error';
 import { IAuthValidate } from './@types/IAuthValidate';
-import { HeaderConstants } from '@src/constant/headerConstants';
 import { NextFunction, Request, Response } from 'express';
 import { UserRoleType } from '../users/@types/UserRoleType';
 

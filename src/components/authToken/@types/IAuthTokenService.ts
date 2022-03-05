@@ -1,11 +1,11 @@
 export interface IAuthTokenService {
 	createAccessTokenAndRefreshToken: (
-		userId: number
+		userId: string
 	) => Promise<[string, string]>;
 
-	createAccessToken: (userId: number) => string;
+	createAccessToken: (userId: string) => string;
 
-	createRefreshToken: (userId: number) => Promise<string>;
+	createRefreshToken: (userId: string) => Promise<string>;
 
 	getUserIdFromAccessToken: (token: string) => Promise<number>;
 
@@ -16,12 +16,12 @@ export interface IAuthTokenService {
 	validateAccessToken: (token: string) => Promise<boolean>;
 
 	validateRefreshToken: (
-		userId: number,
+		userId: string,
 		refreshToken: string
 	) => Promise<boolean>;
 
 	validateRefreshTokenCanRenewAccessToken: (
-		userId: number,
+		userId: string,
 		refreshToken: string
 	) => Promise<boolean>;
 }

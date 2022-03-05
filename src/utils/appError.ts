@@ -1,11 +1,15 @@
+import { HttpStatusCode } from '@src/constant/httpStatusCode';
+
 export class AppError extends Error {
 	isOperational: boolean;
+	httpCode: number;
 	message: string;
 
-	constructor(message: string) {
+	constructor(httpCode: number, message: string) {
 		super();
 
 		this.isOperational = true;
+		this.httpCode = httpCode;
 		this.message = message;
 
 		Error.captureStackTrace(this, this.constructor);
@@ -14,18 +18,24 @@ export class AppError extends Error {
 
 export class NotFoundError extends AppError {
 	constructor(message: string) {
-		super(message);
+		super(HttpStatusCode.NOT_FOUND, message);
 	}
 }
 
 export class IllegalArgumentError extends AppError {
 	constructor(message: string) {
-		super(message);
+		super(HttpStatusCode.BAD_REQUEST, message);
 	}
 }
 
 export class UnauthorizedError extends AppError {
 	constructor(message: string) {
-		super(message);
+		super(HttpStatusCode.UNAUTHORIZED, message);
+	}
+}
+
+export class TooManyRequestError extends AppError {
+	constructor(message: string) {
+		super(HttpStatusCode.TOO_MANY_REQUESTS, message);
 	}
 }

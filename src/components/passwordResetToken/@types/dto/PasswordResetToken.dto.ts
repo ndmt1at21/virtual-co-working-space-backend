@@ -1,6 +1,6 @@
 export type PasswordResetTokenDto = {
-	id: number;
-	userId: number;
+	id: string;
+	userId: string;
 	passwordResetToken: string;
 	passwordResetTokenExpired: Date;
 	createdAt: Date;

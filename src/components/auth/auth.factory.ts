@@ -1,8 +1,10 @@
 import { getCustomRepository } from 'typeorm';
 import { createAuthTokenService } from '@components/authToken/authToken.factory';
 import { authLogger } from '@components/logger';
-import { UserRepository } from '@components/users/user.repository';
-import { createUserService } from '@components/users/user.factory';
+import {
+	createUserRepository,
+	createUserService
+} from '@components/users/user.factory';
 import { AuthController } from './auth.controller';
 import { AuthMiddleware } from './auth.middleware';
 import { AuthService } from './auth.service';
@@ -34,7 +36,7 @@ export function createAuthService() {
 }
 
 export function createAuthMiddleware() {
-	const userRepository = getCustomRepository(UserRepository);
+	const userRepository = createUserRepository();
 	const authTokenService = createAuthTokenService();
 	const authValidate = createAuthValidate();
 
@@ -42,6 +44,6 @@ export function createAuthMiddleware() {
 }
 
 export function createAuthValidate() {
-	const userRepository = getCustomRepository(UserRepository);
+	const userRepository = createUserRepository();
 	return AuthValidate(userRepository);
 }

@@ -3,10 +3,17 @@ import { PasswordResetTokenCreator } from './passwordResetToken.creator';
 import { PasswordResetTokenRepository } from './passwordResetToken.repository';
 import { PasswordResetTokenService } from './passwordResetToken.service';
 
-export const createPasswordResetTokenService = () => {
+export const createPasswordResetTokenRepository = () => {
 	const passwordResetTokenRepository = getCustomRepository(
-		PasswordResetTokenRepository
+		PasswordResetTokenRepository,
+		'main'
 	);
+
+	return passwordResetTokenRepository;
+};
+
+export const createPasswordResetTokenService = () => {
+	const passwordResetTokenRepository = createPasswordResetTokenRepository();
 	const passwordResetTokenCreator = createPasswordResetTokenCreator();
 
 	return PasswordResetTokenService(

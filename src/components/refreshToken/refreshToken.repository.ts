@@ -16,7 +16,7 @@ export class RefreshTokenRepository extends BaseRepository<RefreshToken> {
 	}
 
 	async findByTokenAndUserId(
-		userId: number,
+		userId: string,
 		token: string
 	): Promise<RefreshToken | undefined> {
 		return await this.findOne({

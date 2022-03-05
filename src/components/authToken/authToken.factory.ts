@@ -4,7 +4,10 @@ import { AuthTokenService } from './authToken.service';
 import { AuthTokenValidate } from './authToken.validate';
 
 export function createAuthTokenService() {
-	const refreshTokenRepository = getCustomRepository(RefreshTokenRepository);
+	const refreshTokenRepository = getCustomRepository(
+		RefreshTokenRepository,
+		'main'
+	);
 	const authTokenValidate = createAuthTokenValidate();
 	const authTokenService = AuthTokenService(
 		refreshTokenRepository,

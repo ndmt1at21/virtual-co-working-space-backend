@@ -1,4 +1,4 @@
-type Pageable = {
-	offset: number;
-	pageSize: number;
+export type Pageable = {
+	page: number;
+	size: number;
 };

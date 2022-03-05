@@ -5,8 +5,7 @@ import { PasswordResetTokenService } from './passwordResetToken.service';
 
 export const createPasswordResetTokenRepository = () => {
 	const passwordResetTokenRepository = getCustomRepository(
-		PasswordResetTokenRepository,
-		'main'
+		PasswordResetTokenRepository
 	);
 
 	return passwordResetTokenRepository;

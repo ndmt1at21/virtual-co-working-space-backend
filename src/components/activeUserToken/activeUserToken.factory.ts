@@ -4,8 +4,7 @@ import { ActiveUserTokenService } from './activeUserToken.service';
 
 export const createActiveUserTokenService = () => {
 	const activeUserTokenRepository = getCustomRepository(
-		ActiveUserTokenRepository,
-		'main'
+		ActiveUserTokenRepository
 	);
 
 	return ActiveUserTokenService(activeUserTokenRepository);

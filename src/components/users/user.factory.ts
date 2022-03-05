@@ -6,7 +6,7 @@ import { UserService } from './user.service';
 import { UserValidate } from './user.validate';
 
 export function createUserRepository() {
-	return getCustomRepository(UserRepository, 'main');
+	return getCustomRepository(UserRepository);
 }
 
 export function createUserService() {

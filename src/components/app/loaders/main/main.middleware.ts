@@ -6,12 +6,17 @@ import { Application } from 'express';
 import { appConfig } from '@src/config/app';
 import { ILogger } from '@components/logger/@types/ILogger';
 import { createAuthMiddleware } from '@src/components/auth/auth.factory';
+import { rateLimiting } from '../../middleware/rateLimit';
 
 export const mainMiddleware = (app: Application, logger: ILogger) => {
 	const isProduction = appConfig.NODE_ENV === 'production';
 
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: true }));
+
+	app.use(express.static('public'));
+
+	app.use(rateLimiting({ maxPerIp: 50, timeMs: 10000 }));
 
 	app.use(
 		helmet({

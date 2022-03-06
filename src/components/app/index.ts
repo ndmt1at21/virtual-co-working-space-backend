@@ -47,7 +47,11 @@ export const socketServerLoader = (
 	server: HttpServer,
 	logger: ILogger
 ): SocketServer => {
-	const socketServer = new SocketServer(server);
+	const socketServer = new SocketServer(server, {
+		cors: {
+			origin: 'https://vispace.tech, http://localhost:3000'
+		}
+	});
 	logger.info(`Socket server is initialized.`);
 
 	socketMiddleware(socketServer, logger);

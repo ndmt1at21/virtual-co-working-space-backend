@@ -1,6 +1,6 @@
 import { Pageable } from '@src/@types/Pageable';
-import { CreateItemDto } from './dto/createItem.dto';
-import { ItemDto } from './dto/item.dto';
+import { CreateItemDto } from './dto/CreateItem.dto';
+import { ItemDto } from './dto/Item.dto';
 
 export interface IItemService {
 	findAll(pageable: Pageable): Promise<ItemDto[]>;

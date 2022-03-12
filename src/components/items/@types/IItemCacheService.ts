@@ -1,4 +1,4 @@
-import { ItemDto } from './dto/item.dto';
+import { ItemDto } from './dto/Item.dto';
 
 export interface IItemCacheService {
 	setItem(key: string, value: ItemDto, expireSecond: number): Promise<void>;

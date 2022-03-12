@@ -5,7 +5,7 @@ import { IOfficeMemberCreator } from './@types/IOfficeMemberCreator';
 import { Transform3D } from './@types/Transform3D';
 import { OfficeMember } from './officeMember.entity';
 
-export const OfficeMemberCreator = (): IOfficeMemberCreator => {
+export const OfficeMemberCreator = () => {
 	const createOfficeMemberOverview = (
 		officeMember: OfficeMember,
 		transform: OfficeMemberTransform
@@ -52,7 +52,7 @@ export const OfficeMemberCreator = (): IOfficeMemberCreator => {
 				officeId,
 				memberId,
 				transform: mapOfficeTransformToTransform3D(
-					officeMember.transform
+					{} as OfficeMemberTransform
 				)
 			};
 		});

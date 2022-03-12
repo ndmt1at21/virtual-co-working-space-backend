@@ -36,9 +36,7 @@ export const OfficeMemberTransformService = (
 
 		if (cachedTransform) return cachedTransform;
 
-		return await officeMemberTransformRepository.findTransformByOfficeMemberId(
-			memberId
-		);
+		return undefined;
 	};
 
 	return { createTransform, updateTransform, findTransformByOfficeMemberId };

@@ -1,7 +1,7 @@
 import modelsData from './model.json';
 import { connectDatabase } from '../components/app/loaders/database';
 import { createItemRepository } from '../components/items/item.factory';
-import { CreateItemDto } from '../components/items/@types/dto/createItem.dto';
+import { CreateItemDto } from '../components/items/@types/dto/CreateItem.dto';
 
 connectDatabase()
 	.then(_ => {

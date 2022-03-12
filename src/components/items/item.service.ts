@@ -1,8 +1,8 @@
 import { Pageable } from '@src/@types/Pageable';
 import { NotFoundError } from '@src/utils/appError';
-import { CreateItemDto } from './@types/dto/createItem.dto';
-import { ItemDto } from './@types/dto/item.dto';
-import { UpdateItemDto } from './@types/dto/updateItem.dto';
+import { CreateItemDto } from './@types/dto/CreateItem.dto';
+import { ItemDto } from './@types/dto/Item.dto';
+import { UpdateItemDto } from './@types/dto/UpdateItem.dto';
 import { IItemCreator } from './@types/IItemCreator';
 import { IItemService } from './@types/IItemService';
 import { ItemErrorMessages } from './item.error';

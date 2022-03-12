@@ -1,38 +1,50 @@
 [
 	{
-		"url": "/models/Chair.glb"
+		"name": "Chair",
+		"modelPath": "/models/Chair.glb"
 	},
 	{
-		"url": "/models/Character.glb"
+		"name": "Character",
+		"modelPath": "/models/Character.glb"
 	},
 	{
-		"url": "/models/CoffeeTable.glb"
+		"name": "CoffeeItem",
+		"modelPath": "/models/CoffeeTable.glb"
 	},
 	{
-		"url": "/models/IndoorTree.glb"
+		"name": "IndoorTree",
+		"modelPath": "/models/IndoorTree.glb"
 	},
 	{
-		"url": "/models/Keyboard.glb"
+		"name": "Keyboard",
+		"modelPath": "/models/Keyboard.glb"
 	},
 	{
-		"url": "/models/ModernTable.glb"
+		"name": "ModernTable",
+		"modelPath": "/models/ModernTable.glb"
 	},
 	{
-		"url": "/models/Office.glb"
+		"name": "Office",
+		"modelPath": "/models/Office.glb"
 	},
 	{
-		"url": "/models/Plant.glb"
+		"name": "Plant",
+		"modelPath": "/models/Plant.glb"
 	},
 	{
-		"url": "/models/SofaChair.glb"
+		"name": "Sofa Chair",
+		"modelPath": "/models/SofaChair.glb"
 	},
 	{
-		"url": "/models/SofaChair2.glb"
+		"name": "Sofa Chair",
+		"modelPath": "/models/SofaChair2.glb"
 	},
 	{
-		"url": "/models/YellowChair.glb"
+		"name": "Yellow Chair",
+		"modelPath": "/models/YellowChair.glb"
 	},
 	{
-		"url": "/models/Test.glb"
+		"name": "Chair",
+		"modelPath": "/models/Test.glb"
 	}
 ]

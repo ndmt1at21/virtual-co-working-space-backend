@@ -1,6 +1,7 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
+		"lib": ["es5", "es6", "ESNext", "DOM", "DOM.Iterable"],
 		"allowJs": true,
 		"target": "ESNext",
 		"module": "CommonJS",
@@ -9,6 +10,7 @@
 		"removeComments": true,
 		"esModuleInterop": true,
 		"isolatedModules": false,
+		"resolveJsonModule": true,
 		"noImplicitAny": true,
 		"forceConsistentCasingInFileNames": true,
 		"strictPropertyInitialization": false,

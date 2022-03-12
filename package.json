@@ -2,7 +2,7 @@
 	"name": "virtual-co-working-space-backend",
 	"version": "1.0.0",
 	"description": "",
-	"main": "server.js",
+	"main": "server.ts",
 	"scripts": {
 		"start": "nodemon -r tsconfig-paths/register src/server.ts",
 		"build": "tsc --project tsconfig.json",
@@ -21,6 +21,7 @@
 	},
 	"homepage": "https://github.com/vominhtrieu/virtual-co-working-space-backend#readme",
 	"dependencies": {
+		"@node-redis/json": "^1.0.2",
 		"@types/bcrypt": "^5.0.0",
 		"@types/cors": "^2.8.12",
 		"@types/express": "^4.17.13",
@@ -30,8 +31,8 @@
 		"@types/passport": "^1.0.7",
 		"@types/passport-facebook": "^2.1.11",
 		"@types/passport-google-oauth2": "^0.1.4",
-		"@types/socket.io": "^3.0.2",
 		"bcrypt": "^5.0.1",
+		"bull": "^4.7.0",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.13.2",
 		"cors": "^2.8.5",
@@ -53,11 +54,13 @@
 		"pg": "^8.7.1",
 		"pm2": "^5.1.2",
 		"query-string": "^7.1.1",
+		"redis": "^4.0.4",
 		"socket.io": "^4.4.1",
 		"typeorm": "0.2.41",
 		"winston": "^3.5.1"
 	},
 	"devDependencies": {
+		"@types/bull": "^3.15.8",
 		"@types/jest": "^27.4.0",
 		"@types/node": "^8.0.29",
 		"@types/swagger-ui-express": "^4.1.3",

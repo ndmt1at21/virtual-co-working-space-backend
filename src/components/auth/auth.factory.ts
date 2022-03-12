@@ -10,10 +10,16 @@ import { AuthService } from './auth.service';
 import { AuthValidate } from './auth.validate';
 import { createPasswordResetTokenService } from '../passwordResetToken/passwordResetToken.factory';
 import { createActiveUserTokenService } from '../activeUserToken/activeUserToken.factory';
+import { AuthMailQueueProducer } from './jobs/mail/mail.producer';
 
 export function createAuthController() {
 	const authService = createAuthService();
-	const authController = AuthController(authService, authLogger);
+	const authMailQueueProducer = AuthMailQueueProducer();
+	const authController = AuthController(
+		authMailQueueProducer,
+		authService,
+		authLogger
+	);
 	return authController;
 }
 

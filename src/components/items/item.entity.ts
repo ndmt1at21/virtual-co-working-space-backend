@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '@src/components/base/BaseEntity';
 
 @Entity({ name: 'item' })
@@ -7,6 +7,7 @@ export class Item extends BaseEntity {
 	id: string;
 
 	@Column()
+	@Index({})
 	name: string;
 
 	@Column({ unique: true, name: 'model_path' })

@@ -62,3 +62,11 @@ export const mailLogger = createLogger({
 		new transports.Console(debugOptions)
 	]
 });
+
+export const officeItemLogger = createLogger({
+	defaultMeta: { service: 'office-items-service' },
+	transports: [
+		new transports.File(commonOptions),
+		new transports.Console(debugOptions)
+	]
+});

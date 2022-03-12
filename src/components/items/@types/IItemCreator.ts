@@ -1,5 +1,5 @@
 import { Item } from '../item.entity';
-import { ItemDto } from './dto/item.dto';
+import { ItemDto } from './dto/Item.dto';
 
 export interface IItemCreator {
 	mapItemToItemDto: (item: Item) => ItemDto;

@@ -1,4 +1,4 @@
-import { ItemDto } from './@types/dto/item.dto';
+import { ItemDto } from './@types/dto/Item.dto';
 import { IItemCreator } from './@types/IItemCreator';
 import { Item } from './item.entity';
 

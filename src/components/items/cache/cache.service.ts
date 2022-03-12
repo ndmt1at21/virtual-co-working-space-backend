@@ -1,6 +1,6 @@
 import util from 'util';
 import { createClient } from 'redis';
-import { ItemDto } from '../@types/dto/item.dto';
+import { ItemDto } from '../@types/dto/Item.dto';
 import { IItemCacheService } from '../@types/IItemCacheService';
 
 const client = createClient({

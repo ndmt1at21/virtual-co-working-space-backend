@@ -2,6 +2,7 @@ import { ActiveUserToken } from '@src/components/activeUserToken/activeUserToken
 import { Item } from '@src/components/items/item.entity';
 import { OfficeItem } from '@src/components/officeItems/officeItem.entity';
 import { OfficeMember } from '@src/components/officeMembers/officeMember.entity';
+import { OfficeMemberTransform } from '@src/components/officeMemberTransform/officeMemberTransform.entity';
 import { OfficeRole } from '@src/components/officeRoles/officeRole.entity';
 import { Office } from '@src/components/offices/office.entity';
 import { PasswordResetToken } from '@src/components/passwordResetToken/passwordResetToken.entity';
@@ -19,6 +20,7 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 	username: config.db.pg.DB_USERNAME,
 	password: config.db.pg.DB_PASSWORD,
 	database: config.db.pg.DB_NAME,
+	dropSchema: true,
 	synchronize: true,
 	logging: false,
 	entities: [
@@ -30,7 +32,8 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		Office,
 		OfficeItem,
 		OfficeMember,
-		OfficeRole
+		OfficeRole,
+		OfficeMemberTransform
 	]
 };
 

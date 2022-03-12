@@ -1,7 +1,6 @@
 import passport from 'passport';
 import config from '@src/config';
 import queryString from 'query-string';
-import events from 'events';
 import { NextFunction, Request, Response } from 'express';
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { AuthErrorMessages } from './auth.error';
@@ -16,10 +15,13 @@ import { LoginDto } from './@types/dto/Login.dto';
 import { ResetPasswordContentDto } from './@types/dto/ResetPasswordContent.dto';
 import { ForgotPasswordDto } from './@types/dto/ForgotPassword.dto';
 import { RegisterDto } from './@types/dto/Register.dto';
+import { IAuthMailQueueProducer } from './jobs/mail/@types/IAuthMailQueueProducer';
 
-export const AuthController = (authService: IAuthService, logger: ILogger) => {
-	const eventEmitter = new events.EventEmitter();
-
+export const AuthController = (
+	authMailQueue: IAuthMailQueueProducer,
+	authService: IAuthService,
+	logger: ILogger
+) => {
 	const localLogin = catchAsyncRequestHandler(async (req, res, next) => {
 		const err = await validateRequestBody(LoginDto, req.body);
 		if (err) {
@@ -56,7 +58,7 @@ export const AuthController = (authService: IAuthService, logger: ILogger) => {
 			`User with email ${user.email} registered successfully has id ${user.id}`
 		);
 
-		eventEmitter.emit('user registered', { user, activeToken });
+		authMailQueue.addRegisterConfirmationJob(user, activeToken);
 
 		res.status(HttpStatusCode.CREATED).json({
 			user,
@@ -157,10 +159,10 @@ export const AuthController = (authService: IAuthService, logger: ILogger) => {
 			`Reset password token sent to email ${forgotPasswordDto.email}`
 		);
 
-		eventEmitter.emit('forgot password', {
-			email: forgotPasswordDto.email,
-			resetToken: resetToken.passwordResetToken
-		});
+		authMailQueue.addResetPasswordMailJob(
+			forgotPasswordDto.email,
+			resetToken.passwordResetToken
+		);
 
 		res.status(HttpStatusCode.OK).json({
 			message: 'Password reset token created successfully',

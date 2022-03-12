@@ -5,12 +5,13 @@ import { AuthErrorMessages } from './auth.error';
 import { IAuthValidate } from './@types/IAuthValidate';
 import { NextFunction, Request, Response } from 'express';
 import { UserRoleType } from '../users/@types/UserRoleType';
+import { IAuthMiddleware } from './@types/IAuthMiddleware';
 
 export const AuthMiddleware = (
 	userRepository: UserRepository,
 	authTokenService: IAuthTokenService,
 	authValidate: IAuthValidate
-) => {
+): IAuthMiddleware => {
 	const deserializeUser = catchAsyncRequestHandler(async (req, res, next) => {
 		const accessToken = req.headers.authorization?.split(' ')[1];
 

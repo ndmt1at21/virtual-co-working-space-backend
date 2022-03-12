@@ -2,7 +2,7 @@ import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { pageParser } from '@src/utils/pageParser';
 import { validateRequestBody } from '@src/utils/requestValidation';
-import { CreateItemDto } from './@types/dto/createItem.dto';
+import { CreateItemDto } from './@types/dto/CreateItem.dto';
 import { IItemService } from './@types/IItemService';
 
 export const ItemController = (itemService: IItemService) => {

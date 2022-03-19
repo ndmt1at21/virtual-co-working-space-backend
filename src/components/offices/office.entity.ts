@@ -1,7 +1,16 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	Entity,
+	Index,
+	JoinColumn,
+	ManyToOne,
+	OneToMany,
+	PrimaryGeneratedColumn
+} from 'typeorm';
 import { BaseEntity } from '../base/BaseEntity';
 import { OfficeItem } from '../officeItems/officeItem.entity';
 import { OfficeMember } from '../officeMembers/officeMember.entity';
+import { User } from '../users/user.entity';
 
 @Entity({ name: 'office' })
 export class Office extends BaseEntity {
@@ -12,11 +21,24 @@ export class Office extends BaseEntity {
 	name: string;
 
 	@Column({ unique: true, name: 'invitation_code' })
+	@Index()
 	invitationCode: string;
 
-	@OneToMany(() => OfficeItem, officeItem => officeItem.office)
+	@Column({ name: 'created_by_user_id' })
+	@Index()
+	createdByUserId: string;
+
+	@OneToMany(() => OfficeItem, officeItem => officeItem.office, {
+		cascade: true
+	})
 	officeItems: OfficeItem[];
 
-	@OneToMany(() => OfficeMember, officeMember => officeMember.office)
+	@OneToMany(() => OfficeMember, officeMember => officeMember.office, {
+		cascade: true
+	})
 	officeMembers: OfficeMember[];
+
+	@ManyToOne(() => User)
+	@JoinColumn({ name: 'created_by_user_id' })
+	createdBy: User;
 }

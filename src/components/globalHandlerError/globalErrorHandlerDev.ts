@@ -9,7 +9,7 @@ export const globalErrorHandlerDev: ErrorRequestHandler = (
 	next
 ) => {
 	if (err instanceof AppError) {
-		res.status(err.httpCode).json({
+		res.status(err.statusCode).json({
 			message: err.message,
 			stack: err.stack,
 			error: err

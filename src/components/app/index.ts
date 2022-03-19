@@ -3,7 +3,7 @@ import { Server as HttpServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import { globalErrorHandler } from '../globalHandlerError';
 import { ILogger } from '../logger/@types/ILogger';
-import { connectDatabase } from './loaders/database';
+import { connectDatabase, initDatabase } from './loaders/database';
 import { mainMiddleware, mainRoutes } from './loaders/main';
 import { socketEventHandlers, socketMiddleware } from './loaders/socket';
 
@@ -13,6 +13,9 @@ export const mainAppLoaders = async (
 ): Promise<void> => {
 	await connectDatabase();
 	logger.info('Database connection has been established successfully.');
+
+	await initDatabase();
+	logger.info('Database has been initialized successfully.');
 
 	mainMiddleware(app, logger);
 	logger.info('Middleware has been loaded.');

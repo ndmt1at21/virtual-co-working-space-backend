@@ -43,7 +43,4 @@ export const mainMiddleware = (app: Application, logger: ILogger) => {
 			{ stream: { write: msg => logger.info(msg) } }
 		)
 	);
-
-	const authMiddleware = createAuthMiddleware();
-	app.use(authMiddleware.deserializeUser);
 };

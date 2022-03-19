@@ -1,3 +1,4 @@
+import config from '@src/config';
 import { ActiveUserToken } from '@src/components/activeUserToken/activeUserToken.entity';
 import { Item } from '@src/components/items/item.entity';
 import { OfficeItem } from '@src/components/officeItems/officeItem.entity';
@@ -8,10 +9,11 @@ import { Office } from '@src/components/offices/office.entity';
 import { PasswordResetToken } from '@src/components/passwordResetToken/passwordResetToken.entity';
 import { RefreshToken } from '@src/components/refreshToken/refreshToken.entity';
 import { User } from '@src/components/users/user.entity';
-import config from '@src/config';
-import { createConnection, createConnections } from 'typeorm';
+import { createConnection } from 'typeorm';
 import { MongoConnectionOptions } from 'typeorm/driver/mongodb/MongoConnectionOptions';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
+import { CacheConnectOption, createCacheConnection } from './cache';
+import { OfficeMemberRole } from '@src/components/officeMemberRole/officeMemberRole.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -20,9 +22,7 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 	username: config.db.pg.DB_USERNAME,
 	password: config.db.pg.DB_PASSWORD,
 	database: config.db.pg.DB_NAME,
-	dropSchema: true,
 	synchronize: true,
-	logging: false,
 	entities: [
 		User,
 		RefreshToken,
@@ -33,7 +33,8 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		OfficeItem,
 		OfficeMember,
 		OfficeRole,
-		OfficeMemberTransform
+		OfficeMemberTransform,
+		OfficeMemberRole
 	]
 };
 
@@ -45,19 +46,33 @@ const ormMongoOptions: MongoConnectionOptions = {
 	password: config.db.mongo.DB_PASSWORD,
 	database: config.db.mongo.DB_NAME,
 	logging: false,
+	dropSchema: true,
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 	synchronize: true,
 	entities: []
 };
 
+const officeMemberTransformCache: CacheConnectOption = {
+	connName: 'officeMemberTransform',
+	options: {
+		socket: {
+			port: 6379,
+			host: 'localhost'
+		}
+	}
+};
+
 export const connectDatabase = async (): Promise<void> => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			await createConnection(ormPostgresOptions);
+			await createCacheConnection([officeMemberTransformCache]);
 			resolve();
 		} catch (err: any) {
 			reject('Unable to connect to database: ' + err.message);
 		}
 	});
 };
+
+export * from './initDatabase';

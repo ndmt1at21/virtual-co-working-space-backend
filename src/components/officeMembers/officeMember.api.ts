@@ -14,7 +14,10 @@ export const OfficeMemberRouter = () => {
 		.get(officeMemberController.getOfficeMemberById)
 		.delete(officeMemberController.deleteOfficeMember);
 
-	router.route('/').get(officeMemberController.getOfficeMembersDetail);
+	router
+		.route('/')
+		.get(officeMemberController.getOfficeMembersDetail)
+		.post(officeMemberController.addMemberToOffice);
 
 	return router;
 };

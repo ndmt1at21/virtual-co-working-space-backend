@@ -2,6 +2,7 @@ import { pageParser } from '@src/utils/pageParser';
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { IOfficeMemberService } from './@types/IOfficeMemberService';
+import { CreateOfficeMemberDto } from './@types/dto/CreateOfficeMember.dto';
 
 export const OfficeMemberController = (
 	officeMemberService: IOfficeMemberService
@@ -52,5 +53,25 @@ export const OfficeMemberController = (
 		}
 	);
 
-	return { getOfficeMemberById, getOfficeMembersDetail, deleteOfficeMember };
+	const addMemberToOffice = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			const createOfficeMemberDto = req.body as CreateOfficeMemberDto;
+
+			const officeMember = await officeMemberService.createOfficeMember(
+				createOfficeMemberDto
+			);
+
+			res.status(HttpStatusCode.OK).json({
+				status: 'success',
+				officeMember
+			});
+		}
+	);
+
+	return {
+		getOfficeMemberById,
+		getOfficeMembersDetail,
+		deleteOfficeMember,
+		addMemberToOffice
+	};
 };

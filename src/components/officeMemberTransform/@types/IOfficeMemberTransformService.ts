@@ -3,19 +3,14 @@ import { OfficeMemberTransformDto } from './dto/OfficeMemberTransform.dto';
 import { UpdateOfficeMemberTransformDto } from './dto/UpdateOfficeMemberTransform';
 
 export interface IOfficeMemberTransformService {
-	createTransform(
+	updateTransformInCacheById(
 		officeMemberId: string,
-		memberTransform?: OfficeMemberTransform
-	): Promise<OfficeMemberTransformDto>;
-
-	updateTransform(
-		officeMemberId: string,
-		memberTransform: UpdateOfficeMemberTransformDto
+		transformDto: UpdateOfficeMemberTransformDto
 	): Promise<void>;
 
-	deleteTransform(id: string): Promise<void>;
+	backupTransformFromCacheById(id: string): Promise<void>;
 
-	findTransformByOfficeMemberId(
-		memberId: string
+	findTransformById(
+		id: string
 	): Promise<OfficeMemberTransformDto | undefined>;
 }

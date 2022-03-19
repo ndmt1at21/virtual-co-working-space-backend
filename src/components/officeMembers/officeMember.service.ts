@@ -2,17 +2,16 @@ import { NotFoundError } from '@src/utils/appError';
 import { OfficeMemberDetailDto } from './@types/dto/OfficeMemberDetail.dto';
 import { OfficeMemberOverviewDto } from './@types/dto/OfficeMemberOverview.dto';
 import { OfficeMemberRepository } from './officeMember.repository';
-import { IOfficeMemberTransformService } from '../officeMemberTransform/@types/IOfficeMemberTransformService';
 import { IOfficeMemberCreator } from './@types/IOfficeMemberCreator';
 import { CreateOfficeMemberDto } from './@types/dto/CreateOfficeMember.dto';
 import { IOfficeMemberService } from './@types/IOfficeMemberService';
-import { UpdateOfficeMemberTransformDto } from '../officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
+import { UpdateOfficeMemberTransformDto } from '@components/officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
 import { OfficeMemberErrorMessages } from './officeMember.error';
 import { OfficeMemberOnlineStatus } from './@types/OfficeMemberOnlineStatus';
 import { Pageable } from '@src/@types/Pageable';
 import { mapOfficeMemberToOfficeMemberDetailDto } from './officeMember.mapping';
 import { IOfficeMemberValidate } from './@types/IOfficeMemberValidate';
-import { OfficeMemberTransformRepository } from '../officeMemberTransform/officeMemberTransform.repository';
+import { OfficeMemberTransformRepository } from '@components/officeMemberTransform/officeMemberTransform.repository';
 
 export const OfficeMemberService = (
 	officeMemberRepository: OfficeMemberRepository,
@@ -48,6 +47,12 @@ export const OfficeMemberService = (
 		transform: UpdateOfficeMemberTransformDto
 	): Promise<void> => {
 		// await officeMemberTransformService.updateTransform(id, transform);
+	};
+
+	const findOfficeMemberOverviewById = async (
+		id: string
+	): Promise<OfficeMemberOverviewDto> => {
+		return await officeMemberCreator.createOfficeMemberOverviewById(id);
 	};
 
 	const findOfficeMemberDetailById = async (
@@ -100,6 +105,7 @@ export const OfficeMemberService = (
 		createOfficeMember,
 		deleteOfficeMemberById,
 		updateOfficeMemberTransformById,
+		findOfficeMemberOverviewById,
 		findOfficeMemberDetailById,
 		findOfficeMembersDetail,
 		setOfficeMemberOnlineStatusById

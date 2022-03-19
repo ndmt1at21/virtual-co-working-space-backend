@@ -1,5 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import { validate, ValidationError } from 'class-validator';
+import { validate } from 'class-validator';
 
 type RequestBodyValidationError = {
 	[key: string]: string;

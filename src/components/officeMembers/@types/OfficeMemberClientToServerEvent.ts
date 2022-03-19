@@ -2,6 +2,6 @@ import { UpdateOfficeMemberTransformDto } from '@src/components/officeMemberTran
 import { JoinToOfficeRoomDto } from './dto/JoinToOfficeRoom.dto';
 
 export interface OfficeMemberClientToServerEvent {
-	join: (data: JoinToOfficeRoomDto) => void;
-	move: (transform: UpdateOfficeMemberTransformDto) => void;
+	'office_member:join': (data: JoinToOfficeRoomDto) => void;
+	'office_member:move': (transform: UpdateOfficeMemberTransformDto) => void;
 }

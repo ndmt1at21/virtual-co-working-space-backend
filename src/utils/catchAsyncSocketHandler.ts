@@ -1,21 +1,16 @@
 import { Socket } from 'socket.io';
-import { ExtendedError } from 'socket.io/dist/namespace';
-import { AppError } from './appError';
 
-type SocketRequestHandler = (
-	socket: Socket,
-	next: (err?: ExtendedError) => void
-) => void;
+export type AsyncSocketHandler = (...args: any[]) => Promise<void>;
 
-type AsyncSocketRequestHandler = (
-	socket: Socket,
-	next: (err?: ExtendedError) => void
-) => Promise<AppError | void>;
+export type SocketHandler = (...args: any[]) => void;
 
 export const catchAsyncSocketHandler = (
-	fn: AsyncSocketRequestHandler
-): SocketRequestHandler => {
-	return (socket, next) => {
-		fn(socket, next).catch(err => next(err));
+	socket: Socket,
+	fn: AsyncSocketHandler
+): SocketHandler => {
+	return (...args) => {
+		fn(args).catch(err => {
+			socket.emit('error', err);
+		});
 	};
 };

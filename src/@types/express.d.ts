@@ -1,5 +1,4 @@
 import { Socket } from 'socket.io';
-import { UserDetails } from './UserDetails';
 
 declare global {
 	namespace Express {
@@ -9,8 +8,15 @@ declare global {
 			roles: string[];
 		}
 
+		interface Office {
+			id: string;
+			createdBy: string;
+			role: string[];
+		}
+
 		interface Request {
 			user?: User;
+			office?: Office;
 		}
 	}
 }
@@ -22,8 +28,14 @@ declare module 'socket.io' {
 		roles: string[];
 	}
 
+	interface OfficeMember {
+		id: string;
+		officeId: string;
+		roles: string[];
+	}
+
 	interface Socket {
-		user?: UserDetails;
+		user?: User;
 	}
 }
 

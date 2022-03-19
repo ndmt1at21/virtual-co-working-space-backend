@@ -16,15 +16,9 @@ const startServer = async () => {
 
 	try {
 		await mainAppLoaders(app, serverLogger);
-		const socketServer = socketServerLoader(server, serverLogger);
-		const httpServer = httpServerLoader(
-			server,
-			appConfig.PORT,
-			serverLogger
-		);
 
-		globalManager.httpServer = httpServer;
-		globalManager.socketServer = socketServer;
+		socketServerLoader(server, serverLogger);
+		httpServerLoader(server, appConfig.PORT, serverLogger);
 	} catch (err) {
 		serverLogger.error(err);
 	}

@@ -17,6 +17,8 @@ export interface IOfficeMemberService {
 		transform: UpdateOfficeMemberTransformDto
 	): Promise<void>;
 
+	findOfficeMemberOverviewById(id: string): Promise<OfficeMemberOverviewDto>;
+
 	findOfficeMemberDetailById(id: string): Promise<OfficeMemberDetailDto>;
 
 	findOfficeMembersDetail(

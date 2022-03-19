@@ -5,7 +5,6 @@ import express from 'express';
 import { Application } from 'express';
 import { appConfig } from '@src/config/app';
 import { ILogger } from '@components/logger/@types/ILogger';
-import { createAuthMiddleware } from '@src/components/auth/auth.factory';
 import { rateLimiting } from '../../middleware/rateLimit';
 
 export const mainMiddleware = (app: Application, logger: ILogger) => {

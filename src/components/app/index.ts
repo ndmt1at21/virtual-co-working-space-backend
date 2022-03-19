@@ -52,15 +52,14 @@ export const socketServerLoader = (
 ): SocketServer => {
 	const socketServer = new SocketServer(server, {
 		cors: {
-			origin: 'https://vispace.tech, http://localhost:3000'
-		}
+			origin: true
+		},
+		transports: ['polling', 'websocket'],
+		path: '/socket.io'
 	});
 	logger.info(`Socket server is initialized.`);
 
-	socketMiddleware(socketServer, logger);
-	logger.info(`Socket middleware has been loaded.`);
-
-	socketEventHandlers(socketServer, logger);
+	socketEventHandlers(socketServer);
 	logger.info(`Socket event handlers has been loaded.`);
 
 	return socketServer;

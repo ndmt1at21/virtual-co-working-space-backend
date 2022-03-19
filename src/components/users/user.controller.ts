@@ -8,9 +8,9 @@ import { IUserService } from './@types/IUserService';
 
 export const UserController = (userService: IUserService) => {
 	const createUser = catchAsyncRequestHandler(async (req, res, next) => {
-		const err = await validateRequestBody(CreateUserDto, req.body);
-		if (err) {
-			throw new IllegalArgumentError(err);
+		const errors = await validateRequestBody(CreateUserDto, req.body);
+		if (errors.length > 0) {
+			throw new IllegalArgumentError('Invalid user data', errors);
 		}
 
 		const createUserDto = req.body as CreateUserDto;

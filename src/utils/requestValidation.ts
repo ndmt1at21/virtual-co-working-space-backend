@@ -1,18 +1,29 @@
 import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
+import { validate, ValidationError } from 'class-validator';
+
+type RequestBodyValidationError = {
+	[key: string]: string;
+};
 
 // validate req.body, return first constraint error or null
 export const validateRequestBody = async (
 	classToConvert: any,
 	body: any
-): Promise<string | undefined> => {
+): Promise<RequestBodyValidationError[]> => {
 	const data = plainToInstance(classToConvert, body);
 
 	const errors = await validate(data, { skipMissingProperties: true });
 
-	if (errors.length > 0) {
-		const constraints = errors[0].constraints;
-		console.log(constraints);
-		return '';
-	}
+	const bodyErrors: RequestBodyValidationError[] = [];
+
+	errors.forEach(err => {
+		const { property, constraints } = err;
+
+		if (constraints) {
+			const firstKey = Object.keys(constraints)[0];
+			bodyErrors.push({ [property]: constraints[firstKey] });
+		}
+	});
+
+	return bodyErrors;
 };

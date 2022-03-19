@@ -2,15 +2,19 @@ import { HttpStatusCode } from '@src/constant/httpStatusCode';
 
 export class AppError extends Error {
 	isOperational: boolean;
-	public httpCode: number;
-	public message: string;
+	status: string;
+	statusCode: number;
+	message: string;
+	errors: any[];
 
-	constructor(httpCode: number, message: string) {
+	constructor(statusCode: number, message: string, errors?: any[]) {
 		super();
 
 		this.isOperational = true;
-		this.httpCode = httpCode;
+		this.status = 'error';
+		this.statusCode = statusCode;
 		this.message = message;
+		this.errors = errors || [];
 
 		Error.captureStackTrace(this, this.constructor);
 	}
@@ -23,8 +27,8 @@ export class NotFoundError extends AppError {
 }
 
 export class IllegalArgumentError extends AppError {
-	constructor(message: string) {
-		super(HttpStatusCode.BAD_REQUEST, message);
+	constructor(message: string, errors?: any[]) {
+		super(HttpStatusCode.BAD_REQUEST, message, errors);
 	}
 }
 

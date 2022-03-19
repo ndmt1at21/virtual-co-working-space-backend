@@ -50,13 +50,13 @@ export const AuthTokenService = (
 		await refreshTokenRepository.deleteByToken(refreshToken);
 	};
 
-	const getUserIdFromAccessToken = async (token: string): Promise<number> => {
+	const getUserIdFromAccessToken = async (token: string): Promise<string> => {
 		const payload = (await util.promisify(jwt.verify)(
 			token,
 			config.auth.JWT_SECRET
 		)) as jwt.JwtPayload;
 
-		return +payload.userId;
+		return payload.userId;
 	};
 
 	const validateAccessToken = async (token: string): Promise<boolean> => {

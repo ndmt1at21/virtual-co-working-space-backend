@@ -7,7 +7,7 @@ export interface IAuthTokenService {
 
 	createRefreshToken: (userId: string) => Promise<string>;
 
-	getUserIdFromAccessToken: (token: string) => Promise<number>;
+	getUserIdFromAccessToken: (token: string) => Promise<string>;
 
 	blockRefreshToken: (refreshToken: string) => Promise<void>;
 

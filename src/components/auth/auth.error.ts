@@ -3,8 +3,9 @@ export const AuthErrorMessages = {
 		'Your email or password were incorrect',
 	UNAUTHORIZED_INCORRECT_EXTERNAL: 'Your external login was incorrect',
 	UNAUTHORIZED_USER_BLOCKED: 'User is blocked',
-	UNAUTHORIZED_MISSING_TOKEN: 'Access token and refresh token are required',
-	UNAUTHORIZED_INVALID_TOKEN: 'Access token is invalid',
+	UNAUTHORIZED_USER_NOT_FOUND: 'User not found',
+	UNAUTHORIZED_MISSING_TOKEN: 'Access token is required',
+	UNAUTHORIZED_INVALID_TOKEN: 'Access token has expired or is not yet valid',
 	UNAUTHORIZED_ALREADY_LOGGED_IN: 'You are already logged in',
 	UNAUTHORIZED_PERMISSION_DENIED:
 		'You do not have permission to access this resource',

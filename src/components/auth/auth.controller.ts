@@ -23,10 +23,10 @@ export const AuthController = (
 	logger: ILogger
 ) => {
 	const localLogin = catchAsyncRequestHandler(async (req, res, next) => {
-		const err = await validateRequestBody(LoginDto, req.body);
-		if (err) {
-			logger.error(`User cannot login: ${err}`);
-			throw new IllegalArgumentError(err);
+		const errors = await validateRequestBody(LoginDto, req.body);
+		if (errors.length > 0) {
+			logger.error(`User cannot login: ${errors}`);
+			throw new IllegalArgumentError('Invalid login data', errors);
 		}
 
 		const loginDto = req.body as LoginDto;
@@ -43,10 +43,10 @@ export const AuthController = (
 	});
 
 	const localRegister = catchAsyncRequestHandler(async (req, res, next) => {
-		const err = await validateRequestBody(RegisterDto, req.body);
-		if (err) {
-			logger.error(`User create login: ${err}`);
-			throw new IllegalArgumentError(err);
+		const errors = await validateRequestBody(RegisterDto, req.body);
+		if (errors.length > 0) {
+			logger.error(`User create login: ${errors}`);
+			throw new IllegalArgumentError('Invalid register data', errors);
 		}
 
 		const registerDto = req.body as RegisterDto;
@@ -146,12 +146,16 @@ export const AuthController = (
 	);
 
 	const forgotPassword = catchAsyncRequestHandler(async (req, res, next) => {
-		const err = await validateRequestBody(ForgotPasswordDto, req.body);
-		if (err) {
-			logger.error(`Cannot reset password: ${err}`);
-			throw new IllegalArgumentError(err);
+		const errors = await validateRequestBody(ForgotPasswordDto, req.body);
+		if (errors.length > 0) {
+			logger.error(`Cannot reset password: ${errors}`);
+			throw new IllegalArgumentError(
+				'Invalid forgot password request',
+				errors
+			);
 		}
 
+		// TODO: not show user not found, just show email was sent
 		const forgotPasswordDto = req.body as ForgotPasswordDto;
 		const resetToken = await authService.forgotPassword(forgotPasswordDto);
 
@@ -179,13 +183,16 @@ export const AuthController = (
 			);
 		}
 
-		const err = await validateRequestBody(
+		const errors = await validateRequestBody(
 			ResetPasswordContentDto,
 			req.body
 		);
-		if (err) {
-			logger.error(`Cannot reset password: ${err}`);
-			throw new IllegalArgumentError(err);
+		if (errors.length > 0) {
+			logger.error(`Cannot reset password: ${errors}`);
+			throw new IllegalArgumentError(
+				'Invalid reset password request',
+				errors
+			);
 		}
 
 		const resetPasswordContentDto = req.body as ResetPasswordContentDto;

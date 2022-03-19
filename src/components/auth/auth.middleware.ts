@@ -1,59 +1,49 @@
+import { NextFunction, Request, Response } from 'express';
+import { User } from '@components/users/user.entity';
 import { UserRepository } from '@components/users/user.repository';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { IAuthTokenService } from '@components/authToken/@types/IAuthTokenService';
 import { AuthErrorMessages } from './auth.error';
-import { IAuthValidate } from './@types/IAuthValidate';
-import { NextFunction, Request, Response } from 'express';
-import { UserRoleType } from '../users/@types/UserRoleType';
+import { UserRoleType } from '@components/users/@types/UserRoleType';
 import { IAuthMiddleware } from './@types/IAuthMiddleware';
+import { UnauthorizedError } from '@src/utils/appError';
+import { IAuthValidate } from './@types/IAuthValidate';
 
 export const AuthMiddleware = (
 	userRepository: UserRepository,
 	authTokenService: IAuthTokenService,
 	authValidate: IAuthValidate
 ): IAuthMiddleware => {
-	const deserializeUser = catchAsyncRequestHandler(async (req, res, next) => {
+	const protect = catchAsyncRequestHandler(async (req, res, next) => {
 		const accessToken = req.headers.authorization?.split(' ')[1];
 
 		if (!accessToken) {
-			return next();
+			throw new UnauthorizedError(
+				AuthErrorMessages.UNAUTHORIZED_MISSING_TOKEN
+			);
 		}
 
-		await authTokenService.validateAccessToken(accessToken);
+		const { id, type, email } = await deserializeUser(accessToken);
 
-		const userId = await authTokenService.getUserIdFromAccessToken(
-			accessToken
-		);
-
-		// await authTokenService.validateRefreshToken(userId, refreshToken);
-		await authValidate.validateUserCanAccessResourceById(userId);
-
-		const user = await userRepository.findById(userId);
-
-		const { id, email, type } = user!;
-		req.user = { id, email, roles: [type] };
+		req.user = {
+			id,
+			roles: [type],
+			email
+		};
 
 		next();
 	});
 
-	const protect = catchAsyncRequestHandler(async (req, res, next) => {
-		if (req.user) {
-			next();
-		}
-
-		if (!req.user) {
-			next(AuthErrorMessages.UNAUTHORIZED_MISSING_TOKEN);
-		}
-	});
-
 	const restrictToGuest = catchAsyncRequestHandler(async (req, res, next) => {
-		if (req.user) {
-			next(AuthErrorMessages.UNAUTHORIZED_ALREADY_LOGGED_IN);
+		const accessToken = req.headers.authorization?.split(' ')[1];
+
+		if (accessToken) {
+			throw new UnauthorizedError(
+				AuthErrorMessages.UNAUTHORIZED_ALREADY_LOGGED_IN
+			);
 		}
 
-		if (!req.user) {
-			next();
-		}
+		next();
 	});
 
 	const restrictTo = (roles: UserRoleType[]) => {
@@ -72,5 +62,23 @@ export const AuthMiddleware = (
 		};
 	};
 
-	return { deserializeUser, protect, restrictTo, restrictToGuest };
+	async function deserializeUser(accessToken: string): Promise<User> {
+		await authTokenService.validateAccessToken(accessToken);
+
+		const userId = await authTokenService.getUserIdFromAccessToken(
+			accessToken
+		);
+
+		await authValidate.validateUserCanAccessResourceById(userId);
+		const user = await userRepository.findById(userId);
+
+		if (!user)
+			throw new UnauthorizedError(
+				AuthErrorMessages.UNAUTHORIZED_USER_NOT_FOUND
+			);
+
+		return user;
+	}
+
+	return { protect, restrictTo, restrictToGuest };
 };

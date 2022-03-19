@@ -13,6 +13,8 @@ export interface IOfficeMemberTransformService {
 		memberTransform: UpdateOfficeMemberTransformDto
 	): Promise<void>;
 
+	deleteTransform(id: string): Promise<void>;
+
 	findTransformByOfficeMemberId(
 		memberId: string
 	): Promise<OfficeMemberTransformDto | undefined>;

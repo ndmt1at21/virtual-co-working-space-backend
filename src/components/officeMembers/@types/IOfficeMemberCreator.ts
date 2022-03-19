@@ -4,17 +4,13 @@ import { OfficeMemberDetailDto } from './dto/OfficeMemberDetail.dto';
 import { OfficeMemberOverviewDto } from './dto/OfficeMemberOverview.dto';
 
 export interface IOfficeMemberCreator {
-	createOfficeMemberOverview(
-		officeMember: OfficeMember,
-		transform: OfficeMemberTransformDto
-	): OfficeMemberOverviewDto;
+	createOfficeMemberOverviewById(
+		id: string
+	): Promise<OfficeMemberOverviewDto>;
 
-	createOfficeMemberDetail(
-		officeMember: OfficeMember,
-		transform: OfficeMemberTransformDto
-	): OfficeMemberDetailDto;
+	createOfficeMemberDetailById(id: string): Promise<OfficeMemberDetailDto>;
 
-	createOfficeMembersOverview(
-		officeMembers: OfficeMember[]
-	): OfficeMemberOverviewDto[];
+	createOfficeMembersOverviewByOfficeId(
+		officeId: string
+	): Promise<OfficeMemberOverviewDto[]>;
 }

@@ -1,4 +1,3 @@
-import { Transform3D } from '../../officeMembers/@types/Transform3D';
 import { OfficeMemberTransformDto } from './dto/OfficeMemberTransform.dto';
 
 export interface IOfficeMemberTransformCache {

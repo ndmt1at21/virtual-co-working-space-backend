@@ -1,24 +1,26 @@
 import { createClient } from 'redis';
 
-const client = createClient({
-	socket: {
-		host: 'localhost',
-		port: 6383
-	}
-});
+export const connectDatabase = async () => {
+	const client = createClient({
+		socket: {
+			host: 'localhost',
+			port: 6383
+		}
+	});
 
-client.connect();
+	await client.connect();
 
-client.on('connect', () =>
-	console.log(
-		'Redis client for caching office members transform has been connected.'
-	)
-);
+	client.on('connect', () =>
+		console.log(
+			'Redis client for caching office members transform has been connected.'
+		)
+	);
 
-client.on('error', () =>
-	console.log(
-		'Redis client for caching office members transform has encountered an error.'
-	)
-);
+	client.on('error', () =>
+		console.log(
+			'Redis client for caching office members transform has encountered an error.'
+		)
+	);
 
-export default client;
+	return client;
+};

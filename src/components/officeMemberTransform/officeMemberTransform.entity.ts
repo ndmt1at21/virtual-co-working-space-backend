@@ -4,6 +4,9 @@ import { OfficeMember } from '../officeMembers/officeMember.entity';
 
 @Entity({ name: 'office_member_transform' })
 export class OfficeMemberTransform extends BaseEntity {
+	@PrimaryColumn({ name: 'office_member_id' })
+	officeMemberId: string;
+
 	@Column({ name: 'x_rotation', default: 0 })
 	xRotation: number;
 
@@ -22,7 +25,7 @@ export class OfficeMemberTransform extends BaseEntity {
 	@Column({ name: 'z_position', default: 0 })
 	zPosition: number;
 
-	@OneToOne(() => OfficeMember, { primary: true })
-	@JoinColumn()
+	@OneToOne(() => OfficeMember)
+	@JoinColumn({ name: 'office_member_id' })
 	officeMember: OfficeMember;
 }

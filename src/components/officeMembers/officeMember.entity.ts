@@ -3,38 +3,55 @@ import {
 	Entity,
 	JoinColumn,
 	ManyToOne,
+	OneToMany,
 	OneToOne,
-	PrimaryColumn,
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { Office } from '@src/components/offices/office.entity';
-import { OfficeRole } from '@src/components/officeRoles/officeRole.entity';
-import { User } from '../users/user.entity';
-import { BaseEntity } from '../base/BaseEntity';
+import { User } from '@components/users/user.entity';
+import { BaseEntity } from '@components/base/BaseEntity';
+import { OfficeMemberTransform } from '@components/officeMemberTransform/officeMemberTransform.entity';
+import { OfficeMemberOnlineStatus } from './@types/OfficeMemberOnlineStatus';
+import { OfficeMemberRole } from '../officeMemberRole/officeMemberRole.entity';
 
 @Entity({ name: 'office_member' })
 export class OfficeMember extends BaseEntity {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
-	@PrimaryColumn({ name: 'member_id' })
+	@Column({ name: 'member_id' })
 	memberId: string;
 
-	@PrimaryColumn({ name: 'office_id' })
+	@Column({ name: 'office_id' })
 	officeId: string;
 
-	@Column({ name: 'office_role_id' })
-	officeRoleId: number;
+	@Column({
+		name: 'online_status',
+		type: 'enum',
+		enum: OfficeMemberOnlineStatus,
+		default: OfficeMemberOnlineStatus.OFFLINE
+	})
+	onlineStatus: OfficeMemberOnlineStatus;
 
-	@ManyToOne(() => User)
-	@JoinColumn({ name: 'user_id' })
+	@ManyToOne(() => User, { onDelete: 'CASCADE' })
+	@JoinColumn({ name: 'member_id' })
 	member: User;
 
-	@ManyToOne(() => Office)
+	@ManyToOne(() => Office, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'office_id' })
 	office: Office;
 
-	@ManyToOne(() => OfficeRole)
-	@JoinColumn({ name: 'office_role_id' })
-	officeRole: OfficeRole;
+	@OneToMany(
+		() => OfficeMemberRole,
+		officeMemberRole => officeMemberRole.officeMember,
+		{ cascade: true }
+	)
+	roles: OfficeMemberRole[];
+
+	@OneToOne(
+		() => OfficeMemberTransform,
+		officeTransform => officeTransform.officeMember,
+		{ cascade: true }
+	)
+	transform: OfficeMemberTransform;
 }

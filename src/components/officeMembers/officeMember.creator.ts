@@ -1,83 +1,64 @@
-import { OfficeMemberTransform } from '../officeMemberTransform/officeMemberTransform.entity';
 import { OfficeMemberDetailDto } from './@types/dto/OfficeMemberDetail.dto';
 import { OfficeMemberOverviewDto } from './@types/dto/OfficeMemberOverview.dto';
 import { IOfficeMemberCreator } from './@types/IOfficeMemberCreator';
-import { Transform3D } from './@types/Transform3D';
-import { OfficeMember } from './officeMember.entity';
+import { OfficeMemberRepository } from './officeMember.repository';
+import {
+	mapOfficeMemberToOfficeMemberDetailDto,
+	mapOfficeMemberToOfficeMemberOverviewDto
+} from './officeMember.mapping';
 
-export const OfficeMemberCreator = () => {
-	const createOfficeMemberOverview = (
-		officeMember: OfficeMember,
-		transform: OfficeMemberTransform
-	): OfficeMemberOverviewDto => {
-		const { id, officeId, memberId } = officeMember;
+export const OfficeMemberCreator = (
+	officeMemberRepository: OfficeMemberRepository
+): IOfficeMemberCreator => {
+	const createOfficeMemberOverviewById = async (
+		id: string
+	): Promise<OfficeMemberOverviewDto> => {
+		const officeMember = await officeMemberRepository
+			.queryBuilder()
+			.findById(id)
+			.withMember()
+			.withTransform()
+			.build()
+			.getOne();
 
-		return {
-			id,
-			officeId,
-			memberId,
-			transform: mapOfficeTransformToTransform3D(transform)
-		};
+		return mapOfficeMemberToOfficeMemberOverviewDto(officeMember!);
 	};
 
-	const createOfficeMemberDetail = (
-		officeMember: OfficeMember,
-		transform: OfficeMemberTransform
-	): OfficeMemberDetailDto => {
-		const { id, office, member } = officeMember;
+	const createOfficeMemberDetailById = async (
+		id: string
+	): Promise<OfficeMemberDetailDto> => {
+		const officeMember = await officeMemberRepository
+			.queryBuilder()
+			.findById(id)
+			.withMember()
+			.withOfficeHasCreator()
+			.withTransform()
+			.withRoles()
+			.build()
+			.getOne();
 
-		return {
-			id,
-			office: {
-				id: office.id,
-				name: office.name,
-				invitationCode: office.invitationCode
-			},
-			member: {
-				id: member.id,
-				name: member.name
-			},
-			transform: mapOfficeTransformToTransform3D(transform)
-		};
+		return mapOfficeMemberToOfficeMemberDetailDto(officeMember!);
 	};
 
-	const createOfficeMembersOverview = (
-		officeMembers: OfficeMember[]
-	): OfficeMemberOverviewDto[] => {
-		return officeMembers.map(officeMember => {
-			const { id, officeId, memberId } = officeMember;
+	const createOfficeMembersOverviewByOfficeId = async (
+		officeId: string
+	): Promise<OfficeMemberOverviewDto[]> => {
+		const officeMembers = await officeMemberRepository
+			.queryBuilder()
+			.findByOfficeId(officeId)
+			.withMember()
+			.withTransform()
+			.build()
+			.getMany();
 
-			return {
-				id,
-				officeId,
-				memberId,
-				transform: mapOfficeTransformToTransform3D(
-					{} as OfficeMemberTransform
-				)
-			};
-		});
+		return officeMembers.map(o =>
+			mapOfficeMemberToOfficeMemberOverviewDto(o)
+		);
 	};
 
-	function mapOfficeTransformToTransform3D(
-		memberTransformDto: OfficeMemberTransform
-	): Transform3D {
-		const {
-			xPosition,
-			yPosition,
-			zPosition,
-			xRotation,
-			yRotation,
-			zRotation
-		} = memberTransformDto;
-
-		return {
-			position: { x: xPosition, y: yPosition, z: zPosition },
-			rotation: { x: xRotation, y: yRotation, z: zRotation }
-		};
-	}
 	return {
-		createOfficeMemberOverview,
-		createOfficeMemberDetail,
-		createOfficeMembersOverview
+		createOfficeMemberOverviewById,
+		createOfficeMemberDetailById,
+		createOfficeMembersOverviewByOfficeId
 	};
 };

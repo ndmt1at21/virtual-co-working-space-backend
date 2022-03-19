@@ -1,11 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '@src/components/base/BaseEntity';
 
 @Entity({ name: 'office_role' })
 export class OfficeRole extends BaseEntity {
 	@PrimaryGeneratedColumn('uuid')
-	id: number;
+	id: string;
 
 	@Column({ unique: true })
+	@Index()
 	name: string;
 }

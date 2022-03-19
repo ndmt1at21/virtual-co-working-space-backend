@@ -1,7 +1,7 @@
 import { CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
 
 export abstract class BaseEntity {
-	@CreateDateColumn({ name: 'createdAt' })
+	@CreateDateColumn({ name: 'created_at' })
 	createdAt: Date;
 
 	@UpdateDateColumn({ name: 'updated_at' })

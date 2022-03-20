@@ -52,7 +52,7 @@ export const socketServerLoader = (
 ): SocketServer => {
 	const socketServer = new SocketServer(server, {
 		cors: {
-			origin: true
+			origin: ['http://localhost:3000', 'https://vispace.tech']
 		},
 		transports: ['polling', 'websocket'],
 		path: '/socket.io'

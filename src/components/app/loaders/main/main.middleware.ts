@@ -26,7 +26,7 @@ export const mainMiddleware = (app: Application, logger: ILogger) => {
 
 	app.use(
 		cors({
-			origin: '*',
+			origin: ['http://localhost:3000', 'https://vispace.tech'],
 			credentials: true,
 			exposedHeaders: [
 				'x-total-count',

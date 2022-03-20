@@ -42,5 +42,5 @@ async function expireNumberRequestOfIp(
 	ip: string,
 	timeMs: number
 ): Promise<boolean> {
-	return client.expire(ip, timeMs);
+	return client.expire(ip, timeMs / 1000);
 }

@@ -22,6 +22,7 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 	username: config.db.pg.DB_USERNAME,
 	password: config.db.pg.DB_PASSWORD,
 	database: config.db.pg.DB_NAME,
+	dropSchema: true,
 	synchronize: true,
 	entities: [
 		User,
@@ -55,6 +56,16 @@ const ormMongoOptions: MongoConnectionOptions = {
 
 const officeMemberTransformCache: CacheConnectOption = {
 	connName: 'officeMemberTransform',
+	options: {
+		socket: {
+			port: 6379,
+			host: 'localhost'
+		}
+	}
+};
+
+const mailCache: CacheConnectOption = {
+	connName: 'mail',
 	options: {
 		socket: {
 			port: 6379,

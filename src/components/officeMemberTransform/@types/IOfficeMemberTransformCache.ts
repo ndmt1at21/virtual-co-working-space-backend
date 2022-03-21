@@ -2,13 +2,13 @@ import { OfficeMemberTransformDto } from './dto/OfficeMemberTransform.dto';
 
 export interface IOfficeMemberTransformCache {
 	setTransform(
-		id: string,
+		id: number,
 		memberTransform: OfficeMemberTransformDto
 	): Promise<void>;
 
-	getTransformById(id: string): Promise<OfficeMemberTransformDto | undefined>;
+	getTransformById(id: number): Promise<OfficeMemberTransformDto | undefined>;
 
-	deleteTransformById(id: string): Promise<void>;
+	deleteTransformById(id: number): Promise<void>;
 
 	scan(
 		cursor: number,

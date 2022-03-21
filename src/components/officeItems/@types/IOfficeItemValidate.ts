@@ -1,3 +1,3 @@
 export interface IOfficeItemValidate {
-	checkOfficeItemExistsById(id: string): Promise<void>;
+	checkOfficeItemExistsById(id: number): Promise<void>;
 }

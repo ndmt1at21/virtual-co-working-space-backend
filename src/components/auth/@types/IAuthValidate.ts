@@ -2,7 +2,7 @@ import { LoginDto } from './dto/Login.dto';
 import { OAuth2ProfileDto } from './dto/OAuth2Profile.dto';
 
 export type IAuthValidate = {
-	validateUserCanAccessResourceById: (id: string) => Promise<boolean>;
+	validateUserCanAccessResourceById: (id: number) => Promise<boolean>;
 
 	validateLocalUserCanLogin: (loginDto: LoginDto) => Promise<boolean>;
 

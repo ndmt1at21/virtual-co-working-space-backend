@@ -9,7 +9,7 @@ import { IActiveUserTokenService } from './@types/IActiveUserTokenService';
 export const ActiveUserTokenService = (
 	activeUserTokenRepository: ActiveUserTokenRepository
 ): IActiveUserTokenService => {
-	const createToken = async (userId: string): Promise<ActiveUserTokenDto> => {
+	const createToken = async (userId: number): Promise<ActiveUserTokenDto> => {
 		const token = crypto
 			.randomBytes(config.auth.ACTIVE_USER_TOKEN_LENGTH)
 			.toString('hex');
@@ -27,7 +27,7 @@ export const ActiveUserTokenService = (
 	};
 
 	const validateToken = async (
-		userId: string,
+		userId: number,
 		token: string
 	): Promise<boolean> => {
 		const activeUserToken =

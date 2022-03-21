@@ -37,26 +37,26 @@ export const OfficeMemberService = (
 		);
 	};
 
-	const deleteOfficeMemberById = async (id: string): Promise<void> => {
+	const deleteOfficeMemberById = async (id: number): Promise<void> => {
 		await officeMemberValidate.checkExistsOfficeMemberById(id);
 		await officeMemberRepository.delete(id);
 	};
 
 	const updateOfficeMemberTransformById = async (
-		id: string,
+		id: number,
 		transform: UpdateOfficeMemberTransformDto
 	): Promise<void> => {
 		// await officeMemberTransformService.updateTransform(id, transform);
 	};
 
 	const findOfficeMemberOverviewById = async (
-		id: string
+		id: number
 	): Promise<OfficeMemberOverviewDto> => {
 		return await officeMemberCreator.createOfficeMemberOverviewById(id);
 	};
 
 	const findOfficeMemberDetailById = async (
-		id: string
+		id: number
 	): Promise<OfficeMemberDetailDto> => {
 		return await officeMemberCreator.createOfficeMemberDetailById(id);
 	};
@@ -84,7 +84,7 @@ export const OfficeMemberService = (
 	};
 
 	const setOfficeMemberOnlineStatusById = async (
-		id: string,
+		id: number,
 		status: OfficeMemberOnlineStatus
 	): Promise<void> => {
 		const officeMember = await officeMemberRepository.findOne(id);

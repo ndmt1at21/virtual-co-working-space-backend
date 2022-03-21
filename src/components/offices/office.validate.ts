@@ -6,7 +6,7 @@ import { OfficeRepository } from './office.repository';
 export const OfficeValidate = (
 	officeRepository: OfficeRepository
 ): IOfficeValidate => {
-	const checkOfficeExistsById = async (id: string): Promise<void> => {
+	const checkOfficeExistsById = async (id: number): Promise<void> => {
 		const isExisted = await officeRepository.existsOfficeById(id);
 
 		if (!isExisted)

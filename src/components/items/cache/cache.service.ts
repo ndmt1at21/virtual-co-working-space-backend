@@ -23,7 +23,7 @@ export const ItemCacheService = (): IItemCacheService => {
 		await util.promisify(client.expire)(key, expireSecond);
 	};
 
-	const getItem = async (id: string): Promise<ItemDto | null> => {
+	const getItem = async (id: number): Promise<ItemDto | null> => {
 		const item = await util.promisify(client.get)(id);
 
 		if (!item) return null;
@@ -31,7 +31,7 @@ export const ItemCacheService = (): IItemCacheService => {
 		return JSON.parse(item) as ItemDto;
 	};
 
-	const invalidateItem = async (id: string): Promise<number> => {
+	const invalidateItem = async (id: number): Promise<number> => {
 		return util.promisify(client.del).bind(id)();
 	};
 

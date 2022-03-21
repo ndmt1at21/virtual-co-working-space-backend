@@ -3,11 +3,11 @@ import { OfficeItemDetailDto } from './dto/OfficeItemDetail.dto';
 import { OfficeItemOverviewDto } from './dto/OfficeItemOverviewDto';
 
 export interface IOfficeItemService {
-	findOfficeItemDetailById(id: string): Promise<OfficeItemDetailDto>;
+	findOfficeItemDetailById(id: number): Promise<OfficeItemDetailDto>;
 
 	findOfficeItemsDetail(
 		pageable: Pageable
 	): Promise<[OfficeItemDetailDto[], number]>;
 
-	deleteOfficeItem(id: string): Promise<void>;
+	deleteOfficeItem(id: number): Promise<void>;
 }

@@ -6,7 +6,7 @@ import { IOfficeItemService } from './@types/IOfficeItemService';
 export const OfficeItemController = (officeItemService: IOfficeItemService) => {
 	const getOfficeItemDetailById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = req.params.id;
+			const id = +req.params.id;
 
 			const officeItemDto =
 				await officeItemService.findOfficeItemDetailById(id);
@@ -40,7 +40,7 @@ export const OfficeItemController = (officeItemService: IOfficeItemService) => {
 
 	const deleteOfficeItemById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = req.params.id;
+			const id = +req.params.id;
 
 			await officeItemService.deleteOfficeItem(id);
 
@@ -52,7 +52,7 @@ export const OfficeItemController = (officeItemService: IOfficeItemService) => {
 
 	const updateOfficeItemById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = req.params.id;
+			const id = +req.params.id;
 
 			res.status(HttpStatusCode.OK).json({
 				status: 'success'

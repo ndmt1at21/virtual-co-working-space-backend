@@ -18,7 +18,7 @@ export const ItemController = (itemService: IItemService) => {
 	});
 
 	const getById = catchAsyncRequestHandler(async (req, res, next) => {
-		const item = await itemService.findById(req.params.id);
+		const item = await itemService.findById(+req.params.id);
 		res.status(HttpStatusCode.OK).json(item);
 	});
 

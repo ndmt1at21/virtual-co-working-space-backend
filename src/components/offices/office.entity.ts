@@ -14,8 +14,8 @@ import { User } from '../users/user.entity';
 
 @Entity({ name: 'office' })
 export class Office extends BaseEntity {
-	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	@PrimaryGeneratedColumn()
+	id: number;
 
 	@Column()
 	name: string;
@@ -26,7 +26,7 @@ export class Office extends BaseEntity {
 
 	@Column({ name: 'created_by_user_id' })
 	@Index()
-	createdByUserId: string;
+	createdByUserId: number;
 
 	@OneToMany(() => OfficeItem, officeItem => officeItem.office, {
 		cascade: true

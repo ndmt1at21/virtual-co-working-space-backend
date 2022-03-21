@@ -6,10 +6,10 @@ import { OfficeRole } from '../officeRoles/officeRole.entity';
 @Entity({ name: 'office_member_role' })
 export class OfficeMemberRole extends BaseEntity {
 	@PrimaryColumn({ name: 'office_member_id' })
-	officeMemberId: string;
+	officeMemberId: number;
 
 	@PrimaryColumn({ name: 'office_role_id' })
-	officeRoleId: string;
+	officeRoleId: number;
 
 	@ManyToOne(() => OfficeMember, officeMember => officeMember.roles)
 	@JoinColumn({ name: 'office_member_id' })

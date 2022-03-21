@@ -15,10 +15,10 @@ import { LoginDto } from './@types/dto/Login.dto';
 import { ResetPasswordContentDto } from './@types/dto/ResetPasswordContent.dto';
 import { ForgotPasswordDto } from './@types/dto/ForgotPassword.dto';
 import { RegisterDto } from './@types/dto/Register.dto';
-import { IAuthMailQueueProducer } from './jobs/mail/@types/IAuthMailQueueProducer';
+import { IAuthMailQueueProducer } from './@types/IAuthMailQueueProducer';
 
 export const AuthController = (
-	authMailQueue: IAuthMailQueueProducer,
+	authMailQueueProducer: IAuthMailQueueProducer,
 	authService: IAuthService,
 	logger: ILogger
 ) => {
@@ -58,7 +58,7 @@ export const AuthController = (
 			`User with email ${user.email} registered successfully has id ${user.id}`
 		);
 
-		authMailQueue.addRegisterConfirmationJob(user, activeToken);
+		authMailQueueProducer.addRegisterConfirmationJob(user, activeToken);
 
 		res.status(HttpStatusCode.CREATED).json({
 			user,
@@ -163,7 +163,7 @@ export const AuthController = (
 			`Reset password token sent to email ${forgotPasswordDto.email}`
 		);
 
-		authMailQueue.addResetPasswordMailJob(
+		authMailQueueProducer.addResetPasswordMailJob(
 			forgotPasswordDto.email,
 			resetToken.passwordResetToken
 		);

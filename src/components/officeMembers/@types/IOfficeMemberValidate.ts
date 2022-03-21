@@ -1,5 +1,5 @@
 export interface IOfficeMemberValidate {
-	checkExistsOfficeMemberById(id: string): Promise<void>;
+	checkExistsOfficeMemberById(id: number): Promise<void>;
 
-	checkUniqueUserInOffice(userId: string, officeId: string): Promise<void>;
+	checkUniqueUserInOffice(userId: number, officeId: number): Promise<void>;
 }

@@ -1,4 +1,4 @@
 export type CreateOfficeMemberDto = {
-	memberId: string;
-	officeId: string;
+	memberId: number;
+	officeId: number;
 };

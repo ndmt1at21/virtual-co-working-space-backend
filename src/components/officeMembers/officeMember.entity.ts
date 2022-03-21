@@ -16,14 +16,14 @@ import { OfficeMemberRole } from '../officeMemberRole/officeMemberRole.entity';
 
 @Entity({ name: 'office_member' })
 export class OfficeMember extends BaseEntity {
-	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	@PrimaryGeneratedColumn()
+	id: number;
 
 	@Column({ name: 'member_id' })
-	memberId: string;
+	memberId: number;
 
 	@Column({ name: 'office_id' })
-	officeId: string;
+	officeId: number;
 
 	@Column({
 		name: 'online_status',

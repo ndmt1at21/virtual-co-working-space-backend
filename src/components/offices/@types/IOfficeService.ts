@@ -7,29 +7,29 @@ import { OfficeWithMembersDto } from './dto/OfficeWithMembers.dto';
 
 export interface IOfficeService {
 	createOffice(
-		createdUserId: string,
+		createdUserId: number,
 		createOfficeDto: CreateOfficeDto
 	): Promise<OfficeOverviewDto>;
 
-	deleteOfficeById(officeId: string): Promise<void>;
+	deleteOfficeById(officeId: number): Promise<void>;
 
-	findOfficeOverviewById(id: string): Promise<OfficeOverviewDto>;
+	findOfficeOverviewById(id: number): Promise<OfficeOverviewDto>;
 
-	findOfficeDetailById(id: string): Promise<OfficeDetailDto>;
+	findOfficeDetailById(id: number): Promise<OfficeDetailDto>;
 
 	findAllOfficesOverview(pageable: Pageable): Promise<OfficeOverviewDto[]>;
 
 	findAllOfficesOverviewUserIsMemberByUserId(
-		userId: string,
+		userId: number,
 		pageable: Pageable
 	): Promise<[OfficeOverviewDto[], number]>;
 
-	findOfficeItemsById(officeId: string): Promise<OfficeWithItemsDto>;
+	findOfficeItemsById(officeId: number): Promise<OfficeWithItemsDto>;
 
-	findOfficeMembersById(officeId: string): Promise<OfficeWithMembersDto>;
+	findOfficeMembersById(officeId: number): Promise<OfficeWithMembersDto>;
 
 	updateOfficeById(
-		officeId: string,
+		officeId: number,
 		updateOfficeDto: CreateOfficeDto
 	): Promise<OfficeOverviewDto>;
 }

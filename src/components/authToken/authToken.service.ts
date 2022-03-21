@@ -13,12 +13,12 @@ export const AuthTokenService = (
 	authTokenValidate: IAuthTokenValidate
 ): IAuthTokenService => {
 	const createAccessTokenAndRefreshToken = async (
-		userId: string
+		userId: number
 	): Promise<[string, string]> => {
 		return [createAccessToken(userId), await createRefreshToken(userId)];
 	};
 
-	const createAccessToken = (userId: string): string => {
+	const createAccessToken = (userId: number): string => {
 		return jwt.sign({ userId }, config.auth.JWT_SECRET, {
 			issuer: config.auth.JWT_ISSUER,
 			expiresIn: Date.now() + config.auth.JWT_ACCESS_TOKEN_EXPIRES_TIME,
@@ -26,7 +26,7 @@ export const AuthTokenService = (
 		});
 	};
 
-	const createRefreshToken = async (userId: string): Promise<string> => {
+	const createRefreshToken = async (userId: number): Promise<string> => {
 		const token = crypto
 			.randomBytes(config.auth.REFRESH_TOKEN_LENGTH)
 			.toString('hex');
@@ -50,7 +50,7 @@ export const AuthTokenService = (
 		await refreshTokenRepository.deleteByToken(refreshToken);
 	};
 
-	const getUserIdFromAccessToken = async (token: string): Promise<string> => {
+	const getUserIdFromAccessToken = async (token: string): Promise<number> => {
 		const payload = (await util.promisify(jwt.verify)(
 			token,
 			config.auth.JWT_SECRET
@@ -60,22 +60,36 @@ export const AuthTokenService = (
 	};
 
 	const validateAccessToken = async (token: string): Promise<boolean> => {
+		let jwtPayload: jwt.JwtPayload;
+
 		try {
-			(await util.promisify(jwt.verify)(
+			jwtPayload = (await util.promisify(jwt.verify)(
 				token,
 				config.auth.JWT_SECRET
 			)) as jwt.JwtPayload;
-
-			return true;
 		} catch (err) {
 			throw new UnauthorizedError(
 				AuthTokenErrorMessages.INVALID_ACCESS_TOKEN
 			);
 		}
+
+		if (jwtPayload.iss !== config.auth.JWT_ISSUER) {
+			throw new UnauthorizedError(
+				AuthTokenErrorMessages.INVALID_ACCESS_TOKEN
+			);
+		}
+
+		if (!jwtPayload.exp || jwtPayload.exp < Date.now()) {
+			throw new UnauthorizedError(
+				AuthTokenErrorMessages.ACCESS_TOKEN_EXPIRED
+			);
+		}
+
+		return true;
 	};
 
 	const validateRefreshToken = async (
-		userId: string,
+		userId: number,
 		refreshToken: string
 	): Promise<boolean> => {
 		const refreshTokenEntity =
@@ -92,7 +106,7 @@ export const AuthTokenService = (
 	};
 
 	const validateRefreshTokenCanRenewAccessToken = async (
-		userId: string,
+		userId: number,
 		refreshToken: string
 	): Promise<boolean> => {
 		return await validateRefreshToken(userId, refreshToken);

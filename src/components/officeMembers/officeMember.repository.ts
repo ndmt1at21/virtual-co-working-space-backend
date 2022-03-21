@@ -10,7 +10,7 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 		return new OfficeMemberRepositoryQueryBuilder(this);
 	}
 
-	async existsOfficeMemberById(id: string): Promise<boolean> {
+	async existsOfficeMemberById(id: number): Promise<boolean> {
 		const count = await this.createQueryBuilder('office_member')
 			.where('office_member.id = :id', { id })
 			.getCount();
@@ -19,8 +19,8 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 	}
 
 	async existsUserInOffice(
-		userId: string,
-		officeId: string
+		userId: number,
+		officeId: number
 	): Promise<boolean> {
 		const count = await this.createQueryBuilder('office_member')
 			.where('office_member.member_id = :userId', { userId })
@@ -31,7 +31,7 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 	}
 
 	async setOfficeMemberOnlineStatusById(
-		id: string,
+		id: number,
 		status: OfficeMemberOnlineStatus
 	) {
 		await this.createQueryBuilder('office_member')
@@ -39,5 +39,16 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 			.where('office_member.id = :id', { id })
 			.set({ onlineStatus: status })
 			.execute();
+	}
+
+	async findOfficeMemberByMemberEmailAndOfficeId(
+		email: string,
+		officeId: number
+	): Promise<OfficeMember | undefined> {
+		return this.createQueryBuilder('office_member')
+			.where('office_member.office_id = :officeId', { officeId })
+			.leftJoin('office_member.member', 'user')
+			.where('user.email = :email', { email })
+			.getOne();
 	}
 }

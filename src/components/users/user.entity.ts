@@ -6,8 +6,8 @@ import { UserStatus } from './@types/UserStatus';
 
 @Entity({ name: 'user' })
 export class User extends BaseEntity {
-	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	@PrimaryGeneratedColumn()
+	id: number;
 
 	@Column()
 	name: string;

@@ -3,10 +3,14 @@ import config from '@src/config';
 import { ILogger } from '@src/components/logger/@types/ILogger';
 import { IMailService } from '@src/components/mail/@types/IMailService';
 import { UserDto } from '@src/components/users/@types/dto/User.dto';
-import { authMailQueue } from './mail.queue';
+import { Queue } from 'bull';
 
-export const AuthMailWorker = (mailService: IMailService, logger: ILogger) => {
-	authMailQueue.process('auth_register_activate', 10, async job => {
+export const AuthMailWorker = (
+	queue: Queue,
+	mailService: IMailService,
+	logger: ILogger
+) => {
+	queue.process('auth_register_activate', 10, async job => {
 		const user = job.data.user as UserDto;
 		const activeToken = job.data.activeToken as string;
 
@@ -15,8 +19,8 @@ export const AuthMailWorker = (mailService: IMailService, logger: ILogger) => {
 
 		logger.info(`Start sending activation email to ${user.email}`);
 
-		const result = await mailService.sendEmail({
-			from: 'register@vispace.tech',
+		const result = await mailService.sendMail({
+			from: 'noreply@authentication.vispace.tech',
 			to: user.email,
 			subject: 'Welcome to our app',
 			templateUrl: path.resolve(
@@ -30,14 +34,14 @@ export const AuthMailWorker = (mailService: IMailService, logger: ILogger) => {
 		logger.info(`Activation email sent to ${user.email} successfully`);
 	});
 
-	authMailQueue.process('auth_reset_password', 10, async job => {
+	queue.process('auth_reset_password', 10, async job => {
 		const { data } = job;
 
 		const email = data.email as string;
 		const resetToken = data.resetToken as string;
 
-		const result = await mailService.sendEmail({
-			from: 'register@vispace.tech',
+		const result = await mailService.sendMail({
+			from: 'noreply@authentication.vispace.tech',
 			to: email,
 			subject: 'Reset password',
 			templateUrl: path.resolve(

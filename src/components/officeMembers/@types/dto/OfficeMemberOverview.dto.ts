@@ -2,9 +2,9 @@ import { UserOverviewDto } from '@src/components/users/@types/dto/UserOverviewDt
 import { Transform3dDto } from './Transform3D.dto';
 
 export type OfficeMemberOverviewDto = {
-	id: string;
+	id: number;
 	member: UserOverviewDto;
-	officeId: string;
+	officeId: number;
 	transform: Transform3dDto;
 	onlineStatus: string;
 };

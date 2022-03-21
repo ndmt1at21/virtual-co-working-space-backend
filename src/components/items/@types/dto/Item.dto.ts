@@ -1,5 +1,5 @@
 export type ItemDto = {
-	id: string;
+	id: number;
 	name: string;
 	modelPath: string;
 	createdAt: Date;

@@ -8,7 +8,7 @@ export const OfficeMemberTransformCacheService = (
 	const CACHE_PREFIX = 'office_member_transform';
 
 	const setTransform = async (
-		id: string,
+		id: number,
 		memberTransform: OfficeMemberTransformDto
 	) => {
 		await client.set(
@@ -20,7 +20,7 @@ export const OfficeMemberTransformCacheService = (
 	};
 
 	const getTransformById = async (
-		id: string
+		id: number
 	): Promise<OfficeMemberTransformDto | undefined> => {
 		const memberTransform = await client.get(`${CACHE_PREFIX}:${id}`);
 
@@ -31,8 +31,8 @@ export const OfficeMemberTransformCacheService = (
 		return JSON.parse(memberTransform) as OfficeMemberTransformDto;
 	};
 
-	const deleteTransformById = async (id: string) => {
-		await client.del(id);
+	const deleteTransformById = async (id: number) => {
+		await client.del(`${id}`);
 	};
 
 	const scan = (

@@ -46,8 +46,8 @@ export const OfficeMemberSocketHandler = (
 
 			// TODO: reject old socket connection if user already in office
 
-			socket.join(officeId);
-			socket.to(officeId).emit('office_member:online', userId);
+			socket.join(`${officeId}`);
+			socket.to(`${officeId}`).emit('office_member:online', userId);
 
 			// set online in db
 			await officeMemberRepository.setOfficeMemberOnlineStatusById(
@@ -65,7 +65,7 @@ export const OfficeMemberSocketHandler = (
 
 		try {
 			socket
-				.to(socket.data.officeMember!.officeId)
+				.to(`${socket.data.officeMember!.officeId}`)
 				.emit('office_member:moved', {
 					memberId: socket.user!.id,
 					officeId: socket.data.officeMember!.officeId,
@@ -86,7 +86,7 @@ export const OfficeMemberSocketHandler = (
 
 		try {
 			socket
-				.to(socket.data.officeMember!.officeId)
+				.to(`${socket.data.officeMember!.officeId}`)
 				.emit('office_member:offline', memberId);
 
 			await officeMemberRepository.setOfficeMemberOnlineStatusById(

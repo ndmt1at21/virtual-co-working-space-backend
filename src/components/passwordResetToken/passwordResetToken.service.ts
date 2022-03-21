@@ -28,7 +28,7 @@ export const PasswordResetTokenService = (
 	};
 
 	const createToken = async (
-		userId: string
+		userId: number
 	): Promise<PasswordResetTokenDto> => {
 		const tokenPlain = crypto
 			.randomBytes(config.auth.RESET_PASSWORD_TOKEN_LENGTH)
@@ -71,7 +71,7 @@ export const PasswordResetTokenService = (
 		return true;
 	};
 
-	const deleteByUserId = async (userId: string): Promise<void> => {
+	const deleteByUserId = async (userId: number): Promise<void> => {
 		await passwordResetTokenRepository.softDelete(userId);
 	};
 

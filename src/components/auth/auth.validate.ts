@@ -12,7 +12,7 @@ import { LoginDto } from './@types/dto/Login.dto';
 
 export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 	const validateUserCanAccessResourceById = async (
-		id: string
+		id: number
 	): Promise<boolean> => {
 		const user = await userRepository.findById(id);
 

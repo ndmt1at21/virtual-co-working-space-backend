@@ -11,10 +11,13 @@ import { AuthValidate } from './auth.validate';
 import { createPasswordResetTokenService } from '../passwordResetToken/passwordResetToken.factory';
 import { createActiveUserTokenService } from '../activeUserToken/activeUserToken.factory';
 import { AuthMailQueueProducer } from './jobs/mail/mail.producer';
+import { getQueue } from '../app/loaders/queue/queue';
+import { createMailService } from '../mail/mail.factory';
+import { AuthMailWorker } from './jobs/mail/mail.worker';
 
 export function createAuthController() {
 	const authService = createAuthService();
-	const authMailQueueProducer = AuthMailQueueProducer();
+	const authMailQueueProducer = createAuthMailQueueProducer();
 	const authController = AuthController(
 		authMailQueueProducer,
 		authService,
@@ -50,4 +53,13 @@ export function createAuthMiddleware() {
 export function createAuthValidate() {
 	const userRepository = createUserRepository();
 	return AuthValidate(userRepository);
+}
+
+export function createAuthMailQueueProducer() {
+	const queue = createAuthMailQueue();
+	return AuthMailQueueProducer(queue);
+}
+
+export function createAuthMailQueue() {
+	return getQueue('auth_mail');
 }

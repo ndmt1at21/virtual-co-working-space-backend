@@ -10,17 +10,17 @@ export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<O
 		super(repository, 'office_member');
 	}
 
-	findById(id: string): OfficeMemberRepositoryQueryBuilder {
+	findById(id: number): OfficeMemberRepositoryQueryBuilder {
 		super.findById(id);
 		return this;
 	}
 
-	findByOfficeId(officeId: string): OfficeMemberRepositoryQueryBuilder {
+	findByOfficeId(officeId: number): OfficeMemberRepositoryQueryBuilder {
 		this.query.where('office_member.office_id = :officeId', { officeId });
 		return this;
 	}
 
-	findByMemberId(memberId: string): OfficeMemberRepositoryQueryBuilder {
+	findByMemberId(memberId: number): OfficeMemberRepositoryQueryBuilder {
 		this.query.where('office_member.member_id = :memberId', {
 			memberId
 		});
@@ -28,8 +28,8 @@ export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<O
 	}
 
 	findByMemberIdAndOfficeId(
-		memberId: string,
-		officeId: string
+		memberId: number,
+		officeId: number
 	): OfficeMemberRepositoryQueryBuilder {
 		this.query
 			.where('office_member.member_id = :memberId', { memberId })

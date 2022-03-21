@@ -9,7 +9,7 @@ export const OfficeMemberController = (
 ) => {
 	const getOfficeMemberById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = req.params.id;
+			const id = +req.params.id;
 
 			const officeMember =
 				await officeMemberService.findOfficeMemberDetailById(id);
@@ -43,7 +43,7 @@ export const OfficeMemberController = (
 
 	const deleteOfficeMember = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = req.params.id;
+			const id = +req.params.id;
 
 			await officeMemberService.deleteOfficeMemberById(id);
 

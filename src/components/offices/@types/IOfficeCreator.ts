@@ -4,11 +4,11 @@ import { OfficeDetailDto } from './dto/OfficeDetail.dto';
 import { OfficeOverviewDto } from './dto/OfficeOverview.dto';
 
 export interface IOfficeCreator {
-	createOfficeOverviewById(id: string): Promise<OfficeOverviewDto>;
+	createOfficeOverviewById(id: number): Promise<OfficeOverviewDto>;
 
-	createOfficesOverviewsByIds(ids: string[]): Promise<OfficeOverviewDto[]>;
+	createOfficesOverviewsByIds(ids: number[]): Promise<OfficeOverviewDto[]>;
 
-	createOfficeDetailById(id: string): Promise<OfficeDetailDto>;
+	createOfficeDetailById(id: number): Promise<OfficeDetailDto>;
 
 	createOfficesOverview(pageable: Pageable): Promise<OfficeOverviewDto[]>;
 }

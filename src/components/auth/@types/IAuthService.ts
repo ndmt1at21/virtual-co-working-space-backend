@@ -18,7 +18,7 @@ export interface IAuthService {
 	localRegister: (createUserDto: CreateUserDto) => Promise<LocalRegisterDto>;
 
 	refreshAccessToken: (
-		userId: string,
+		userId: number,
 		refreshToken: string
 	) => Promise<CredentialsDto>;
 
@@ -30,5 +30,5 @@ export interface IAuthService {
 
 	resetPassword: (resetPasswordDto: ResetPasswordDto) => Promise<void>;
 
-	activeNewUser: (userId: string, token: string) => Promise<void>;
+	activeNewUser: (userId: number, token: string) => Promise<void>;
 }

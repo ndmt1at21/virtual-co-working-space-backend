@@ -2,7 +2,7 @@
 	"name": "virtual-co-working-space-backend",
 	"version": "1.0.0",
 	"description": "",
-	"main": "server.ts",
+	"main": "src/server.ts",
 	"scripts": {
 		"start": "nodemon -r tsconfig-paths/register src/server.ts",
 		"build": "tsc --project tsconfig.json",
@@ -31,13 +31,13 @@
 		"@types/passport": "^1.0.7",
 		"@types/passport-facebook": "^2.1.11",
 		"@types/passport-google-oauth2": "^0.1.4",
+		"@types/uuid": "^8.3.4",
 		"bcrypt": "^5.0.1",
 		"bull": "^4.7.0",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.13.2",
 		"cors": "^2.8.5",
 		"cross-env": "^7.0.3",
-		"crypto": "^1.0.1",
 		"dotenv": "^14.3.2",
 		"express": "^4.17.2",
 		"handlebars": "^4.7.7",
@@ -58,6 +58,7 @@
 		"redis": "^4.0.4",
 		"socket.io": "^4.4.1",
 		"typeorm": "0.2.41",
+		"uuid": "^8.3.2",
 		"winston": "^3.5.1"
 	},
 	"devDependencies": {

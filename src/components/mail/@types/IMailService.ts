@@ -2,5 +2,7 @@ import { MailOptions } from './MailOptions';
 import { SentResult } from './SentResult';
 
 export interface IMailService {
-	sendEmail(mail: MailOptions): Promise<SentResult>;
+	sendMail(mail: MailOptions): Promise<SentResult>;
+
+	sendBulkMails(options: MailOptions[]): Promise<void>;
 }

@@ -16,7 +16,7 @@ export const OfficeCreator = (
 	officeItemRepository: OfficeItemRepository
 ): IOfficeCreator => {
 	const createOfficeOverviewById = async (
-		id: string
+		id: number
 	): Promise<OfficeOverviewDto> => {
 		const office = await officeRepository
 			.queryBuilder()
@@ -29,7 +29,7 @@ export const OfficeCreator = (
 	};
 
 	const createOfficeDetailById = async (
-		id: string
+		id: number
 	): Promise<OfficeDetailDto> => {
 		const office = await officeRepository
 			.queryBuilder()
@@ -57,7 +57,7 @@ export const OfficeCreator = (
 	};
 
 	const createOfficesOverviewsByIds = async (
-		ids: string[]
+		ids: number[]
 	): Promise<OfficeOverviewDto[]> => {
 		const offices = await officeRepository
 			.queryBuilder()

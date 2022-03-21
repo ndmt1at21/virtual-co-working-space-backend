@@ -11,7 +11,7 @@ export class RepositoryQueryBuilder<T> {
 		this.tableAlias = tableAlias;
 	}
 
-	findById(id: string): RepositoryQueryBuilder<T> {
+	findById(id: number): RepositoryQueryBuilder<T> {
 		this.query.where(`${this.tableAlias}.id = :id`, { id });
 		return this;
 	}

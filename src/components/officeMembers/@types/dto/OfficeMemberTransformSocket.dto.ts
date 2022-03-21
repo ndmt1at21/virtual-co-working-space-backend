@@ -1,6 +1,6 @@
 export type OfficeMemberTransformSocketDto = {
-	officeId: string;
-	memberId: string;
+	officeId: number;
+	memberId: number;
 	xRotation: number;
 	yRotation: number;
 	zRotation: number;

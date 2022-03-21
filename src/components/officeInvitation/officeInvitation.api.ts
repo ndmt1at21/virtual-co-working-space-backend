@@ -6,8 +6,8 @@ export const OfficeInvitationRouter = (): Router => {
 	const officeController = createOfficeInvitationController();
 
 	router
-		.route('/')
-		.get(officeController.acceptInvitationByToken)
+		.route('/:id')
+		.get(officeController.getInvitation)
 		.delete(officeController.deleteInvitation)
 		.post(officeController.createInvitationByEmail);
 

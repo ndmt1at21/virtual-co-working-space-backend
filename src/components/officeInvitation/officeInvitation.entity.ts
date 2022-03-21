@@ -12,18 +12,18 @@ import { Office } from '@components/offices/office.entity';
 
 @Entity({ name: 'office_invitation' })
 export class OfficeInvitation extends BaseEntity {
-	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	@PrimaryGeneratedColumn()
+	id: number;
 
 	@Column({ unique: true })
 	@Index()
 	token: string;
 
 	@Column({ name: 'office_id' })
-	officeId: string;
+	officeId: number;
 
 	@Column({ name: 'created_by_user_id' })
-	createdByUserId: string;
+	createdByUserId: number;
 
 	@Column({ name: 'invited_email' })
 	invitedEmail: string;
@@ -35,7 +35,7 @@ export class OfficeInvitation extends BaseEntity {
 	@JoinColumn({ name: 'created_by_user_id' })
 	createdBy: User;
 
-	@ManyToOne(() => Office)
+	@ManyToOne(() => Office, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'office_id' })
 	office: Office;
 }

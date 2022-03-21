@@ -30,7 +30,7 @@ export const OfficeService = (
 	officeInvitationCodeGenerator: IOfficeInvitationCodeGenerator
 ): IOfficeService => {
 	const createOffice = async (
-		createdUserId: string,
+		createdUserId: number,
 		createOfficeDto: CreateOfficeDto
 	): Promise<OfficeOverviewDto> => {
 		const invitationCode = officeInvitationCodeGenerator.generate();
@@ -55,7 +55,7 @@ export const OfficeService = (
 	};
 
 	const updateOfficeById = async (
-		id: string,
+		id: number,
 		payload: UpdateOfficeDto
 	): Promise<OfficeOverviewDto> => {
 		await officeValidate.checkOfficeExistsById(id);
@@ -69,7 +69,7 @@ export const OfficeService = (
 	};
 
 	const findOfficeOverviewById = async (
-		id: string
+		id: number
 	): Promise<OfficeOverviewDto> => {
 		await officeValidate.checkOfficeExistsById(id);
 		const officeOverview = await officeCreator.createOfficeOverviewById(id);
@@ -77,7 +77,7 @@ export const OfficeService = (
 	};
 
 	const findOfficeDetailById = async (
-		id: string
+		id: number
 	): Promise<OfficeDetailDto> => {
 		await officeValidate.checkOfficeExistsById(id);
 		const officeDetail = await officeCreator.createOfficeDetailById(id);
@@ -91,7 +91,7 @@ export const OfficeService = (
 	};
 
 	const findAllOfficesOverviewUserIsMemberByUserId = async (
-		userId: string,
+		userId: number,
 		pageable: Pageable
 	): Promise<[OfficeOverviewDto[], number]> => {
 		const officeMembers = await officeMemberRepository
@@ -115,7 +115,7 @@ export const OfficeService = (
 	};
 
 	const findOfficeItemsById = async (
-		id: string
+		id: number
 	): Promise<OfficeWithItemsDto> => {
 		await officeValidate.checkOfficeExistsById(id);
 
@@ -130,7 +130,7 @@ export const OfficeService = (
 	};
 
 	const findOfficeMembersById = async (
-		id: string
+		id: number
 	): Promise<OfficeWithMembersDto> => {
 		await officeValidate.checkOfficeExistsById(id);
 
@@ -144,7 +144,7 @@ export const OfficeService = (
 		};
 	};
 
-	const deleteOfficeById = async (id: string): Promise<void> => {
+	const deleteOfficeById = async (id: number): Promise<void> => {
 		await officeValidate.checkOfficeExistsById(id);
 		await officeRepository.softDelete(id);
 	};

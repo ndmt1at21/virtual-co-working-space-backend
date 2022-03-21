@@ -3,7 +3,7 @@ import { OfficeOverviewDto } from '@src/components/offices/@types/dto/OfficeOver
 import { Transform3dDto } from './Transform3D.dto';
 
 export type OfficeItemDetailDto = {
-	id: string;
+	id: number;
 	item: ItemDto;
 	office: OfficeOverviewDto;
 	transform: Transform3dDto;

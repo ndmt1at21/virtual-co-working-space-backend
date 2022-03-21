@@ -5,7 +5,7 @@ import { OfficeMember } from '../officeMembers/officeMember.entity';
 @Entity({ name: 'office_member_transform' })
 export class OfficeMemberTransform extends BaseEntity {
 	@PrimaryColumn({ name: 'office_member_id' })
-	officeMemberId: string;
+	officeMemberId: number;
 
 	@Column({ name: 'x_rotation', default: 0 })
 	xRotation: number;

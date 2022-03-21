@@ -5,12 +5,12 @@ import { OfficeMemberOverviewDto } from './dto/OfficeMemberOverview.dto';
 
 export interface IOfficeMemberCreator {
 	createOfficeMemberOverviewById(
-		id: string
+		id: number
 	): Promise<OfficeMemberOverviewDto>;
 
-	createOfficeMemberDetailById(id: string): Promise<OfficeMemberDetailDto>;
+	createOfficeMemberDetailById(id: number): Promise<OfficeMemberDetailDto>;
 
 	createOfficeMembersOverviewByOfficeId(
-		officeId: string
+		officeId: number
 	): Promise<OfficeMemberOverviewDto[]>;
 }

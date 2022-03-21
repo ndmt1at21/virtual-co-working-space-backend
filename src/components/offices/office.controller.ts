@@ -10,7 +10,7 @@ import { IOfficeService } from './@types/IOfficeService';
 export const OfficeController = (officeService: IOfficeService) => {
 	const getOfficeDetailById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = req.params.id;
+			const id = +req.params.id;
 			const office = await officeService.findOfficeDetailById(id);
 
 			res.status(HttpStatusCode.OK).json({
@@ -30,7 +30,7 @@ export const OfficeController = (officeService: IOfficeService) => {
 				);
 			}
 
-			const id = req.params.id;
+			const id = +req.params.id;
 
 			const updateOfficeDto = req.body as UpdateOfficeDto;
 			const office = await officeService.updateOfficeById(
@@ -47,7 +47,7 @@ export const OfficeController = (officeService: IOfficeService) => {
 
 	const deleteOfficeById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = req.params.id;
+			const id = +req.params.id;
 
 			await officeService.deleteOfficeById(id);
 
@@ -59,7 +59,7 @@ export const OfficeController = (officeService: IOfficeService) => {
 
 	const getOfficeItemsById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = req.params.id;
+			const id = +req.params.id;
 
 			const items = await officeService.findOfficeItemsById(id);
 
@@ -72,7 +72,7 @@ export const OfficeController = (officeService: IOfficeService) => {
 
 	const getOfficeMembersById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = req.params.id;
+			const id = +req.params.id;
 
 			const members = await officeService.findOfficeMembersById(id);
 

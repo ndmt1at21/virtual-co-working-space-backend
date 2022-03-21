@@ -5,11 +5,11 @@ export interface IUserValidate {
 	checkCreateUserData: (data: CreateUserDto) => Promise<void>;
 
 	checkUpdatePasswordData: (
-		userId: string,
+		userId: number,
 		data: UpdatePasswordDto
 	) => Promise<void>;
 
-	checkUserExistsById: (id: string) => Promise<void>;
+	checkUserExistsById: (id: number) => Promise<void>;
 
 	checkUserExistsByEmail: (email: string) => Promise<void>;
 }

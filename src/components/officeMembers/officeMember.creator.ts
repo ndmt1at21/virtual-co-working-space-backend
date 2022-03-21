@@ -11,7 +11,7 @@ export const OfficeMemberCreator = (
 	officeMemberRepository: OfficeMemberRepository
 ): IOfficeMemberCreator => {
 	const createOfficeMemberOverviewById = async (
-		id: string
+		id: number
 	): Promise<OfficeMemberOverviewDto> => {
 		const officeMember = await officeMemberRepository
 			.queryBuilder()
@@ -25,7 +25,7 @@ export const OfficeMemberCreator = (
 	};
 
 	const createOfficeMemberDetailById = async (
-		id: string
+		id: number
 	): Promise<OfficeMemberDetailDto> => {
 		const officeMember = await officeMemberRepository
 			.queryBuilder()
@@ -41,7 +41,7 @@ export const OfficeMemberCreator = (
 	};
 
 	const createOfficeMembersOverviewByOfficeId = async (
-		officeId: string
+		officeId: number
 	): Promise<OfficeMemberOverviewDto[]> => {
 		const officeMembers = await officeMemberRepository
 			.queryBuilder()

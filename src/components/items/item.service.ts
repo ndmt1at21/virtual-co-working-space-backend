@@ -22,7 +22,7 @@ export const ItemService = (
 		return itemCreator.mapItemsToItemsDto(items);
 	};
 
-	const findById = async (id: string): Promise<ItemDto> => {
+	const findById = async (id: number): Promise<ItemDto> => {
 		const item = await itemRepository.findOne(id);
 
 		if (!item) {
@@ -37,7 +37,7 @@ export const ItemService = (
 		return itemCreator.mapItemToItemDto(item);
 	};
 
-	const deleteById = async (id: string): Promise<void> => {
+	const deleteById = async (id: number): Promise<void> => {
 		const result = await itemRepository.softDelete(id);
 
 		if (!result.affected) {
@@ -46,7 +46,7 @@ export const ItemService = (
 	};
 
 	const updateById = async (
-		id: string,
+		id: number,
 		item: UpdateItemDto
 	): Promise<ItemDto> => {
 		const updatedItem = await itemRepository.save({ id, ...item });

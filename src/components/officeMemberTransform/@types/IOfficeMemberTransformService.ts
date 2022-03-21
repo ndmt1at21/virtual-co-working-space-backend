@@ -4,13 +4,13 @@ import { UpdateOfficeMemberTransformDto } from './dto/UpdateOfficeMemberTransfor
 
 export interface IOfficeMemberTransformService {
 	updateTransformInCacheById(
-		officeMemberId: string,
+		officeMemberId: number,
 		transformDto: UpdateOfficeMemberTransformDto
 	): Promise<void>;
 
-	backupTransformFromCacheById(id: string): Promise<void>;
+	backupTransformFromCacheById(id: number): Promise<void>;
 
 	findTransformById(
-		id: string
+		id: number
 	): Promise<OfficeMemberTransformDto | undefined>;
 }

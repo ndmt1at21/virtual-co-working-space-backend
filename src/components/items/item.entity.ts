@@ -3,8 +3,8 @@ import { BaseEntity } from '@src/components/base/BaseEntity';
 
 @Entity({ name: 'item' })
 export class Item extends BaseEntity {
-	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	@PrimaryGeneratedColumn()
+	id: number;
 
 	@Column()
 	@Index({})

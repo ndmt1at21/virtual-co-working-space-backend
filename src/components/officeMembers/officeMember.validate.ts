@@ -6,7 +6,7 @@ import { OfficeMemberRepository } from './officeMember.repository';
 export const OfficeMemberValidate = (
 	officeMemberRepository: OfficeMemberRepository
 ): IOfficeMemberValidate => {
-	const checkExistsOfficeMemberById = async (id: string): Promise<void> => {
+	const checkExistsOfficeMemberById = async (id: number): Promise<void> => {
 		const isExisted = await officeMemberRepository.existsOfficeMemberById(
 			id
 		);
@@ -19,8 +19,8 @@ export const OfficeMemberValidate = (
 	};
 
 	const checkUniqueUserInOffice = async (
-		userId: string,
-		officeId: string
+		userId: number,
+		officeId: number
 	): Promise<void> => {
 		const memberExisted = await officeMemberRepository.existsUserInOffice(
 			userId,

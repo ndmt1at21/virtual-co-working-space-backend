@@ -2,7 +2,7 @@ import { BaseRepository } from '../base/BaseRepository';
 import { AuthTracking } from './authTracking.entity';
 
 export class AuthTrackingRepository extends BaseRepository<AuthTracking> {
-	async updateLastLoginByUserId(userId: string, lastLogin: Date) {
+	async updateLastLoginByUserId(userId: number, lastLogin: Date) {
 		return await this.createQueryBuilder()
 			.update()
 			.where('userId = :userId', { userId })
@@ -10,7 +10,7 @@ export class AuthTrackingRepository extends BaseRepository<AuthTracking> {
 			.execute();
 	}
 
-	async updateLastLogoutByUserId(userId: string, lastLogout: Date) {
+	async updateLastLogoutByUserId(userId: number, lastLogout: Date) {
 		return await this.createQueryBuilder()
 			.update()
 			.where('userId = :userId', { userId })

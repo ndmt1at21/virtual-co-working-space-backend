@@ -1,7 +1,7 @@
 export interface IAuthTrackingService {
-	createAuthTracking(userId: string): Promise<void>;
+	createAuthTracking(userId: number): Promise<void>;
 
-	updateLastLogin(userId: string): Promise<void>;
+	updateLastLogin(userId: number): Promise<void>;
 
-	updateLastLogout(userId: string): Promise<void>;
+	updateLastLogout(userId: number): Promise<void>;
 }

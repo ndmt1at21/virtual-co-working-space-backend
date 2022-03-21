@@ -1,6 +1,6 @@
 export type ActiveUserTokenDto = {
-	id: string;
-	userId: string;
+	id: number;
+	userId: number;
 	token: string;
 	createdAt: Date;
 	updatedAt: Date;

@@ -12,14 +12,14 @@ import { BaseEntity } from '../base/BaseEntity';
 
 @Entity({ name: 'office_item' })
 export class OfficeItem extends BaseEntity {
-	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	@PrimaryGeneratedColumn()
+	id: number;
 
 	@PrimaryColumn({ name: 'item_id' })
-	itemId: string;
+	itemId: number;
 
 	@PrimaryColumn({ name: 'office_id' })
-	officeId: string;
+	officeId: number;
 
 	@Column({ name: 'x_rotation' })
 	xRotation: number;

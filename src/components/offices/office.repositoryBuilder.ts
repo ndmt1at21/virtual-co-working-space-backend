@@ -8,12 +8,12 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 		super(repository, 'office');
 	}
 
-	findById(id: string): OfficeRepositoryQueryBuilder {
+	findById(id: number): OfficeRepositoryQueryBuilder {
 		super.findById(id);
 		return this;
 	}
 
-	findByIds(ids: string[]): OfficeRepositoryQueryBuilder {
+	findByIds(ids: number[]): OfficeRepositoryQueryBuilder {
 		this.query.where('office.id IN (:...ids)', { ids });
 		return this;
 	}
@@ -25,7 +25,7 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 		return this;
 	}
 
-	findByCreatorId(creatorId: string): OfficeRepositoryQueryBuilder {
+	findByCreatorId(creatorId: number): OfficeRepositoryQueryBuilder {
 		this.query.where('office.created_by_user_id = :creatorId', {
 			creatorId
 		});

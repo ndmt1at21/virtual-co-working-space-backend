@@ -3,7 +3,7 @@ import { ItemDto } from './dto/Item.dto';
 export interface IItemCacheService {
 	setItem(key: string, value: ItemDto, expireSecond: number): Promise<void>;
 
-	getItem(id: string): Promise<ItemDto | null>;
+	getItem(id: number): Promise<ItemDto | null>;
 
-	invalidateItem(id: string): Promise<number>;
+	invalidateItem(id: number): Promise<number>;
 }

@@ -10,23 +10,23 @@ export interface IOfficeMemberService {
 		createOfficeMemberDto: CreateOfficeMemberDto
 	): Promise<OfficeMemberOverviewDto>;
 
-	deleteOfficeMemberById(id: string): Promise<void>;
+	deleteOfficeMemberById(id: number): Promise<void>;
 
 	updateOfficeMemberTransformById(
-		id: string,
+		id: number,
 		transform: UpdateOfficeMemberTransformDto
 	): Promise<void>;
 
-	findOfficeMemberOverviewById(id: string): Promise<OfficeMemberOverviewDto>;
+	findOfficeMemberOverviewById(id: number): Promise<OfficeMemberOverviewDto>;
 
-	findOfficeMemberDetailById(id: string): Promise<OfficeMemberDetailDto>;
+	findOfficeMemberDetailById(id: number): Promise<OfficeMemberDetailDto>;
 
 	findOfficeMembersDetail(
 		pageable: Pageable
 	): Promise<[OfficeMemberDetailDto[], number]>;
 
 	setOfficeMemberOnlineStatusById(
-		id: string,
+		id: number,
 		status: OfficeMemberOnlineStatus
 	): Promise<void>;
 }

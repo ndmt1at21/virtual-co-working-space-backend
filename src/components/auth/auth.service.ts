@@ -53,14 +53,14 @@ export const AuthService = (
 		return { user, activeToken: token };
 	};
 
-	const activeNewUser = async (userId: string, token: string) => {
+	const activeNewUser = async (userId: number, token: string) => {
 		await activeUserTokenService.validateToken(userId, token);
 		await userService.activeNewUser(userId);
 		await activeUserTokenService.deleteToken(token);
 	};
 
 	const refreshAccessToken = async (
-		userId: string,
+		userId: number,
 		refreshToken: string
 	): Promise<CredentialsDto> => {
 		await authTokenService.validateRefreshTokenCanRenewAccessToken(

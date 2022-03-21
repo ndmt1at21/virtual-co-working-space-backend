@@ -14,7 +14,7 @@ export const UserValidate = (userRepository: UserRepository): IUserValidate => {
 	};
 
 	const checkUpdatePasswordData = async (
-		userId: string,
+		userId: number,
 		data: UpdatePasswordDto
 	) => {
 		const { password, confirmPassword } = data;
@@ -22,7 +22,7 @@ export const UserValidate = (userRepository: UserRepository): IUserValidate => {
 		await checkPasswordMatch(password, confirmPassword);
 	};
 
-	const checkUserExistsById = async (id: string) => {
+	const checkUserExistsById = async (id: number) => {
 		const isIdExists = await userRepository.existsUserById(id);
 
 		if (!isIdExists) {

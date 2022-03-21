@@ -4,8 +4,8 @@ import { ItemDto } from './dto/Item.dto';
 
 export interface IItemService {
 	findAll(pageable: Pageable): Promise<ItemDto[]>;
-	findById(id: string): Promise<ItemDto>;
+	findById(id: number): Promise<ItemDto>;
 	create(item: CreateItemDto): Promise<ItemDto>;
-	updateById(id: string, item: CreateItemDto): Promise<ItemDto>;
-	deleteById(id: string): Promise<void>;
+	updateById(id: number, item: CreateItemDto): Promise<ItemDto>;
+	deleteById(id: number): Promise<void>;
 }

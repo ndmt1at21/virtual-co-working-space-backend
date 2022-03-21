@@ -5,7 +5,7 @@ import { OfficeMemberOverviewDto } from '@src/components/officeMembers/@types/dt
 import { UserOverviewDto } from '@src/components/users/@types/dto/UserOverviewDto';
 
 export type OfficeDetailDto = {
-	id: string;
+	id: number;
 	name: string;
 	invitationCode: string;
 	createdAt: Date;

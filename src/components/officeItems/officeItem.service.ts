@@ -10,7 +10,7 @@ export const OfficeItemService = (
 	officeItemValidate: IOfficeItemValidate
 ): IOfficeItemService => {
 	const findOfficeItemDetailById = async (
-		id: string
+		id: number
 	): Promise<OfficeItemDetailDto> => {
 		await officeItemValidate.checkOfficeItemExistsById(id);
 
@@ -36,7 +36,7 @@ export const OfficeItemService = (
 		];
 	};
 
-	const deleteOfficeItem = async (id: string) => {
+	const deleteOfficeItem = async (id: number) => {
 		await officeItemValidate.checkOfficeItemExistsById(id);
 		await officeItemRepository.delete(id);
 	};

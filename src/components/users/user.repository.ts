@@ -25,7 +25,7 @@ export class UserRepository extends BaseRepository<User> {
 		});
 	}
 
-	async existsUserById(id: string): Promise<boolean> {
+	async existsUserById(id: number): Promise<boolean> {
 		const count = await this.count({
 			where: {
 				id
@@ -45,7 +45,7 @@ export class UserRepository extends BaseRepository<User> {
 		return count === 1;
 	}
 
-	async updatePasswordByUserId(userId: string, password: string) {
+	async updatePasswordByUserId(userId: number, password: string) {
 		await this.update(
 			{ id: userId },
 			{

@@ -6,7 +6,7 @@ import { OfficeItemRepository } from './officeItem.repository';
 export const OfficeItemValidate = (
 	officeItemRepository: OfficeItemRepository
 ): IOfficeItemValidate => {
-	const checkOfficeItemExistsById = async (id: string): Promise<void> => {
+	const checkOfficeItemExistsById = async (id: number): Promise<void> => {
 		const isExisted = await officeItemRepository.existsOfficeItemById(id);
 
 		if (!isExisted)

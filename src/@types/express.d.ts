@@ -3,14 +3,14 @@ import { Socket } from 'socket.io';
 declare global {
 	namespace Express {
 		interface User {
-			id: string;
+			id: number;
 			email: string;
 			roles: string[];
 		}
 
 		interface Office {
-			id: string;
-			createdBy: string;
+			id: number;
+			createdBy: number;
 			role: string[];
 		}
 
@@ -23,14 +23,14 @@ declare global {
 
 declare module 'socket.io' {
 	interface User {
-		id: string;
+		id: number;
 		email: string;
 		roles: string[];
 	}
 
 	interface OfficeMember {
-		id: string;
-		officeId: string;
+		id: number;
+		officeId: number;
 		roles: string[];
 	}
 

@@ -35,13 +35,13 @@ export const UserController = (userService: IUserService) => {
 	});
 
 	const getUserById = catchAsyncRequestHandler(async (req, res, next) => {
-		const userId = req.params.id;
+		const userId = +req.params.id;
 		const user = await userService.findUserById(userId);
 		res.status(HttpStatusCode.OK).json(user);
 	});
 
 	const updateUser = catchAsyncRequestHandler(async (req, res, next) => {
-		const userId = req.params.id;
+		const userId = +req.params.id;
 
 		const err = validateRequestBody(UpdateUserDto, req.body);
 		if (err) throw err;
@@ -56,7 +56,7 @@ export const UserController = (userService: IUserService) => {
 	});
 
 	const deleteUser = catchAsyncRequestHandler(async (req, res, next) => {
-		const userId = req.params.id;
+		const userId = +req.params.id;
 		await userService.deleteUserById(userId);
 		res.status(HttpStatusCode.OK).json({
 			message: 'User deleted successfully'

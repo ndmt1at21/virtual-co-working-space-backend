@@ -53,7 +53,7 @@ export const UserService = (
 		return userCreator.userEntityToUserDto(userCreated);
 	};
 
-	const findUserById = async (id: string): Promise<UserDto> => {
+	const findUserById = async (id: number): Promise<UserDto> => {
 		await userValidate.checkUserExistsById(id);
 		const user = await userRepository.findById(id);
 		return userCreator.userEntityToUserDto(user!);
@@ -66,7 +66,7 @@ export const UserService = (
 	};
 
 	const updateUserById = async (
-		id: string,
+		id: number,
 		payload: UpdateUserDto
 	): Promise<UserDto> => {
 		await userValidate.checkUserExistsById(id);
@@ -80,7 +80,7 @@ export const UserService = (
 	};
 
 	const updatePasswordById = async (
-		id: string,
+		id: number,
 		updatePasswordDto: UpdatePasswordDto
 	): Promise<UserDto> => {
 		await userValidate.checkUpdatePasswordData(id, updatePasswordDto);
@@ -96,12 +96,12 @@ export const UserService = (
 		return userCreator.userEntityToUserDto(updatedUser);
 	};
 
-	const deleteUserById = async (id: string): Promise<void> => {
+	const deleteUserById = async (id: number): Promise<void> => {
 		await userValidate.checkUserExistsById(id);
 		await userRepository.softDelete(id);
 	};
 
-	const blockUserById = async (id: string): Promise<number> => {
+	const blockUserById = async (id: number): Promise<number> => {
 		const result = await userRepository.update(id, {
 			status: UserStatus.BLOCKED
 		});
@@ -109,7 +109,7 @@ export const UserService = (
 		return result.affected || 0;
 	};
 
-	const activeNewUser = async (id: string): Promise<UserDto> => {
+	const activeNewUser = async (id: number): Promise<UserDto> => {
 		const updatedUser = await userRepository.save({
 			id,
 			status: UserStatus.ACTIVE

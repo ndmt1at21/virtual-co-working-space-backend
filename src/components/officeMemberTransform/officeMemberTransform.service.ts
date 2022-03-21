@@ -10,7 +10,7 @@ export const OfficeMemberTransformService = (
 	officeMemberTransformCache: IOfficeMemberTransformCache
 ): IOfficeMemberTransformService => {
 	const updateTransformInCacheById = async (
-		officeMemberId: string,
+		officeMemberId: number,
 		transformDto: UpdateOfficeMemberTransformDto
 	): Promise<void> => {
 		await officeMemberTransformCache.setTransform(officeMemberId, {
@@ -19,7 +19,7 @@ export const OfficeMemberTransformService = (
 		});
 	};
 
-	const backupTransformFromCacheById = async (id: string): Promise<void> => {
+	const backupTransformFromCacheById = async (id: number): Promise<void> => {
 		const transform = await officeMemberTransformCache.getTransformById(id);
 
 		if (transform) {
@@ -29,7 +29,7 @@ export const OfficeMemberTransformService = (
 	};
 
 	const findTransformById = async (
-		id: string
+		id: number
 	): Promise<OfficeMemberTransformDto | undefined> => {
 		const cachedTransform =
 			await officeMemberTransformCache.getTransformById(id);

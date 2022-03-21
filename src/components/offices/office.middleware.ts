@@ -12,7 +12,7 @@ export const OfficeMiddleware = (
 		res: Response,
 		next: NextFunction
 	) => {
-		const officeId = req.params.id;
+		const officeId = +req.params.id;
 		const userId = req.user!.id;
 
 		if (!officeId || !userId) {

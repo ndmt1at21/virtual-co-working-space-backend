@@ -1,5 +1,5 @@
 export type OfficeMemberTransformDto = {
-	officeMemberId: string;
+	officeMemberId: number;
 	xRotation: number;
 	yRotation: number;
 	zRotation: number;

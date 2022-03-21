@@ -6,7 +6,7 @@ import { Pageable } from '@src/@types/Pageable';
 
 @EntityRepository(OfficeItem)
 export class OfficeItemRepository extends BaseRepository<OfficeItem> {
-	async existsOfficeItemById(id: string) {
+	async existsOfficeItemById(id: number) {
 		const count = await this.createQueryBuilder('office_item')
 			.where('office_item.id = :id', { id })
 			.getCount();
@@ -15,7 +15,7 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 	}
 
 	async updateOfficeItemTransformById(
-		id: string,
+		id: number,
 		transform: Transform3dDto
 	): Promise<void> {
 		const { position, rotation } = transform;
@@ -33,7 +33,7 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 	}
 
 	async findOfficeItemWithItemById(
-		id: string
+		id: number
 	): Promise<OfficeItem | undefined> {
 		return this.createQueryBuilder('office_item')
 			.leftJoinAndSelect('office_item.item', 'item')
@@ -42,7 +42,7 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 	}
 
 	async findOfficeItemWithItemAndOfficeById(
-		id: string
+		id: number
 	): Promise<OfficeItem | undefined> {
 		return this.createQueryBuilder('office_item')
 			.leftJoinAndSelect('office_item.item', 'item')
@@ -63,7 +63,7 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 	}
 
 	async findOfficeItemsWithItemByOfficeId(
-		officeId: string
+		officeId: number
 	): Promise<OfficeItem[]> {
 		return this.createQueryBuilder('office_item')
 			.leftJoinAndSelect('office_item.item', 'item')

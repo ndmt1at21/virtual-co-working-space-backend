@@ -3,7 +3,7 @@ import { UserOverviewDto } from '@src/components/users/@types/dto/UserOverviewDt
 import { Transform3dDto } from './Transform3D.dto';
 
 export class OfficeMemberDetailDto {
-	id: string;
+	id: number;
 	member: UserOverviewDto;
 	office: OfficeOverviewDto;
 	roles: string[];
@@ -15,7 +15,7 @@ export class OfficeMemberDetailDto {
 	}
 
 	constructor(
-		id: string,
+		id: number,
 		member: UserOverviewDto,
 		office: OfficeOverviewDto,
 		roles: string[],
@@ -32,7 +32,7 @@ export class OfficeMemberDetailDto {
 }
 
 class OfficeMemberDetailDtoBuilder {
-	id: string;
+	id: number;
 	member: UserOverviewDto;
 	office: OfficeOverviewDto;
 	roles: string[];

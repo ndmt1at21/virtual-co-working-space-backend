@@ -22,7 +22,7 @@ export class ActiveUserTokenRepository extends BaseRepository<ActiveUserToken> {
 	}
 
 	async findByUserIdAndToken(
-		userId: string,
+		userId: number,
 		token: string
 	): Promise<ActiveUserToken | undefined> {
 		return await this.findOne({

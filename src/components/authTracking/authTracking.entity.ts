@@ -3,12 +3,12 @@ import { BaseEntity } from '../base/BaseEntity';
 
 @Entity({ name: 'auth_tracking' })
 export class AuthTracking extends BaseEntity {
-	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	@PrimaryGeneratedColumn()
+	id: number;
 
 	@Column({ name: 'user_id' })
 	@Index({ unique: true })
-	userId: string;
+	userId: number;
 
 	@Column({ name: 'last_login' })
 	lastLogin?: Date;

@@ -1,3 +1,3 @@
 export type JoinToOfficeRoomDto = {
-	officeId: string;
+	officeId: number;
 };

@@ -1,3 +1,3 @@
 export interface IOfficeValidate {
-	checkOfficeExistsById: (id: string) => Promise<void>;
+	checkOfficeExistsById: (id: number) => Promise<void>;
 }

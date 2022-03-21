@@ -21,7 +21,7 @@ export class OfficeRepository extends BaseRepository<Office> {
 		return count === 1;
 	}
 
-	async existsOfficeById(id: string): Promise<boolean> {
+	async existsOfficeById(id: number): Promise<boolean> {
 		const count = await this.createQueryBuilder('office')
 			.where('office.id = :id', { id })
 			.getCount();

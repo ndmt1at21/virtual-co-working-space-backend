@@ -5,6 +5,7 @@ import { globalErrorHandler } from '../globalHandlerError';
 import { ILogger } from '../logger/@types/ILogger';
 import { connectDatabase, initDatabase } from './loaders/database';
 import { mainMiddleware, mainRoutes } from './loaders/main';
+import { createMessageQueues } from './loaders/queue';
 import { socketEventHandlers, socketMiddleware } from './loaders/socket';
 
 export const mainAppLoaders = async (
@@ -16,6 +17,9 @@ export const mainAppLoaders = async (
 
 	await initDatabase();
 	logger.info('Database has been initialized successfully.');
+
+	createMessageQueues();
+	logger.info('Message queues have been created successfully.');
 
 	mainMiddleware(app, logger);
 	logger.info('Middleware has been loaded.');

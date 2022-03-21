@@ -55,6 +55,14 @@ export function createAuthValidate() {
 	return AuthValidate(userRepository);
 }
 
+export function createAuthMailWorker() {
+	const queue = createAuthMailQueue();
+	const mailService = createMailService();
+	const logger = authLogger;
+
+	return AuthMailWorker(queue, mailService, logger);
+}
+
 export function createAuthMailQueueProducer() {
 	const queue = createAuthMailQueue();
 	return AuthMailQueueProducer(queue);

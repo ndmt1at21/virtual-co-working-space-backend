@@ -61,8 +61,6 @@ export const OfficeMemberSocketHandler = (
 	}
 
 	async function onMemberMove(transform: UpdateOfficeMemberTransformDto) {
-		console.log(transform);
-
 		try {
 			socket
 				.to(`${socket.data.officeMember!.officeId}`)

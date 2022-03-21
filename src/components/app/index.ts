@@ -4,7 +4,12 @@ import { Server as SocketServer } from 'socket.io';
 import { globalErrorHandler } from '../globalHandlerError';
 import { ILogger } from '../logger/@types/ILogger';
 import { connectDatabase, initDatabase } from './loaders/database';
-import { mainMiddleware, mainRoutes } from './loaders/main';
+import {
+	loadBackgroundJobs,
+	loadServices,
+	mainMiddleware,
+	mainRoutes
+} from './loaders/main';
 import { createMessageQueues } from './loaders/queue';
 import { socketEventHandlers, socketMiddleware } from './loaders/socket';
 
@@ -18,8 +23,14 @@ export const mainAppLoaders = async (
 	await initDatabase();
 	logger.info('Database has been initialized successfully.');
 
-	createMessageQueues();
+	await createMessageQueues();
 	logger.info('Message queues have been created successfully.');
+
+	await loadServices();
+	logger.info('Services have been loaded successfully.');
+
+	loadBackgroundJobs();
+	logger.info('Background jobs have been loaded successfully.');
 
 	mainMiddleware(app, logger);
 	logger.info('Middleware has been loaded.');

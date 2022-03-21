@@ -10,46 +10,67 @@ export const AuthMailWorker = (
 	mailService: IMailService,
 	logger: ILogger
 ) => {
-	queue.process('auth_register_activate', 10, async job => {
-		const user = job.data.user as UserDto;
-		const activeToken = job.data.activeToken as string;
+	const load = () => {
+		loadRegisterActivationJob();
+		loadResetPasswordJob();
+	};
 
-		if (!user || !activeToken)
-			throw new Error('User or active token is undefined');
+	function loadRegisterActivationJob() {
+		queue.process('auth_register_activate', 10, async job => {
+			const user = job.data.user as UserDto;
+			const activeToken = job.data.activeToken as string;
 
-		logger.info(`Start sending activation email to ${user.email}`);
+			if (!user || !activeToken)
+				throw new Error('User or active token is undefined');
 
-		const result = await mailService.sendMail({
-			from: 'noreply@authentication.vispace.tech',
-			to: user.email,
-			subject: 'Welcome to our app',
-			templateUrl: path.resolve(
-				'/src/components/mailTemplates/accountActivate.html'
-			),
-			context: {
-				url: `${config.app.SERVER_DOMAIN}/auth/activate/${activeToken}`
-			}
+			logger.info(
+				`Start sending activation link to email: ${user.email}`
+			);
+
+			const result = await mailService.sendMail({
+				from: 'ViSpace <noreply@authentication.vispace.tech>',
+				to: user.email,
+				subject: 'Welcome to our app',
+				templateUrl: path.resolve(
+					'src/components/mailTemplates/accountActivate.html'
+				),
+				context: {
+					activationUrl: `${config.app.SERVER_DOMAIN}/auth/activate/${activeToken}`
+				}
+			});
+
+			logger.info(
+				`Activation link sent to email: ${user.email} successfully`
+			);
 		});
+	}
 
-		logger.info(`Activation email sent to ${user.email} successfully`);
-	});
+	function loadResetPasswordJob() {
+		queue.process('auth_reset_password', 10, async job => {
+			const { data } = job;
 
-	queue.process('auth_reset_password', 10, async job => {
-		const { data } = job;
+			const email = data.email as string;
+			const resetToken = data.resetToken as string;
 
-		const email = data.email as string;
-		const resetToken = data.resetToken as string;
+			logger.info(`Start sending reset password link to email: ${email}`);
 
-		const result = await mailService.sendMail({
-			from: 'noreply@authentication.vispace.tech',
-			to: email,
-			subject: 'Reset password',
-			templateUrl: path.resolve(
-				'/src/components/mail/templates/resetPassword.html'
-			),
-			context: {
-				url: `${config.app.SERVER_DOMAIN}/auth/reset/${resetToken}`
-			}
+			const result = await mailService.sendMail({
+				from: 'ViSpace <noreply@authentication.vispace.tech>',
+				to: email,
+				subject: 'Reset password',
+				templateUrl: path.resolve(
+					'src/components/mailTemplates/resetPassword.html'
+				),
+				context: {
+					resetPasswordUrl: `${config.app.SERVER_DOMAIN}/auth/reset/${resetToken}`
+				}
+			});
+
+			logger.info(
+				`Reset password link sent to email: ${email} successfully`
+			);
 		});
-	});
+	}
+
+	return { load };
 };

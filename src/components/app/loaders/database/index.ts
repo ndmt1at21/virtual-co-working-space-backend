@@ -68,7 +68,7 @@ const mailCache: CacheConnectOption = {
 	connName: 'mail',
 	options: {
 		socket: {
-			port: 6379,
+			port: 6380,
 			host: 'localhost'
 		}
 	}
@@ -78,7 +78,10 @@ export const connectDatabase = async (): Promise<void> => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			await createConnection(ormPostgresOptions);
-			await createCacheConnection([officeMemberTransformCache]);
+			await createCacheConnection([
+				officeMemberTransformCache,
+				mailCache
+			]);
 			resolve();
 		} catch (err: any) {
 			reject('Unable to connect to database: ' + err.message);

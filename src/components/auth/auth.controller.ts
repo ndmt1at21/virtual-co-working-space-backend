@@ -169,8 +169,7 @@ export const AuthController = (
 		);
 
 		res.status(HttpStatusCode.OK).json({
-			message: 'Password reset token created successfully',
-			resetToken: resetToken.passwordResetToken
+			message: 'Password reset token created successfully'
 		});
 	});
 

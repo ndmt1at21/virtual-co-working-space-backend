@@ -22,7 +22,8 @@ export const MailCacheService = (
 	const getMailTemplate = async (
 		templateUrl: string
 	): Promise<string | null> => {
-		return await cacheConnection.get(`${PREFIX}:${templateUrl}`);
+		const result = await cacheConnection.get(`${PREFIX}:${templateUrl}`);
+		return result;
 	};
 
 	return { setMailTemplate, getMailTemplate };

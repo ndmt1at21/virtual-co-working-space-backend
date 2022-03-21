@@ -27,7 +27,9 @@ async function connectToClient(
 	connName: string,
 	options: RedisClientOptions
 ): Promise<RedisClientType> {
-	const client = await createClient(options);
+	const client = createClient(options);
+	await client.connect();
+
 	conn[connName] = client;
 
 	client.on('error', err => {

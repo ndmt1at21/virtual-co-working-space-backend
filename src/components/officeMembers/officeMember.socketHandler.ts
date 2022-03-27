@@ -47,10 +47,11 @@ export const OfficeMemberSocketHandler = (
 				officeId: officeMember.officeId
 			};
 
-			await disconnectExistSocketHasSameUserId(userId);
+			// await disconnectExistSocketHasSameUserId(userId);
 			emitMemberOnlineToOffice(officeMember.memberId, officeId);
 			setMemberInOfficeOnline(officeMember.memberId);
 		} catch (err: any) {
+			console.log('errr:::', err);
 			socket.emit('office_member:error', err);
 			socket.disconnect();
 		}

@@ -30,8 +30,16 @@ export const UserController = (userService: IUserService) => {
 
 	const updateProfile = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = req.user!.id;
-		const user = await userService.findUserById(userId);
-		res.status(HttpStatusCode.OK).json(user);
+		const errors = await validateRequestBody(UpdateUserDto, req.body);
+		if (errors.length > 0) throw errors;
+
+		const updateUserDto = req.body as UpdateUserDto;
+		const updatedUser = await userService.updateUserById(
+			userId,
+			updateUserDto
+		);
+
+		res.status(HttpStatusCode.OK).json(updatedUser);
 	});
 
 	const getUserById = catchAsyncRequestHandler(async (req, res, next) => {

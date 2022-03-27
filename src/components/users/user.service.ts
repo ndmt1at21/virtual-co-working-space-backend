@@ -73,10 +73,12 @@ export const UserService = (
 
 		const user = await userRepository.findById(id);
 
-		return await userRepository.save({
+		const updatedUser = await userRepository.save({
 			...user!,
 			...payload
 		});
+
+		return userCreator.userEntityToUserDto(updatedUser);
 	};
 
 	const updatePasswordById = async (

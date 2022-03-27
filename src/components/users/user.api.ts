@@ -16,7 +16,7 @@ export const UserRouter = (): Router => {
 	router
 		.route('/me/profile')
 		.get(userController.getProfile)
-		.patch(userController.updateUser);
+		.patch(userController.updateProfile);
 
 	router
 		.route('/:id')

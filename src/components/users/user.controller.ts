@@ -32,7 +32,8 @@ export const UserController = (userService: IUserService) => {
 		const userId = req.user!.id;
 
 		const errors = await validateRequestBody(UpdateUserDto, req.body);
-		if (errors.length > 0) throw errors;
+		if (errors.length > 0)
+			throw new IllegalArgumentError('Invalid update user data', errors);
 
 		const updateUserDto = req.body as UpdateUserDto;
 		const updatedUser = await userService.updateUserById(

@@ -22,7 +22,7 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 	username: config.db.pg.DB_USERNAME,
 	password: config.db.pg.DB_PASSWORD,
 	database: config.db.pg.DB_NAME,
-	dropSchema: true,
+	dropSchema: false,
 	synchronize: true,
 	entities: [
 		User,

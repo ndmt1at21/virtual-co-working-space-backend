@@ -4,13 +4,13 @@ import { createOfficeMemberSocketHandler } from '@src/components/officeMembers/o
 import { OfficeMemberSocketHandler } from '@src/components/officeMembers/officeMember.socketHandler';
 import { Server } from 'socket.io';
 
-export const socketEventHandlers = (socket: Server) => {
+export const socketEventHandlers = (socketServer: Server) => {
 	const socketAuthMiddleware = createSocketMiddleware();
 
 	// TODO: use auth middleware to protect all socket events
-	socket.use(socketAuthMiddleware.protect);
+	socketServer.use(socketAuthMiddleware.protect);
 
-	socket.on('connection', socket => {
-		createOfficeMemberSocketHandler(socket);
+	socketServer.on('connection', socket => {
+		createOfficeMemberSocketHandler(socketServer, socket);
 	});
 };

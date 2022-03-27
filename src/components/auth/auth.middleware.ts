@@ -37,13 +37,25 @@ export const AuthMiddleware = (
 	const restrictToGuest = catchAsyncRequestHandler(async (req, res, next) => {
 		const accessToken = req.headers.authorization?.split(' ')[1];
 
-		if (accessToken) {
-			throw new UnauthorizedError(
-				AuthErrorMessages.UNAUTHORIZED_ALREADY_LOGGED_IN
-			);
+		if (
+			!accessToken ||
+			accessToken === 'null' ||
+			accessToken === 'undefined'
+		) {
+			next();
+			return;
 		}
 
-		next();
+		try {
+			const user = await deserializeUser(accessToken);
+
+			if (user)
+				throw new UnauthorizedError(
+					AuthErrorMessages.UNAUTHORIZED_ALREADY_LOGGED_IN
+				);
+		} catch (err) {
+			next();
+		}
 	});
 
 	const restrictTo = (roles: UserRoleType[]) => {

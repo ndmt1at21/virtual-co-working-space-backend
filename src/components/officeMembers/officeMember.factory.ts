@@ -1,9 +1,11 @@
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { getCustomRepository } from 'typeorm';
+import { getCacheConnection } from '../app/loaders/database/cache';
 import {
 	createOfficeMemberTransformRepository,
 	createOfficeMemberTransformService
 } from '../officeMemberTransform/officeMemberTransform.factory';
+import { OfficeMemberCacheService } from './officeMember.cache';
 import { OfficeMemberController } from './officeMember.controller';
 import { OfficeMemberCreator } from './officeMember.creator';
 import { OfficeMemberRepository } from './officeMember.repository';
@@ -16,14 +18,20 @@ export function createOfficeMemberController() {
 	return OfficeMemberController(service);
 }
 
-export function createOfficeMemberSocketHandler(socket: Socket) {
+export function createOfficeMemberSocketHandler(
+	socketNamespace: Server,
+	socket: Socket
+) {
 	const officeMemberRepository = createOfficeMemberRepository();
 	const officeMemberTransformService = createOfficeMemberTransformService();
+	const officeMemberCacheService = createOfficeMemberCache();
 
 	return OfficeMemberSocketHandler(
+		socketNamespace,
 		socket,
 		officeMemberRepository,
-		officeMemberTransformService
+		officeMemberTransformService,
+		officeMemberCacheService
 	);
 }
 
@@ -40,6 +48,11 @@ export function createOfficeMemberService() {
 		officeMemberCreator,
 		officeMemberValidate
 	);
+}
+
+export function createOfficeMemberCache() {
+	const cache = getCacheConnection('officeMember');
+	return OfficeMemberCacheService(cache);
 }
 
 export function createOfficeMemberValidate() {

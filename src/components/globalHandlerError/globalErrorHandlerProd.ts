@@ -1,6 +1,7 @@
 import { ErrorRequestHandler } from 'express';
 import { AppError } from '@src/utils/appError';
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
+import { serverLogger } from '../logger';
 
 export const globalErrorHandlerProd: ErrorRequestHandler = (
 	err: Error,
@@ -8,6 +9,8 @@ export const globalErrorHandlerProd: ErrorRequestHandler = (
 	res,
 	next
 ) => {
+	serverLogger.error(err);
+
 	if (err instanceof AppError) {
 		res.status(HttpStatusCode.OK).json({
 			status: err.status,

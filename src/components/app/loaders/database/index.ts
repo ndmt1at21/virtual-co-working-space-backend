@@ -74,13 +74,24 @@ const mailCache: CacheConnectOption = {
 	}
 };
 
+const officeMemberCache: CacheConnectOption = {
+	connName: 'officeMember',
+	options: {
+		socket: {
+			port: 6381,
+			host: 'localhost'
+		}
+	}
+};
+
 export const connectDatabase = async (): Promise<void> => {
 	return new Promise(async (resolve, reject) => {
 		try {
 			await createConnection(ormPostgresOptions);
 			await createCacheConnection([
 				officeMemberTransformCache,
-				mailCache
+				mailCache,
+				officeMemberCache
 			]);
 			resolve();
 		} catch (err: any) {

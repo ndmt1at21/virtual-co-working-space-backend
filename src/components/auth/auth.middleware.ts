@@ -69,7 +69,11 @@ export const AuthMiddleware = (
 			}
 
 			if (!hasPermission) {
-				next(AuthErrorMessages.UNAUTHORIZED_PERMISSION_DENIED);
+				next(
+					new UnauthorizedError(
+						AuthErrorMessages.UNAUTHORIZED_PERMISSION_DENIED
+					)
+				);
 			}
 		};
 	};

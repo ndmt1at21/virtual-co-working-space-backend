@@ -1,5 +1,5 @@
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
-import { IllegalArgumentError } from '@src/utils/appError';
+import { AppError, IllegalArgumentError } from '@src/utils/appError';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { validateRequestBody } from '@src/utils/requestValidation';
 import { CreateUserDto } from './@types/dto/CreateUser.dto';
@@ -30,6 +30,7 @@ export const UserController = (userService: IUserService) => {
 
 	const updateProfile = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = req.user!.id;
+
 		const errors = await validateRequestBody(UpdateUserDto, req.body);
 		if (errors.length > 0) throw errors;
 
@@ -52,7 +53,8 @@ export const UserController = (userService: IUserService) => {
 		const userId = +req.params.id;
 
 		const errors = await validateRequestBody(UpdateUserDto, req.body);
-		if (errors.length > 0) throw errors;
+		if (errors.length > 0)
+			throw new IllegalArgumentError('Invalid update user data', errors);
 
 		const updateUserDto = req.body as UpdateUserDto;
 		const updatedUser = await userService.updateUserById(

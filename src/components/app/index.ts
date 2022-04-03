@@ -13,6 +13,8 @@ import {
 import { createMessageQueues } from './loaders/queue';
 import { socketEventHandlers, socketMiddleware } from './loaders/socket';
 
+import io from 'socket.io';
+
 export const mainAppLoaders = async (
 	app: Application,
 	logger: ILogger

@@ -70,3 +70,11 @@ export const officeItemLogger = createLogger({
 		new transports.Console(debugOptions)
 	]
 });
+
+export const cloudLogger = createLogger({
+	defaultMeta: { service: 'cloud-service' },
+	transports: [
+		new transports.File(commonOptions),
+		new transports.Console(debugOptions)
+	]
+});

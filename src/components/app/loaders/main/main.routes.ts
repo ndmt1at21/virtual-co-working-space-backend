@@ -5,6 +5,7 @@ import { ItemRouter } from '@src/components/items';
 import { OfficeRouter } from '@src/components/offices';
 import { OfficeItemRouter } from '@src/components/officeItems';
 import { OfficeMemberRouter } from '@src/components/officeMembers';
+import { CloudUploadRouter } from '@src/components/cloudUpload/cloudUpload.api';
 
 export const mainRoutes = (app: Application) => {
 	const API_PREFIX = '/api/v1';
@@ -15,6 +16,7 @@ export const mainRoutes = (app: Application) => {
 	const officeRouter = OfficeRouter();
 	const officeItemRouter = OfficeItemRouter();
 	const officeMemberRouter = OfficeMemberRouter();
+	const cloudUploadRouter = CloudUploadRouter();
 
 	app.use(`${API_PREFIX}/auth`, authRouter);
 	app.use(`${API_PREFIX}/users`, userRouter);
@@ -22,4 +24,5 @@ export const mainRoutes = (app: Application) => {
 	app.use(`${API_PREFIX}/offices`, officeRouter);
 	app.use(`${API_PREFIX}/office-items`, officeItemRouter);
 	app.use(`${API_PREFIX}/office-members`, officeMemberRouter);
+	app.use(`${API_PREFIX}/uploads`, cloudUploadRouter);
 };

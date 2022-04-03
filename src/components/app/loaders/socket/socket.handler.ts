@@ -1,7 +1,5 @@
 import { createSocketMiddleware } from '@src/components/authSocket/authSocket.factory';
-import { ILogger } from '@src/components/logger/@types/ILogger';
-import { createOfficeMemberSocketHandler } from '@src/components/officeMembers/officeMember.factory';
-import { OfficeMemberSocketHandler } from '@src/components/officeMembers/officeMember.socketHandler';
+import { createOfficeSocketHandler } from '@src/components/offices/office.factory';
 import { Server } from 'socket.io';
 
 export const socketEventHandlers = (socketServer: Server) => {
@@ -11,6 +9,6 @@ export const socketEventHandlers = (socketServer: Server) => {
 	socketServer.use(socketAuthMiddleware.protect);
 
 	socketServer.on('connection', socket => {
-		createOfficeMemberSocketHandler(socketServer, socket);
+		createOfficeSocketHandler(socketServer, socket);
 	});
 };

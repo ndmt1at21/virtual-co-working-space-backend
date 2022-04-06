@@ -1,6 +1,6 @@
+import multer from 'multer';
 import { IllegalArgumentError } from '@src/utils/appError';
 import { Request } from 'express';
-import multer from 'multer';
 import { ICloudUploadMiddleware } from './@types/ICloudUploadMiddleware';
 
 export const CloudUploadMiddleware = (): ICloudUploadMiddleware => {

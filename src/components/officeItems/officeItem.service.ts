@@ -1,14 +1,32 @@
 import { Pageable } from '@src/@types/Pageable';
+import { CreateOfficeItemDto } from './@types/dto/CreateOfficeItem.dto';
 import { OfficeItemDetailDto } from './@types/dto/OfficeItemDetail.dto';
+import { OfficeItemOverviewDto } from './@types/dto/OfficeItemOverviewDto';
+import { UpdateOfficeItemTransformDto } from './@types/dto/UpdateOfficeItemTransform.dto';
 import { IOfficeItemService } from './@types/IOfficeItemService';
 import { IOfficeItemValidate } from './@types/IOfficeItemValidate';
-import { mapOfficeItemToOfficeItemDetailDto } from './officeItem.mapping';
+import {
+	mapOfficeItemToOfficeItemDetailDto,
+	mapOfficeItemToOfficeItemOverviewDto
+} from './officeItem.mapping';
 import { OfficeItemRepository } from './officeItem.repository';
 
 export const OfficeItemService = (
 	officeItemRepository: OfficeItemRepository,
 	officeItemValidate: IOfficeItemValidate
 ): IOfficeItemService => {
+	const createOfficeItem = async (
+		createOfficeItemDto: CreateOfficeItemDto
+	): Promise<OfficeItemOverviewDto> => {
+		const officeItem = await officeItemRepository.save(createOfficeItemDto);
+		return mapOfficeItemToOfficeItemOverviewDto(officeItem);
+	};
+
+	const updateOfficeItemTransform = async (
+		id: number,
+		transform: UpdateOfficeItemTransformDto
+	) => {};
+
 	const findOfficeItemDetailById = async (
 		id: number
 	): Promise<OfficeItemDetailDto> => {
@@ -42,6 +60,7 @@ export const OfficeItemService = (
 	};
 
 	return {
+		createOfficeItem,
 		findOfficeItemDetailById,
 		findOfficeItemsDetail,
 		deleteOfficeItem

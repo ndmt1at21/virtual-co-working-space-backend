@@ -6,6 +6,7 @@ declare global {
 			id: number;
 			email: string;
 			roles: string[];
+			emailVerified: boolean;
 		}
 
 		interface Office {

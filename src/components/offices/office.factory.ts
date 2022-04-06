@@ -11,9 +11,15 @@ import { OfficeService } from './office.service';
 import { OfficeValidate } from './office.validate';
 import { createOfficeRoleRepository } from '@components/officeRoles/officeRole.factory';
 import generator from '@components/officeInvitationCodeGenerator';
+import { OfficeSocketHandler } from './office.socketHandler';
+import { Server, Socket } from 'socket.io';
 
 export function createOfficeController() {
 	return OfficeController(createOfficeService());
+}
+
+export function createOfficeSocketHandler(io: Server, socket: Socket) {
+	return OfficeSocketHandler(io, socket);
 }
 
 export function createOfficeService() {

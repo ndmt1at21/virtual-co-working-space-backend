@@ -1,4 +1,4 @@
-export interface IOfficeMemberCacheService {
+export interface IOfficeMemberSocketCacheService {
 	setUserSocket(userId: string, socketId: string): Promise<void>;
 
 	getUserSocket(userId: string): Promise<string | null>;

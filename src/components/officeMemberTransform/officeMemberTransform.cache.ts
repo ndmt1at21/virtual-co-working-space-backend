@@ -1,5 +1,5 @@
-import { IOfficeMemberTransformCache } from '../../@types/IOfficeMemberTransformCache';
-import { OfficeMemberTransformDto } from '../../@types/dto/OfficeMemberTransform.dto';
+import { IOfficeMemberTransformCache } from './@types/IOfficeMemberTransformCache';
+import { OfficeMemberTransformDto } from './@types/dto/OfficeMemberTransform.dto';
 import { RedisClientType } from 'redis';
 
 export const OfficeMemberTransformCacheService = (

@@ -1,5 +1,3 @@
-import { OfficeMember } from '../officeMember.entity';
-
 export type OfficeMemberData = {
 	id: number;
 	officeId: number;

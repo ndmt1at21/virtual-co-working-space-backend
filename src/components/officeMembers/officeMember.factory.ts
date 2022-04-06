@@ -5,29 +5,28 @@ import {
 	createOfficeMemberTransformRepository,
 	createOfficeMemberTransformService
 } from '../officeMemberTransform/officeMemberTransform.factory';
-import { OfficeMemberCacheService } from './officeMember.cache';
 import { OfficeMemberController } from './officeMember.controller';
 import { OfficeMemberCreator } from './officeMember.creator';
 import { OfficeMemberRepository } from './officeMember.repository';
 import { OfficeMemberService } from './officeMember.service';
-import { OfficeMemberSocketHandler } from './officeMember.socketHandler';
 import { OfficeMemberValidate } from './officeMember.validate';
+import {
+	OfficeMemberSocketCacheService,
+	OfficeMemberSocketService
+} from './socket';
 
 export function createOfficeMemberController() {
 	const service = createOfficeMemberService();
 	return OfficeMemberController(service);
 }
 
-export function createOfficeMemberSocketHandler(
-	socketNamespace: Server,
-	socket: Socket
-) {
+export function createOfficeMemberSocketService(io: Server, socket: Socket) {
 	const officeMemberRepository = createOfficeMemberRepository();
 	const officeMemberTransformService = createOfficeMemberTransformService();
 	const officeMemberCacheService = createOfficeMemberCache();
 
-	return OfficeMemberSocketHandler(
-		socketNamespace,
+	return OfficeMemberSocketService(
+		io,
 		socket,
 		officeMemberRepository,
 		officeMemberTransformService,
@@ -52,7 +51,7 @@ export function createOfficeMemberService() {
 
 export function createOfficeMemberCache() {
 	const cache = getCacheConnection('officeMember');
-	return OfficeMemberCacheService(cache);
+	return OfficeMemberSocketCacheService(cache);
 }
 
 export function createOfficeMemberValidate() {

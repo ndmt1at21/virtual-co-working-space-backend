@@ -1,9 +1,9 @@
 import { RedisClientType } from 'redis';
-import { IOfficeMemberCacheService } from './@types/IOfficeMemberCacheService';
+import { IOfficeMemberSocketCacheService } from '../@types/socket/IOfficeMemberSocketCacheService';
 
-export const OfficeMemberCacheService = (
+export const OfficeMemberSocketCacheService = (
 	cache: RedisClientType
-): IOfficeMemberCacheService => {
+): IOfficeMemberSocketCacheService => {
 	const PREFIX = 'office_member';
 
 	const setUserSocket = async (userId: string, socketId: string) => {

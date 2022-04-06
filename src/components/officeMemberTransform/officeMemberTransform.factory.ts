@@ -1,6 +1,6 @@
 import { getCustomRepository } from 'typeorm';
 import { getCacheConnection } from '../app/loaders/database/cache';
-import { OfficeMemberTransformCacheService } from './cache/officeMemberTransform/officeMemberTransform.service';
+import { OfficeMemberTransformCacheService } from './officeMemberTransform.cache';
 import { OfficeMemberTransformRepository } from './officeMemberTransform.repository';
 import { OfficeMemberTransformService } from './officeMemberTransform.service';
 

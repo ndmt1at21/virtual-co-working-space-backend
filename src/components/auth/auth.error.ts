@@ -9,6 +9,7 @@ export const AuthErrorMessages = {
 	UNAUTHORIZED_ALREADY_LOGGED_IN: 'You are already logged in',
 	UNAUTHORIZED_PERMISSION_DENIED:
 		'You do not have permission to access this resource',
+	UNAUTHORIZED_EMAIL_NOT_VERIFIED: 'Email is not verified',
 
 	LOGIN_MISSING_EMAIL_PASSWORD: 'Email and password are required',
 	LOGIN_EXTERNAL_MISSING_EMAIL: 'Email is required',

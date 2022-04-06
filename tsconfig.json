@@ -24,7 +24,7 @@
 			"@components/*": ["./components/*"],
 			"@constant/*": ["./constant/*"]
 		},
-		"typeRoots": ["./@types", "./src/@types", "./node_modules/@types"]
+		"typeRoots": ["./src/@types", "./node_modules/@types"]
 	},
 	"include": ["./**/*.ts", "src/**/*.ts"],
 	"exclude": ["node_modules", "build/**/*"],

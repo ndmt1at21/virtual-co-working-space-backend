@@ -1,6 +1,9 @@
 import { IllegalArgumentError, NotFoundError } from '@src/utils/appError';
 import { OfficeMemberRepository } from '../officeMembers/officeMember.repository';
-import { CreateOfficeInvitationDto } from './@types/dto/CreateOfficeInvitation.dto';
+import {
+	CreateOfficeInvitationByEmailDto,
+	CreatePublicOfficeInvitationDto
+} from './@types/dto/CreateOfficeInvitation.dto';
 import { IOfficeInvitationValidate } from './@types/IOfficeInvitationValidate';
 import { OfficeInvitation } from './officeInvitation.entity';
 import { OfficeInvitationErrorMessages } from './officeInvitation.error';
@@ -10,12 +13,19 @@ export const OfficeInvitationValidate = (
 	officeInvitationRepository: OfficeInvitationRepository,
 	officeMemberRepository: OfficeMemberRepository
 ): IOfficeInvitationValidate => {
-	const checkCreateInvitationTokenData = async (
-		invitationDto: CreateOfficeInvitationDto
+	const checkCreateInvitationTokenByEmailData = async (
+		invitationDto: CreateOfficeInvitationByEmailDto
 	): Promise<void> => {
-		const { inviteEmail, inviterId, officeId } = invitationDto;
+		const { invitedEmail, inviterId, officeId } = invitationDto;
 		await checkInviterInOffice(inviterId, officeId);
-		await checkInvitedEmailIsNotAlreadyMember(inviteEmail, officeId);
+		await checkInvitedEmailIsNotAlreadyMember(invitedEmail, officeId);
+	};
+
+	const checkCreatePublicInvitationTokenData = async (
+		invitationDto: CreatePublicOfficeInvitationDto
+	): Promise<void> => {
+		const { inviterId, officeId } = invitationDto;
+		await checkInviterInOffice(inviterId, officeId);
 	};
 
 	const checkUserCanJoinByInvitationToken = async (
@@ -28,10 +38,24 @@ export const OfficeInvitationValidate = (
 		);
 	};
 
+	const checkInvitationExistsByInvitedEmailAndInvitationToken = async (
+		invitedEmail: string,
+		token: string
+	): Promise<void> => {
+		const invitation =
+			await officeInvitationRepository.findOfficeInvitationByInvitedEmailAndInvitationToken(
+				invitedEmail,
+				token
+			);
+
+		checkInvitationExists(invitation);
+		checkInvitationNotExpired(invitation!);
+	};
+
 	async function checkInvitedEmailIsNotAlreadyMember(
 		invitedEmail: string,
 		officeId: number
-	) {
+	): Promise<void> {
 		const officeMember =
 			await officeMemberRepository.findOfficeMemberByMemberEmailAndOfficeId(
 				invitedEmail,
@@ -61,7 +85,7 @@ export const OfficeInvitationValidate = (
 	async function checkInvitationTokenExistsAndNotExpired(
 		invitedEmail: string,
 		invitationToken: string
-	) {
+	): Promise<void> {
 		const officeInvitation =
 			await officeInvitationRepository.findOfficeInvitationByInvitedEmailAndInvitationToken(
 				invitedEmail,
@@ -89,7 +113,8 @@ export const OfficeInvitationValidate = (
 	}
 
 	return {
-		checkCreateInvitationTokenData,
+		checkCreateInvitationTokenByEmailData,
+		checkCreatePublicInvitationTokenData,
 		checkUserCanJoinByInvitationToken
 	};
 };

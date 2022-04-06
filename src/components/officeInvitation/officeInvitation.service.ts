@@ -1,38 +1,74 @@
-import { CreateOfficeInvitationDto } from './@types/dto/CreateOfficeInvitation.dto';
+import {
+	CreateOfficeInvitationByEmailDto,
+	CreatePublicOfficeInvitationDto
+} from './@types/dto/CreateOfficeInvitation.dto';
+import { OfficeInvitationDto } from './@types/dto/OfficeInvitation.dto';
 import { IOfficeInvitationService } from './@types/IOfficeInvitationService';
 import { IOfficeInvitationValidate } from './@types/IOfficeInvitationValidate';
+import { mapOfficeInvitationToOfficeInvitationDto } from './officeInvitation.mapping';
 import { OfficeInvitationRepository } from './officeInvitation.repository';
 
 export const OfficeInvitationService = (
 	officeInvitationRepository: OfficeInvitationRepository,
 	officeInvitationValidate: IOfficeInvitationValidate
 ): IOfficeInvitationService => {
-	const createOfficeInvitationToken = async (
-		invitationDto: CreateOfficeInvitationDto
-	) => {
-		const { inviteEmail, inviterId, officeId } = invitationDto;
+	const createPublicOfficeInvitation = async (
+		invitationDto: CreatePublicOfficeInvitationDto
+	): Promise<OfficeInvitationDto> => {
+		await officeInvitationValidate.checkCreatePublicInvitationTokenData(
+			invitationDto
+		);
+
+		const { inviterId, officeId } = invitationDto;
+
+		const officeInvitation = await officeInvitationRepository.create({
+			officeId,
+			createdByUserId: inviterId
+		});
+
+		return mapOfficeInvitationToOfficeInvitationDto(officeInvitation);
+	};
+
+	const createOfficeInvitationByEmail = async (
+		invitationDto: CreateOfficeInvitationByEmailDto
+	): Promise<OfficeInvitationDto> => {
+		await officeInvitationValidate.checkCreateInvitationTokenByEmailData(
+			invitationDto
+		);
+
+		const { invitedEmail, inviterId, officeId } = invitationDto;
 
 		const officeInvitation = await officeInvitationRepository.create({
 			officeId,
 			createdByUserId: inviterId,
-			invitedEmail: inviteEmail
+			invitedEmail: invitedEmail
 		});
 
-		return officeInvitation.token;
+		return mapOfficeInvitationToOfficeInvitationDto(officeInvitation);
+	};
+
+	const findInvitationByInvitedEmailAndInvitationToken = async (
+		invitedEmail: string,
+		token: string
+	): Promise<OfficeInvitationDto> => {
+		await officeInvitationRepository.existsOfficeInvitationToken(token);
+		const officeInvitation =
+			await officeInvitationRepository.findOfficeInvitationByInvitedEmailAndInvitationToken(
+				invitedEmail,
+				token
+			);
+
+		return mapOfficeInvitationToOfficeInvitationDto(officeInvitation);
 	};
 
 	const acceptInvitationByInvitationToken = async (inviteToken: string) => {};
 
-	const acceptInvitationByOfficeInvitationCode = async (
-		inviteCode: string
-	) => {};
-
 	const deleteInvitation = async (inviteToken: string) => {};
 
 	return {
-		createOfficeInvitationToken,
+		createPublicOfficeInvitation,
+		createOfficeInvitationByEmail,
 		acceptInvitationByInvitationToken,
-		acceptInvitationByOfficeInvitationCode,
 		deleteInvitation
 	};
 };

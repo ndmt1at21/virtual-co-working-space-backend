@@ -2,7 +2,7 @@ module.exports = {
 	apps: [
 		{
 			name: 'virtual-working-space',
-			script: 'ts-node -r tsconfig-paths/register src/server.ts',
+			script: 'node .build/main.js',
 			env_production: {
 				NODE_ENV: 'production'
 			}

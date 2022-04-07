@@ -35,7 +35,7 @@ export const AuthMailWorker = (
 					'src/components/mailTemplates/accountActivate.html'
 				),
 				context: {
-					activationUrl: `${config.app.SERVER_DOMAIN}/auth/activate/${activeToken}`,
+					activationUrl: `${config.app.CLIENT_DOMAIN}/auth/activate/${activeToken}`,
 					receiver: `${user.name}`
 				}
 			});
@@ -63,7 +63,7 @@ export const AuthMailWorker = (
 					'src/components/mailTemplates/resetPassword.html'
 				),
 				context: {
-					resetPasswordUrl: `${config.app.SERVER_DOMAIN}/auth/reset/${resetToken}`
+					resetPasswordUrl: `${config.app.CLIENT_DOMAIN}/auth/reset/${resetToken}`
 				}
 			});
 

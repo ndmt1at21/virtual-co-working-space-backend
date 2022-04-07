@@ -1,4 +1,4 @@
-import { ObjectID, Repository } from 'typeorm';
+import { DeepPartial, ObjectID, Repository, SaveOptions } from 'typeorm';
 
 type ID = string | number | Date | ObjectID;
 

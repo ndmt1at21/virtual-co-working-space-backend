@@ -5,6 +5,7 @@ import { ActiveTokenErrorMessages } from './activeToken.error';
 import { ActiveUserTokenRepository } from './activeUserToken.repository';
 import { ActiveUserTokenDto } from './@types/dto/ActiveUserToken.dto';
 import { IActiveUserTokenService } from './@types/IActiveUserTokenService';
+import { ActiveUserToken } from './activeUserToken.entity';
 
 export const ActiveUserTokenService = (
 	activeUserTokenRepository: ActiveUserTokenRepository
@@ -14,12 +15,17 @@ export const ActiveUserTokenService = (
 			.randomBytes(config.auth.ACTIVE_USER_TOKEN_LENGTH)
 			.toString('hex');
 
-		const createdToken = await activeUserTokenRepository.save({
-			userId,
-			token
-		});
+		const createdToken = await activeUserTokenRepository
+			.createQueryBuilder()
+			.insert()
+			.into(ActiveUserToken)
+			.values({
+				userId,
+				token
+			})
+			.execute();
 
-		return { ...createdToken };
+		return { ...createdToken.raw[0] };
 	};
 
 	const deleteToken = async (token: string): Promise<number> => {

@@ -5,7 +5,8 @@
 	"main": "src/server.ts",
 	"scripts": {
 		"start": "nodemon -r tsconfig-paths/register src/server.ts",
-		"build": "webpack --mode production",
+		"build:prod": "webpack --mode production",
+		"build:dev": "webpack --mode development",
 		"test": "jest",
 		"docs:start": "nodemon -r tsconfig-paths/register src/docs/server.ts",
 		"typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js"

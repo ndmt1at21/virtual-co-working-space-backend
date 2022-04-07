@@ -3,7 +3,6 @@ import { IOfficeInvitationCodeGenerator } from '../officeInvitationCodeGenerator
 import { mapOfficeItemToOfficeItemOverviewDto } from '../officeItems/officeItem.mapping';
 import { OfficeItemRepository } from '../officeItems/officeItem.repository';
 import { IOfficeMemberCreator } from '../officeMembers/@types/IOfficeMemberCreator';
-import { mapOfficeMemberToOfficeMemberOverviewDto } from '../officeMembers/officeMember.mapping';
 import { OfficeMemberRepository } from '../officeMembers/officeMember.repository';
 import { OfficeRoleType } from '../officeRoles/@types/OfficeRoleType';
 import { OfficeRoleRepository } from '../officeRoles/officeRole.repository';
@@ -16,7 +15,7 @@ import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
 import { IOfficeCreator } from './@types/IOfficeCreator';
 import { IOfficeService } from './@types/IOfficeService';
 import { IOfficeValidate } from './@types/IOfficeValidate';
-import { mapOfficeToOfficeOverviewDto } from './office.mapping';
+import { Office } from './office.entity';
 import { OfficeRepository } from './office.repository';
 
 export const OfficeService = (
@@ -34,6 +33,7 @@ export const OfficeService = (
 		createOfficeDto: CreateOfficeDto
 	): Promise<OfficeOverviewDto> => {
 		const invitationCode = officeInvitationCodeGenerator.generate();
+
 		const ownerRole = await officeRoleRepository.findOfficeRoleByName(
 			OfficeRoleType.OWNER
 		);
@@ -44,14 +44,23 @@ export const OfficeService = (
 			transform: {}
 		});
 
-		const office = await officeRepository.save({
-			invitationCode,
-			createdByUserId: createdUserId,
-			name: createOfficeDto.name,
-			officeMembers: [officeMember]
-		});
+		const office = await officeRepository
+			.createQueryBuilder()
+			.insert()
+			.into(Office)
+			.values({
+				invitationCode,
+				createdByUserId: createdUserId,
+				name: createOfficeDto.name,
+				officeMembers: [officeMember]
+			})
+			.execute();
 
-		return await officeCreator.createOfficeOverviewById(office.id);
+		const officeDto = await officeCreator.createOfficeOverviewById(
+			office.raw[0].id
+		);
+
+		return officeDto;
 	};
 
 	const updateOfficeById = async (

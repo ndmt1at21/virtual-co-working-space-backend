@@ -1,8 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
-const DotenvWebpackPlugin = require('dotenv-webpack');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
 	/** @type {import('webpack').Configuration} */
@@ -46,9 +45,5 @@ module.exports = {
 			util: false
 		}
 	},
-	plugins: [
-		new DotenvWebpackPlugin(),
-		new webpack.ProgressPlugin(),
-		new CleanWebpackPlugin()
-	]
+	plugins: [new webpack.ProgressPlugin(), new CleanWebpackPlugin()]
 };

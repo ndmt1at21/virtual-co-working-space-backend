@@ -58,7 +58,7 @@ export const OfficeInvitationService = (
 				token
 			);
 
-		return mapOfficeInvitationToOfficeInvitationDto(officeInvitation);
+		return mapOfficeInvitationToOfficeInvitationDto(officeInvitation!);
 	};
 
 	const acceptInvitationByInvitationToken = async (inviteToken: string) => {};

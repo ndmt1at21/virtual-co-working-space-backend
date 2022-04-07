@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"lib": ["es5", "es6", "ESNext", "DOM", "DOM.Iterable"],
 		"allowJs": true,
-		"target": "ESNext",
+		"target": "ES5",
 		"module": "CommonJS",
 		"outDir": "build",
 		"moduleResolution": "node",
@@ -30,5 +30,8 @@
 	"exclude": ["node_modules", "build/**/*"],
 	"ts-node": {
 		"files": true
-	}
+	},
+	"plugins": [
+		{ "transform": "typescript-transform-paths", "afterDeclarations": true }
+	]
 }

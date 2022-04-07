@@ -7,22 +7,22 @@ export const OfficeInvitationRouter = (): Router => {
 
 	router.post('/', officeController.createInvitationByEmail);
 
-	router.post(
-		'/token/:inviteToken/accept',
-		officeController.acceptInvitationByInviteToken
-	);
+	// router.post(
+	// 	'/token/:inviteToken/accept',
+	// 	officeController.acceptInvitationByInviteToken
+	// );
 
-	router.post(
-		'/:inviteCode/accept',
-		officeController.acceptInvitationByInviteCode
-	);
+	// router.post(
+	// 	'/:inviteCode/accept',
+	// 	officeController.acceptInvitationByInviteCode
+	// );
 
-	router.get(
-		'/token/:inviteToken',
-		officeController.findInvitationByInviteToken
-	);
+	// router.get(
+	// 	'/token/:inviteToken',
+	// 	officeController.findInvitationByInviteToken
+	// );
 
-	router.get('/:inviteCode', officeController.getInvitationByInviteCode);
+	// router.get('/:inviteCode', officeController.getInvitationByInviteCode);
 
 	return router;
 };

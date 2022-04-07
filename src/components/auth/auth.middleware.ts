@@ -8,6 +8,7 @@ import { UserRoleType } from '@components/users/@types/UserRoleType';
 import { IAuthMiddleware } from './@types/IAuthMiddleware';
 import { UnauthorizedError } from '@src/utils/appError';
 import { IAuthValidate } from './@types/IAuthValidate';
+import { UserStatus } from '../users/@types/UserStatus';
 
 export const AuthMiddleware = (
 	userRepository: UserRepository,
@@ -23,12 +24,13 @@ export const AuthMiddleware = (
 			);
 		}
 
-		const { id, type, email } = await deserializeUser(accessToken);
+		const { id, type, email, status } = await deserializeUser(accessToken);
 
 		req.user = {
 			id,
 			roles: [type],
-			email
+			email,
+			emailVerified: status === UserStatus.INACTIVE
 		};
 
 		next();
@@ -57,6 +59,17 @@ export const AuthMiddleware = (
 			next();
 		}
 	});
+
+	const restrictToEmailVerified = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			const isEmailVerified = req.user?.emailVerified;
+
+			if (!isEmailVerified)
+				throw new UnauthorizedError(
+					AuthErrorMessages.UNAUTHORIZED_EMAIL_NOT_VERIFIED
+				);
+		}
+	);
 
 	const restrictTo = (roles: UserRoleType[]) => {
 		return (req: Request, res: Response, next: NextFunction) => {
@@ -96,5 +109,5 @@ export const AuthMiddleware = (
 		return user;
 	}
 
-	return { protect, restrictTo, restrictToGuest };
+	return { protect, restrictTo, restrictToGuest, restrictToEmailVerified };
 };

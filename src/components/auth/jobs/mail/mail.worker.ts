@@ -35,7 +35,8 @@ export const AuthMailWorker = (
 					'src/components/mailTemplates/accountActivate.html'
 				),
 				context: {
-					activationUrl: `${config.app.SERVER_DOMAIN}/auth/activate/${activeToken}`
+					activationUrl: `${config.app.SERVER_DOMAIN}/auth/activate/${activeToken}`,
+					receiver: `${user.name}`
 				}
 			});
 

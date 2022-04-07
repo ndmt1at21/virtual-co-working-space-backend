@@ -1,29 +1,73 @@
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { IllegalArgumentError } from '@src/utils/appError';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
-import { NextFunction, Request, Response } from 'express';
+import { validateRequestBody } from '@src/utils/requestValidation';
+import {
+	CreateOfficeInvitationByEmailDto,
+	CreatePublicOfficeInvitationDto
+} from './@types/dto/CreateOfficeInvitation.dto';
 import { IOfficeInvitationService } from './@types/IOfficeInvitationService';
 
 export const OfficeInvitationController = (
 	officeInvitationService: IOfficeInvitationService
 ) => {
-	const getInvitation = catchAsyncRequestHandler(async (req, res, next) => {
-		const { token, code } = req.query;
+	const createPublicInvitation = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			const errors = await validateRequestBody(
+				CreatePublicOfficeInvitationDto,
+				req.body
+			);
+			if (errors.length > 0)
+				throw new IllegalArgumentError('Invalid request body', errors);
 
-		if (token) {
-			getInvitationByInvitationToken(token as string, req, res, next);
+			const createOfficeInvitationDto =
+				req.body as CreatePublicOfficeInvitationDto;
+
+			const officeInvitation =
+				await officeInvitationService.createPublicOfficeInvitation(
+					createOfficeInvitationDto
+				);
+
+			res.status(HttpStatusCode.OK).json({
+				data: {
+					invitation: officeInvitation
+				}
+			});
+
+			req.officeInvitation
 		}
+	);
 
-		if (code) {
-			getInvitationByInvitationCode(code as string, req, res, next);
+	const createInvitationByEmail = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			const errors = await validateRequestBody(
+				CreateOfficeInvitationByEmailDto,
+				req.body
+			);
+			if (errors.length > 0)
+				throw new IllegalArgumentError('Invalid request body', errors);
+
+			const createOfficeInvitationDto =
+				req.body as CreateOfficeInvitationByEmailDto;
+
+			const officeInvitation =
+				await officeInvitationService.createOfficeInvitationByEmail(
+					createOfficeInvitationDto
+				);
+
+			res.status(HttpStatusCode.OK).json({
+				data: {
+					invitation: officeInvitation
+				}
+			});
 		}
-	});
+	);
 
-	const acceptInvitationByInvitationToken = catchAsyncRequestHandler(
+	const getInvitation = catchAsyncRequestHandler(
 		async (req, res, next) => {}
 	);
 
-	const acceptInvitationByOfficeInvitationCode = catchAsyncRequestHandler(
+	const acceptInvitation = catchAsyncRequestHandler(
 		async (req, res, next) => {}
 	);
 
@@ -31,56 +75,11 @@ export const OfficeInvitationController = (
 		async (req, res, next) => {}
 	);
 
-	const createInvitationByEmail = catchAsyncRequestHandler(
-		async (req, res, next) => {}
-	);
-
-	async function getInvitationByInvitationToken(
-		token: string | undefined,
-		req: Request,
-		res: Response,
-		next: NextFunction
-	) {
-		if (!token)
-			throw new IllegalArgumentError('Invitation token is required');
-
-		// const invitationDto =
-		// 	await officeInvitationService.getInvitationInformationByInvitationToken(
-		// 		token
-		// 	);
-
-		// res.status(HttpStatusCode.OK).json({
-		// 	data: {
-		// 		invitation: invitationDto
-		// 	}
-		// });
-	}
-
-	async function getInvitationByInvitationCode(
-		code: string | undefined,
-		req: Request,
-		res: Response,
-		next: NextFunction
-	) {
-		if (!code)
-			throw new IllegalArgumentError('Invitation code is required');
-
-		// const invitationDto =
-		// 	await officeInvitationService.getInvitationInformationByOfficeInvitationCode(
-		// 		code
-		// 	);
-
-		// res.status(HttpStatusCode.OK).json({
-		// 	data: {
-		// 		invitation: invitationDto
-		// 	}
-		// });
-	}
-
 	return {
 		getInvitation,
-		acceptInvitationByInvitationToken,
+		acceptInvitation,
 		deleteInvitation,
+		createPublicInvitation,
 		createInvitationByEmail
 	};
 };

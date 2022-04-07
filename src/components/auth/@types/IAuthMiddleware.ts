@@ -6,5 +6,7 @@ export interface IAuthMiddleware {
 
 	restrictToGuest: RequestHandler;
 
+	restrictToEmailVerified: RequestHandler;
+
 	restrictTo: (roles: UserRoleType[]) => RequestHandler;
 }

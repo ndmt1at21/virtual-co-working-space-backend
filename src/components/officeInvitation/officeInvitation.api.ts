@@ -5,11 +5,24 @@ export const OfficeInvitationRouter = (): Router => {
 	const router = Router();
 	const officeController = createOfficeInvitationController();
 
-	router
-		.route('/:id')
-		.get(officeController.getInvitation)
-		.delete(officeController.deleteInvitation)
-		.post(officeController.createInvitationByEmail);
+	router.post('/', officeController.createInvitationByEmail);
+
+	router.post(
+		'/token/:inviteToken/accept',
+		officeController.acceptInvitationByInviteToken
+	);
+
+	router.post(
+		'/:inviteCode/accept',
+		officeController.acceptInvitationByInviteCode
+	);
+
+	router.get(
+		'/token/:inviteToken',
+		officeController.findInvitationByInviteToken
+	);
+
+	router.get('/:inviteCode', officeController.getInvitationByInviteCode);
 
 	return router;
 };

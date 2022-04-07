@@ -1,4 +1,4 @@
-import { OfficeMemberTransformSocketDto } from './dto/OfficeMemberTransformSocket.dto';
+import { OfficeMemberTransformSocketDto } from '../dto/OfficeMemberTransformSocket.dto';
 
 export interface OfficeMemberServerToClientEvent {
 	'office_member:error': (err: any) => void;

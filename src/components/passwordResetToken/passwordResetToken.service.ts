@@ -11,11 +11,13 @@ export const PasswordResetTokenService = (
 	passwordResetTokenRepository: PasswordResetTokenRepository,
 	passwordResetTokenCreator: IPasswordResetTokenCreator
 ): IPasswordResetTokenService => {
-	const findByToken = async (
+	const findByPlainToken = async (
 		token: string
 	): Promise<PasswordResetTokenDto> => {
+		const encryptedToken = encryptToken(token);
+
 		const resetToken = await passwordResetTokenRepository.findByToken(
-			token
+			encryptedToken
 		);
 
 		if (!resetToken) {
@@ -38,14 +40,14 @@ export const PasswordResetTokenService = (
 
 		const createdToken = await passwordResetTokenRepository.save({
 			userId,
-			passwordResetToken: tokenPlain,
+			passwordResetToken: tokenEncrypt,
 			passwordResetTokenExpired: new Date(
 				Date.now() + config.auth.RESET_PASSWORD_TOKEN_EXPIRES_TIME
 			)
 		});
 
 		return passwordResetTokenCreator.mapPasswordResetTokenToPasswordResetTokenDto(
-			{ ...createdToken, passwordResetToken: tokenEncrypt }
+			{ ...createdToken, passwordResetToken: tokenPlain }
 		);
 	};
 
@@ -80,7 +82,7 @@ export const PasswordResetTokenService = (
 	}
 
 	return {
-		findByToken,
+		findByPlainToken,
 		createToken,
 		validateToken,
 		deleteByUserId

@@ -16,6 +16,7 @@ import { ResetPasswordContentDto } from './@types/dto/ResetPasswordContent.dto';
 import { ForgotPasswordDto } from './@types/dto/ForgotPassword.dto';
 import { RegisterDto } from './@types/dto/Register.dto';
 import { IAuthMailQueueProducer } from './@types/IAuthMailQueueProducer';
+import { appConfig } from '@src/config/app';
 
 export const AuthController = (
 	authMailQueueProducer: IAuthMailQueueProducer,
@@ -58,7 +59,12 @@ export const AuthController = (
 			`User with email ${user.email} registered successfully has id ${user.id}`
 		);
 
-		authMailQueueProducer.addRegisterConfirmationJob(user, activeToken);
+		const clientUrl = appConfig.CLIENT_DOMAIN;
+		authMailQueueProducer.addRegisterConfirmationJob(
+			user,
+			activeToken,
+			clientUrl
+		);
 
 		res.status(HttpStatusCode.CREATED).json({
 			user,
@@ -163,9 +169,11 @@ export const AuthController = (
 			`Reset password token sent to email ${forgotPasswordDto.email}`
 		);
 
+		const clientUrl = appConfig.CLIENT_DOMAIN;
 		authMailQueueProducer.addResetPasswordMailJob(
 			forgotPasswordDto.email,
-			resetToken.passwordResetToken
+			resetToken.passwordResetToken,
+			clientUrl
 		);
 
 		res.status(HttpStatusCode.OK).json({
@@ -280,6 +288,16 @@ export const AuthController = (
 					});
 			}
 		)(req, res, next);
+	}
+
+	function getClientUrlFromRequest(req: Request): string | undefined {
+		const clientUrl = req.headers['referer'] as string;
+
+		if (!clientUrl) {
+			return undefined;
+		}
+
+		return clientUrl.slice(0, -1);
 	}
 
 	return {

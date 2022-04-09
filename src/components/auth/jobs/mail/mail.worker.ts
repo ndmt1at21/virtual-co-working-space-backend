@@ -1,5 +1,4 @@
 import path from 'path';
-import config from '@src/config';
 import { ILogger } from '@src/components/logger/@types/ILogger';
 import { IMailService } from '@src/components/mail/@types/IMailService';
 import { UserDto } from '@src/components/users/@types/dto/User.dto';
@@ -19,6 +18,7 @@ export const AuthMailWorker = (
 		queue.process('auth_register_activate', 10, async job => {
 			const user = job.data.user as UserDto;
 			const activeToken = job.data.activeToken as string;
+			const clientUrl = job.data.clientUrl;
 
 			if (!user || !activeToken)
 				throw new Error('User or active token is undefined');
@@ -35,7 +35,7 @@ export const AuthMailWorker = (
 					'src/components/mailTemplates/accountActivate.html'
 				),
 				context: {
-					activationUrl: `${config.app.CLIENT_DOMAIN}/auth/activate/${activeToken}`,
+					activationUrl: `${clientUrl}/auth/activate/${activeToken}`,
 					receiver: `${user.name}`
 				}
 			});
@@ -52,6 +52,7 @@ export const AuthMailWorker = (
 
 			const email = data.email as string;
 			const resetToken = data.resetToken as string;
+			const clientUrl = data.clientUrl;
 
 			logger.info(`Start sending reset password link to email: ${email}`);
 
@@ -63,7 +64,7 @@ export const AuthMailWorker = (
 					'src/components/mailTemplates/resetPassword.html'
 				),
 				context: {
-					resetPasswordUrl: `${config.app.CLIENT_DOMAIN}/auth/reset/${resetToken}`
+					resetPasswordUrl: `${clientUrl}/auth/reset/${resetToken}`
 				}
 			});
 

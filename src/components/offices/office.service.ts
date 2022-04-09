@@ -120,6 +120,8 @@ export const OfficeService = (
 			officeMembers.map(om => om.officeId)
 		);
 
+		console.log(offices);
+
 		return [offices, totalOfficeMembers];
 	};
 

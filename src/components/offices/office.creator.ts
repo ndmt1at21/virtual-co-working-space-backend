@@ -59,6 +59,8 @@ export const OfficeCreator = (
 	const createOfficesOverviewsByIds = async (
 		ids: number[]
 	): Promise<OfficeOverviewDto[]> => {
+		if (ids.length === 0) return [];
+
 		const offices = await officeRepository
 			.queryBuilder()
 			.findByIds(ids)

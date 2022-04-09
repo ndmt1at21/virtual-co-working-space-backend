@@ -2,7 +2,7 @@ import {
 	Column,
 	Entity,
 	JoinColumn,
-	OneToOne,
+	ManyToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { BaseEntity } from '@src/components/base/BaseEntity';
@@ -22,7 +22,7 @@ export class PasswordResetToken extends BaseEntity {
 	@Column({ name: 'password_reset_token_expired' })
 	passwordResetTokenExpired: Date;
 
-	@OneToOne(() => User)
+	@ManyToOne(() => User)
 	@JoinColumn({ name: 'user_id' })
 	user: User;
 }

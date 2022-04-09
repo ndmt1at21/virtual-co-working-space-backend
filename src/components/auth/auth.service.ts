@@ -98,9 +98,8 @@ export const AuthService = (
 
 		await passwordResetTokenService.validateToken(resetToken);
 
-		const resetTokenEntity = await passwordResetTokenService.findByToken(
-			resetToken
-		);
+		const resetTokenEntity =
+			await passwordResetTokenService.findByPlainToken(resetToken);
 
 		const user = await userService.findUserById(resetTokenEntity!.userId);
 

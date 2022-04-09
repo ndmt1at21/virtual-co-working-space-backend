@@ -1,11 +1,11 @@
 import { ItemDto } from '@src/components/items/@types/dto/Item.dto';
 import { OfficeOverviewDto } from '@src/components/offices/@types/dto/OfficeOverview.dto';
-import { Transform3dDto } from './Transform3D.dto';
+import { OfficeItemTransformDto } from './OfficeItemTransform.dto';
 
 export type OfficeItemDetailDto = {
 	id: number;
 	item: ItemDto;
 	office: OfficeOverviewDto;
-	transform: Transform3dDto;
+	transform: OfficeItemTransformDto;
 	createdAt: Date;
 };

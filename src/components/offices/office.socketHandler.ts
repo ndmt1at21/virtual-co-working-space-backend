@@ -1,10 +1,12 @@
 import { Server as SocketServer, Socket } from 'socket.io';
-import { JoinToOfficeRoomDto } from './@types/dto/JoinToOfficeRoom.dto';
-import { OfficeMemberRepository } from '../officeMembers/officeMember.repository';
 import { OfficeClientToServerEvent } from './@types/OfficeClientToServerEvent';
 import { OfficeServerToClientEvent } from './@types/OfficeServerToClientEvent';
 import { OfficeSocketData } from './@types/OfficeSocketData';
 import { createOfficeMemberSocketService } from '../officeMembers/officeMember.factory';
+import { createOfficeItemSocketService } from '../officeItems/officeItem.factory';
+import { CreateOfficeItemDto } from '../officeItems/@types/dto/CreateOfficeItem.dto';
+import { UpdateOfficeItemTransformDto } from '../officeItems/@types/dto/UpdateOfficeItemTransform.dto';
+import { UpdateOfficeMemberTransformDto } from '../officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
 
 export const OfficeSocketHandler = (
 	socketNamespace: SocketServer,
@@ -20,19 +22,17 @@ export const OfficeSocketHandler = (
 		socket
 	);
 
+	const officeItemSocketService = createOfficeItemSocketService(
+		socketNamespace,
+		socket
+	);
+
 	socket.on('office_member:join', async data => {
 		try {
 			await officeMemberSocketService.onJoinToOfficeRoom(data);
 
-			socket.on('office_member:move', transform => {
-				officeMemberSocketService.onMemberMove(transform);
-			});
-
-			socket.on('office_item:create', data => {});
-
-			socket.on('office_item:move', data => {});
-
-			socket.on('office_item:delete', data => {});
+			handleOfficeMemberEvents(socket);
+			handleOfficeItemsEvents(socket);
 
 			socket.on('disconnect', () => {
 				officeMemberSocketService.onMemberDisconnect();
@@ -41,4 +41,27 @@ export const OfficeSocketHandler = (
 			socket.emit('office:error', err);
 		}
 	});
+
+	function handleOfficeMemberEvents(socket: Socket) {
+		socket.on(
+			'office_member:move',
+			(transform: UpdateOfficeMemberTransformDto) => {
+				officeMemberSocketService.onMemberMove(transform);
+			}
+		);
+	}
+
+	function handleOfficeItemsEvents(socket: Socket) {
+		socket.on('office_item:create', (data: CreateOfficeItemDto) => {
+			officeItemSocketService.onOfficeItemCreate(data);
+		});
+
+		socket.on('office_item:move', (data: UpdateOfficeItemTransformDto) => {
+			officeItemSocketService.onOfficeItemMove(data);
+		});
+
+		socket.on('office_item:delete', (id: number) => {
+			officeItemSocketService.onOfficeItemDelete(id);
+		});
+	}
 };

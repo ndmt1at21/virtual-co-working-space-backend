@@ -1,4 +1,4 @@
-import { EntityRepository } from 'typeorm';
+import { DeepPartial, EntityRepository } from 'typeorm';
 import { BaseRepository } from '../base/BaseRepository';
 import { Office } from './office.entity';
 import { OfficeRepositoryQueryBuilder } from './office.repositoryBuilder';

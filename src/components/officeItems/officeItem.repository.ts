@@ -1,8 +1,8 @@
 import { EntityRepository } from 'typeorm';
 import { OfficeItem } from '@src/components/officeItems/officeItem.entity';
 import { BaseRepository } from '../base/BaseRepository';
-import { Transform3dDto } from './@types/dto/Transform3D.dto';
 import { Pageable } from '@src/@types/Pageable';
+import { OfficeItemTransformDto } from './@types/dto/OfficeItemTransform.dto';
 
 @EntityRepository(OfficeItem)
 export class OfficeItemRepository extends BaseRepository<OfficeItem> {
@@ -16,20 +16,9 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 
 	async updateOfficeItemTransformById(
 		id: number,
-		transform: Transform3dDto
+		transform: OfficeItemTransformDto
 	): Promise<void> {
-		const { position, rotation } = transform;
-		const { x: xPosition, y: yPosition, z: zPosition } = position;
-		const { x: xRotation, y: yRotation, z: zRotation } = rotation;
-
-		await this.update(id, {
-			xPosition,
-			yPosition,
-			zPosition,
-			xRotation,
-			yRotation,
-			zRotation
-		});
+		await this.update(id, { ...transform });
 	}
 
 	async findOfficeItemWithItemById(

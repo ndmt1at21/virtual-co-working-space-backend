@@ -2,6 +2,7 @@ import { Pageable } from '@src/@types/Pageable';
 import { CreateOfficeItemDto } from './@types/dto/CreateOfficeItem.dto';
 import { OfficeItemDetailDto } from './@types/dto/OfficeItemDetail.dto';
 import { OfficeItemOverviewDto } from './@types/dto/OfficeItemOverviewDto';
+import { OfficeItemTransformDto } from './@types/dto/OfficeItemTransform.dto';
 import { UpdateOfficeItemTransformDto } from './@types/dto/UpdateOfficeItemTransform.dto';
 import { IOfficeItemService } from './@types/IOfficeItemService';
 import { IOfficeItemValidate } from './@types/IOfficeItemValidate';
@@ -24,8 +25,16 @@ export const OfficeItemService = (
 
 	const updateOfficeItemTransform = async (
 		id: number,
-		transform: UpdateOfficeItemTransformDto
-	) => {};
+		transform: OfficeItemTransformDto
+	): Promise<UpdateOfficeItemTransformDto> => {
+		await officeItemValidate.checkOfficeItemExistsById(id);
+		await officeItemRepository.updateOfficeItemTransformById(id, transform);
+
+		return {
+			id,
+			transform
+		};
+	};
 
 	const findOfficeItemDetailById = async (
 		id: number
@@ -61,6 +70,7 @@ export const OfficeItemService = (
 
 	return {
 		createOfficeItem,
+		updateOfficeItemTransform,
 		findOfficeItemDetailById,
 		findOfficeItemsDetail,
 		deleteOfficeItem

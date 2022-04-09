@@ -15,7 +15,6 @@ import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
 import { IOfficeCreator } from './@types/IOfficeCreator';
 import { IOfficeService } from './@types/IOfficeService';
 import { IOfficeValidate } from './@types/IOfficeValidate';
-import { Office } from './office.entity';
 import { OfficeRepository } from './office.repository';
 
 export const OfficeService = (
@@ -44,20 +43,15 @@ export const OfficeService = (
 			transform: {}
 		});
 
-		const office = await officeRepository
-			.createQueryBuilder()
-			.insert()
-			.into(Office)
-			.values({
-				invitationCode,
-				createdByUserId: createdUserId,
-				name: createOfficeDto.name,
-				officeMembers: [officeMember]
-			})
-			.execute();
+		const office = await officeRepository.save({
+			invitationCode,
+			createdByUserId: createdUserId,
+			name: createOfficeDto.name,
+			officeMembers: [officeMember]
+		});
 
 		const officeDto = await officeCreator.createOfficeOverviewById(
-			office.raw[0].id
+			office.id
 		);
 
 		return officeDto;
@@ -119,8 +113,6 @@ export const OfficeService = (
 		const offices = await officeCreator.createOfficesOverviewsByIds(
 			officeMembers.map(om => om.officeId)
 		);
-
-		console.log(offices);
 
 		return [offices, totalOfficeMembers];
 	};

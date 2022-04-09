@@ -1,4 +1,4 @@
-import { Transform3dDto } from '../officeItems/@types/dto/Transform3D.dto';
+import { Transform3dDto } from '../officeMembers/@types/dto/Transform3D.dto';
 import { OfficeMemberTransform } from './officeMemberTransform.entity';
 
 export const mapOfficeMemberTransformToTransform3D = (

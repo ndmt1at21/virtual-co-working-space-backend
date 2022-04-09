@@ -1,13 +1,6 @@
-import { Expose } from 'class-transformer';
-import { IsDefined } from 'class-validator';
-import { Transform3dDto } from './Transform3D.dto';
+import { OfficeItemTransformDto } from './OfficeItemTransform.dto';
 
-export class UpdateOfficeItemTransformDto {
-	@IsDefined()
-	@Expose()
+export type UpdateOfficeItemTransformDto = {
 	id: number;
-
-	@IsDefined()
-	@Expose()
-	transform: Transform3dDto;
-}
+	transform: OfficeItemTransformDto;
+};

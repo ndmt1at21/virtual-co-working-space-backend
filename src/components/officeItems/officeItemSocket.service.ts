@@ -1,11 +1,9 @@
 import { Server as SocketServer, Socket } from 'socket.io';
 import { CreateOfficeItemDto } from './@types/dto/CreateOfficeItem.dto';
-import { DeleteOfficeItemDto } from './@types/dto/DeleteOfficeItem.dto';
 import { UpdateOfficeItemTransformDto } from './@types/dto/UpdateOfficeItemTransform.dto';
 import { IOfficeItemService } from './@types/IOfficeItemService';
 import { OfficeItemClientToServerEvent } from './@types/OfficeItemClientToServerEvent';
 import { OfficeItemServerToClientEvent } from './@types/OfficeItemServerToClientEvent';
-import { OfficeItemRepository } from './officeItem.repository';
 
 export const OfficeItemSocketService = (
 	socketNamespace: SocketServer,
@@ -15,25 +13,35 @@ export const OfficeItemSocketService = (
 		any,
 		any
 	>,
-	officeItemRepository: OfficeItemRepository,
 	officeItemService: IOfficeItemService
 ) => {
 	const onOfficeItemCreate = async (data: CreateOfficeItemDto) => {
-		const createdOfficeItem = await officeItemService.createOfficeItem(
-			data
-		);
+		const { itemId, officeId, ...transform } = data;
 
-		socket.emit('office_item:created', createdOfficeItem);
+		const officeItem = await officeItemService.createOfficeItem({
+			itemId,
+			officeId,
+			...transform
+		});
+
+		socket.emit('office_item:created', officeItem);
 	};
 
 	const onOfficeItemMove = async (data: UpdateOfficeItemTransformDto) => {
-		await officeItemRepository.updateOfficeItemTransformById(
-			data.id,
-			data.transform
-		);
+		const { id, transform } = data;
+
+		socket.emit('office_item:moved', {
+			id,
+			transform
+		});
+
+		await officeItemService.updateOfficeItemTransform(id, transform);
 	};
 
-	const onOfficeItemDelete = async (data: DeleteOfficeItemDto) => {};
+	const onOfficeItemDelete = async (id: number) => {
+		await officeItemService.deleteOfficeItem(id);
+		socket.emit('office_item:deleted', id);
+	};
 
 	return { onOfficeItemCreate, onOfficeItemMove, onOfficeItemDelete };
 };

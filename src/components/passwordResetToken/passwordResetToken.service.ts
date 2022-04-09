@@ -74,7 +74,7 @@ export const PasswordResetTokenService = (
 	};
 
 	const deleteByUserId = async (userId: number): Promise<void> => {
-		await passwordResetTokenRepository.softDelete(userId);
+		await passwordResetTokenRepository.deleteByUserId(userId);
 	};
 
 	function encryptToken(token: string): string {

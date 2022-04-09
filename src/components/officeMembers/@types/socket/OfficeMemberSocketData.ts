@@ -4,6 +4,6 @@ export type OfficeMemberData = {
 	memberId: number;
 };
 
-export interface OfficeMemberSocketData {
+export interface OfficeSocketData {
 	officeMember: OfficeMemberData;
 }

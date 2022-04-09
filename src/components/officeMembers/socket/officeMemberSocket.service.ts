@@ -1,13 +1,13 @@
 import { UpdateOfficeMemberTransformDto } from '@src/components/officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
 import { IOfficeMemberTransformService } from '@src/components/officeMemberTransform/@types/IOfficeMemberTransformService';
 import { JoinToOfficeRoomDto } from '@src/components/offices/@types/dto/JoinToOfficeRoom.dto';
+import { OfficeSocketData } from '@src/components/offices/@types/OfficeSocketData';
 import { Server as SocketServer, Socket } from 'socket.io';
 import { OfficeMemberOnlineStatus } from '../@types/OfficeMemberOnlineStatus';
 import { IOfficeMemberSocketCacheService } from '../@types/socket/IOfficeMemberSocketCacheService';
 import { IOfficeMemberSocketService } from '../@types/socket/IOfficeMemberSocketService';
 import { OfficeMemberClientToServerEvent } from '../@types/socket/OfficeMemberClientToServerEvent';
 import { OfficeMemberServerToClientEvent } from '../@types/socket/OfficeMemberServerToClientEvent';
-import { OfficeMemberSocketData } from '../@types/socket/OfficeMemberSocketData';
 import { OfficeMemberRepository } from '../officeMember.repository';
 
 export const OfficeMemberSocketService = (
@@ -16,7 +16,7 @@ export const OfficeMemberSocketService = (
 		OfficeMemberClientToServerEvent,
 		OfficeMemberServerToClientEvent,
 		any,
-		OfficeMemberSocketData
+		OfficeSocketData
 	>,
 	officeMemberRepository: OfficeMemberRepository,
 	officeMemberTransformService: IOfficeMemberTransformService,
@@ -34,10 +34,13 @@ export const OfficeMemberSocketService = (
 
 		if (!officeMember) throw new Error('Office member not found');
 
-		socket.data.officeMember = {
-			id: officeMember.id,
-			memberId: officeMember.memberId,
-			officeId: officeMember.officeId
+		socket.data = {
+			officeId: officeMember!.officeId,
+			officeMember: {
+				id: officeMember.id,
+				memberId: officeMember.memberId,
+				officeId: officeMember!.officeId
+			}
 		};
 
 		socket.join(`${officeMember!.officeId}`);
@@ -48,13 +51,11 @@ export const OfficeMemberSocketService = (
 	}
 
 	async function onMemberMove(transform: UpdateOfficeMemberTransformDto) {
-		socket
-			.to(`${socket.data.officeMember!.officeId}`)
-			.emit('office_member:moved', {
-				memberId: socket.user!.id,
-				officeId: socket.data.officeMember!.officeId,
-				...transform
-			});
+		socket.to(`${socket.data.officeId}`).emit('office_member:moved', {
+			memberId: socket.user!.id,
+			officeId: socket.data.officeMember!.officeId,
+			...transform
+		});
 
 		await officeMemberTransformService.updateTransformInCacheById(
 			socket.data.officeMember!.id,

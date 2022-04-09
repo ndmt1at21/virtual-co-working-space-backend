@@ -1,4 +1,5 @@
 import { Server as SocketServer, Socket } from 'socket.io';
+import { OfficeSocketData } from '../offices/@types/OfficeSocketData';
 import { CreateOfficeItemDto } from './@types/dto/CreateOfficeItem.dto';
 import { UpdateOfficeItemTransformDto } from './@types/dto/UpdateOfficeItemTransform.dto';
 import { IOfficeItemService } from './@types/IOfficeItemService';
@@ -11,7 +12,7 @@ export const OfficeItemSocketService = (
 		OfficeItemClientToServerEvent,
 		OfficeItemServerToClientEvent,
 		any,
-		any
+		OfficeSocketData
 	>,
 	officeItemService: IOfficeItemService
 ) => {
@@ -20,7 +21,7 @@ export const OfficeItemSocketService = (
 
 		const officeItem = await officeItemService.createOfficeItem({
 			itemId,
-			officeId,
+			officeId: socket.data.officeId!,
 			...transform
 		});
 

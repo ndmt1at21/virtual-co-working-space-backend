@@ -1,28 +1,29 @@
 import { Router } from 'express';
+import { rateLimiting } from '../app/middleware/rateLimit';
+import { createAuthMiddleware } from '../auth/auth.factory';
 import { createOfficeInvitationController } from './officeInvitation.factory';
 
 export const OfficeInvitationRouter = (): Router => {
 	const router = Router();
+	const authMiddleware = createAuthMiddleware();
 	const officeController = createOfficeInvitationController();
 
-	router.post('/', officeController.createInvitationByEmail);
+	router.use(authMiddleware.protect);
 
-	// router.post(
-	// 	'/token/:inviteToken/accept',
-	// 	officeController.acceptInvitationByInviteToken
-	// );
+	router.post(
+		'/token/:inviteToken/join',
+		officeController.joinWithPrivateInvitation
+	);
 
-	// router.post(
-	// 	'/:inviteCode/accept',
-	// 	officeController.acceptInvitationByInviteCode
-	// );
+	router.get('/token/:inviteToken', officeController.getPrivateInvitation);
 
-	// router.get(
-	// 	'/token/:inviteToken',
-	// 	officeController.findInvitationByInviteToken
-	// );
+	router.post('/:inviteCode/join', officeController.joinWithPublicInvitation);
 
-	// router.get('/:inviteCode', officeController.getInvitationByInviteCode);
+	router.get('/:inviteCode', officeController.getPublicInvitation);
+
+	router
+		.use(rateLimiting({ maxPerIp: 5, timeMs: 1000 }))
+		.post('/', officeController.createOfficeInvitationByEmail);
 
 	return router;
 };

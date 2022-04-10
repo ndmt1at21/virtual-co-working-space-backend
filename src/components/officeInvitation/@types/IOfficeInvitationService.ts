@@ -1,19 +1,24 @@
-import {
-	CreateOfficeInvitationByEmailDto,
-	CreatePublicOfficeInvitationDto
-} from './dto/CreateOfficeInvitation.dto';
+import { CreatePrivateInvitationDto } from './dto/CreatePrivateInvitation.dto';
 import { OfficeInvitationDto } from './dto/OfficeInvitation.dto';
 
 export interface IOfficeInvitationService {
-	createPublicOfficeInvitation(
-		invitationDto: CreatePublicOfficeInvitationDto
+	createPrivateInvitation(
+		createInvitationDto: CreatePrivateInvitationDto
 	): Promise<OfficeInvitationDto>;
 
-	createOfficeInvitationByEmail(
-		invitationDto: CreateOfficeInvitationByEmailDto
+	findPrivateInvitation(
+		userId: number,
+		token: string
 	): Promise<OfficeInvitationDto>;
 
-	acceptInvitationByInvitationToken(inviteToken: string): Promise<void>;
+	findPublicInvitation(
+		userId: number,
+		inviteCode: string
+	): Promise<OfficeInvitationDto>;
+
+	acceptPrivateInvitation(userId: number, inviteToken: string): Promise<void>;
+
+	acceptPublicInvitation(userId: number, inviteCode: string): Promise<void>;
 
 	deleteInvitation(inviteToken: string): Promise<void>;
 }

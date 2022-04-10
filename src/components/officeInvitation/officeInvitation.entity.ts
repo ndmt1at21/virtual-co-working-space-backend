@@ -9,7 +9,6 @@ import {
 import { BaseEntity } from '@components/base/BaseEntity';
 import { User } from '@components/users/user.entity';
 import { Office } from '@components/offices/office.entity';
-import { OfficeInvitationType } from './@types/OfficeInvitationType';
 
 @Entity({ name: 'office_invitation' })
 export class OfficeInvitation extends BaseEntity {
@@ -27,13 +26,10 @@ export class OfficeInvitation extends BaseEntity {
 	createdByUserId: number;
 
 	@Column({ name: 'invited_email' })
-	invitedEmail?: string;
+	invitedEmail: string;
 
 	@Column({ name: 'expired_at' })
 	expiredAt: Date;
-
-	@Column({ type: 'enum', enum: OfficeInvitationType })
-	type: OfficeInvitationType;
 
 	@ManyToOne(() => User)
 	@JoinColumn({ name: 'created_by_user_id' })

@@ -78,3 +78,11 @@ export const cloudLogger = createLogger({
 		new transports.Console(debugOptions)
 	]
 });
+
+export const officeInvitationLogger = createLogger({
+	defaultMeta: { service: 'office-invitation-service' },
+	transports: [
+		new transports.File(commonOptions),
+		new transports.Console(debugOptions)
+	]
+});

@@ -1,64 +1,111 @@
 import { IllegalArgumentError, NotFoundError } from '@src/utils/appError';
 import { OfficeMemberRepository } from '../officeMembers/officeMember.repository';
-import {
-	CreateOfficeInvitationByEmailDto,
-	CreatePublicOfficeInvitationDto
-} from './@types/dto/CreateOfficeInvitation.dto';
+import { OfficeRepository } from '../offices/office.repository';
+import { UserRepository } from '../users/user.repository';
+import { CreatePrivateInvitationDto } from './@types/dto/CreatePrivateInvitation.dto';
 import { IOfficeInvitationValidate } from './@types/IOfficeInvitationValidate';
-import { OfficeInvitation } from './officeInvitation.entity';
 import { OfficeInvitationErrorMessages } from './officeInvitation.error';
 import { OfficeInvitationRepository } from './officeInvitation.repository';
 
-export const OfficeInvitationValidate = (
-	officeInvitationRepository: OfficeInvitationRepository,
-	officeMemberRepository: OfficeMemberRepository
-): IOfficeInvitationValidate => {
-	const checkCreateInvitationTokenByEmailData = async (
-		invitationDto: CreateOfficeInvitationByEmailDto
+type OfficeInvitationValidateParams = {
+	officeInvitationRepository: OfficeInvitationRepository;
+	officeRepository: OfficeRepository;
+	officeMemberRepository: OfficeMemberRepository;
+	userRepository: UserRepository;
+};
+
+export const OfficeInvitationValidate = ({
+	officeInvitationRepository,
+	officeRepository,
+	officeMemberRepository,
+	userRepository
+}: OfficeInvitationValidateParams): IOfficeInvitationValidate => {
+	const checkCreatePrivateInvitation = async (
+		invitationDto: CreatePrivateInvitationDto
 	): Promise<void> => {
-		const { invitedEmail, inviterId, officeId } = invitationDto;
+		const { email, inviterId, officeId } = invitationDto;
+
 		await checkInviterInOffice(inviterId, officeId);
-		await checkInvitedEmailIsNotAlreadyMember(invitedEmail, officeId);
+		await checkUserIsNotMemberByEmail(email, officeId);
 	};
 
-	const checkCreatePublicInvitationTokenData = async (
-		invitationDto: CreatePublicOfficeInvitationDto
-	): Promise<void> => {
-		const { inviterId, officeId } = invitationDto;
-		await checkInviterInOffice(inviterId, officeId);
-	};
-
-	const checkUserCanJoinByInvitationToken = async (
-		invitedEmail: string,
-		invitationToken: string
-	): Promise<void> => {
-		await checkInvitationTokenExistsAndNotExpired(
-			invitedEmail,
-			invitationToken
-		);
-	};
-
-	const checkInvitationExistsByInvitedEmailAndInvitationToken = async (
-		invitedEmail: string,
+	const checkUserCanJoinByPrivateInvitation = async (
+		userId: number,
 		token: string
 	): Promise<void> => {
-		const invitation =
+		// check user exists
+		const user = await userRepository.findById(userId);
+
+		if (!user) {
+			throw new NotFoundError('User not found');
+		}
+
+		// user should has an invitation
+		const officeInvitation =
 			await officeInvitationRepository.findOfficeInvitationByInvitedEmailAndInvitationToken(
-				invitedEmail,
+				user.email,
 				token
 			);
 
-		checkInvitationExists(invitation);
-		checkInvitationNotExpired(invitation!);
+		if (!officeInvitation) {
+			throw new NotFoundError(
+				OfficeInvitationErrorMessages.INVITATION_NOT_FOUND
+			);
+		}
+
+		if (officeInvitation.expiredAt.getTime() < Date.now()) {
+			throw new IllegalArgumentError(
+				OfficeInvitationErrorMessages.INVITATION_EXPIRED
+			);
+		}
+
+		// user is not already member of the office
+		await checkUserIsNotMember(userId, officeInvitation.officeId);
 	};
 
-	async function checkInvitedEmailIsNotAlreadyMember(
-		invitedEmail: string,
+	const checkUserCanJoinByPublicInvitation = async (
+		userId: number,
+		inviteCode: string
+	): Promise<void> => {
+		// check office exists
+		const office = await officeRepository
+			.queryBuilder()
+			.findByInvitationCode(inviteCode)
+			.build()
+			.getOne();
+
+		if (!office)
+			throw new NotFoundError(
+				OfficeInvitationErrorMessages.INVITATION_NOT_FOUND
+			);
+
+		// check user is not already member of the office
+		await checkUserIsNotMember(userId, office.id);
+	};
+
+	async function checkUserIsNotMember(
+		userId: number,
+		officeId: number
+	): Promise<void> {
+		const userExists = await officeMemberRepository.existsUserInOffice(
+			userId,
+			officeId
+		);
+
+		if (userExists) {
+			throw new IllegalArgumentError(
+				OfficeInvitationErrorMessages.ALREADY_INVITED
+			);
+		}
+	}
+
+	async function checkUserIsNotMemberByEmail(
+		userEmail: string,
 		officeId: number
 	): Promise<void> {
 		const officeMember =
-			await officeMemberRepository.findOfficeMemberByMemberEmailAndOfficeId(
-				invitedEmail,
+			await officeMemberRepository.existsUserEmailInOffice(
+				userEmail,
 				officeId
 			);
 
@@ -82,39 +129,9 @@ export const OfficeInvitationValidate = (
 			);
 	}
 
-	async function checkInvitationTokenExistsAndNotExpired(
-		invitedEmail: string,
-		invitationToken: string
-	): Promise<void> {
-		const officeInvitation =
-			await officeInvitationRepository.findOfficeInvitationByInvitedEmailAndInvitationToken(
-				invitedEmail,
-				invitationToken
-			);
-
-		checkInvitationExists(officeInvitation);
-		checkInvitationNotExpired(officeInvitation!);
-	}
-
-	function checkInvitationExists(
-		officeInvitation: OfficeInvitation | undefined
-	) {
-		if (!officeInvitation) {
-			throw new NotFoundError(OfficeInvitationErrorMessages.NOT_FOUND);
-		}
-	}
-
-	function checkInvitationNotExpired(officeInvitation: OfficeInvitation) {
-		if (officeInvitation.expiredAt.getTime() < Date.now()) {
-			throw new IllegalArgumentError(
-				OfficeInvitationErrorMessages.EXPIRED
-			);
-		}
-	}
-
 	return {
-		checkCreateInvitationTokenByEmailData,
-		checkCreatePublicInvitationTokenData,
-		checkUserCanJoinByInvitationToken
+		checkCreatePrivateInvitation,
+		checkUserCanJoinByPrivateInvitation,
+		checkUserCanJoinByPublicInvitation
 	};
 };

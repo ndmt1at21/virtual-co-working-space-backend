@@ -1,19 +1,17 @@
-import {
-	CreateOfficeInvitationByEmailDto,
-	CreatePublicOfficeInvitationDto
-} from './dto/CreateOfficeInvitation.dto';
+import { CreatePrivateInvitationDto } from './dto/CreatePrivateInvitation.dto';
 
 export interface IOfficeInvitationValidate {
-	checkCreateInvitationTokenByEmailData(
-		invitationDto: CreateOfficeInvitationByEmailDto
+	checkCreatePrivateInvitation(
+		invitationDto: CreatePrivateInvitationDto
 	): Promise<void>;
 
-	checkCreatePublicInvitationTokenData(
-		invitationDto: CreatePublicOfficeInvitationDto
+	checkUserCanJoinByPrivateInvitation(
+		userId: number,
+		token: string
 	): Promise<void>;
 
-	checkUserCanJoinByInvitationToken(
-		invitedEmail: string,
-		invitationToken: string
+	checkUserCanJoinByPublicInvitation(
+		userId: number,
+		inviteCode: string
 	): Promise<void>;
 }

@@ -10,7 +10,11 @@ client.connect();
 client.on('connect', () => console.log('Redis for rate limiting is connected'));
 client.on('error', err => console.log('Redis for rate limiting error: ', err));
 
-export const rateLimiting = ({ timeMs, maxPerIp }: RateLimitingOptions) => {
+export const rateLimiting = ({
+	timeMs,
+	maxPerIp,
+	errMessage
+}: RateLimitingOptions) => {
 	client.flushAll();
 
 	return async (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +29,7 @@ export const rateLimiting = ({ timeMs, maxPerIp }: RateLimitingOptions) => {
 		if (nRequest > maxPerIp) {
 			return next(
 				new TooManyRequestError(
-					RateLimitErrorMessages.RATE_LIMIT_EXCEEDED
+					errMessage || RateLimitErrorMessages.RATE_LIMIT_EXCEEDED
 				)
 			);
 		}

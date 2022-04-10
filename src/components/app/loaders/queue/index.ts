@@ -10,6 +10,16 @@ const mailQueue: QueueConfig = {
 	}
 };
 
+const officeInvitationQueue: QueueConfig = {
+	queueName: 'office_invitation',
+	options: {
+		redis: {
+			host: 'localhost',
+			port: 6379
+		}
+	}
+};
+
 export const createMessageQueues = async () => {
-	createQueues([mailQueue]);
+	createQueues([mailQueue, officeInvitationQueue]);
 };

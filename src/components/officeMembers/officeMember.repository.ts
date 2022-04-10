@@ -30,6 +30,19 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 		return count === 1;
 	}
 
+	async existsUserEmailInOffice(
+		email: string,
+		officeId: number
+	): Promise<boolean> {
+		const count = await this.createQueryBuilder('office_member')
+			.leftJoin('office_member.member', 'user')
+			.where('user.email = :email', { email })
+			.andWhere('office_member.office_id = :officeId', { officeId })
+			.getCount();
+
+		return count === 1;
+	}
+
 	async setOfficeMemberOnlineStatusById(
 		id: number,
 		status: OfficeMemberOnlineStatus
@@ -49,6 +62,16 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 			.where('office_member.office_id = :officeId', { officeId })
 			.leftJoin('office_member.member', 'user')
 			.where('user.email = :email', { email })
+			.getOne();
+	}
+
+	async findOfficeMemberByMemberIdAndOfficeId(
+		memberId: number,
+		officeId: number
+	): Promise<OfficeMember | undefined> {
+		return this.createQueryBuilder('office_member')
+			.where('office_member.office_id = :officeId', { officeId })
+			.andWhere('office_member.member_id = :memberId', { memberId })
 			.getOne();
 	}
 }

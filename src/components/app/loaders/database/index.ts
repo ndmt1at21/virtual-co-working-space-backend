@@ -14,6 +14,7 @@ import { MongoConnectionOptions } from 'typeorm/driver/mongodb/MongoConnectionOp
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { CacheConnectOption, createCacheConnection } from './cache';
 import { OfficeMemberRole } from '@src/components/officeMemberRole/officeMemberRole.entity';
+import { OfficeInvitation } from '@src/components/officeInvitation/officeInvitation.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -35,7 +36,8 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		OfficeMember,
 		OfficeRole,
 		OfficeMemberTransform,
-		OfficeMemberRole
+		OfficeMemberRole,
+		OfficeInvitation
 	]
 };
 

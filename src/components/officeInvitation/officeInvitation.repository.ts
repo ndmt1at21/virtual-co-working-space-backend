@@ -6,7 +6,7 @@ import { OfficeInvitation } from './officeInvitation.entity';
 export class OfficeInvitationRepository extends BaseRepository<OfficeInvitation> {
 	async existsOfficeInvitationToken(token: string): Promise<boolean> {
 		const count = await this.createQueryBuilder('office_invitation')
-			.where('office_invitation.token = :token', { token: 'token' })
+			.where('office_invitation.token = :token', { token })
 			.getCount();
 
 		return count === 1;

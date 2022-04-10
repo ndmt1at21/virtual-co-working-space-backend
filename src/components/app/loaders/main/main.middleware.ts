@@ -15,7 +15,7 @@ export const mainMiddleware = (app: Application, logger: ILogger) => {
 
 	app.use(express.static('public'));
 
-	app.use(rateLimiting({ maxPerIp: 50, timeMs: 10000 }));
+	app.use(rateLimiting({ maxPerIp: 20, timeMs: 1000 }));
 
 	app.use(
 		helmet({

@@ -1,74 +1,142 @@
-import {
-	CreateOfficeInvitationByEmailDto,
-	CreatePublicOfficeInvitationDto
-} from './@types/dto/CreateOfficeInvitation.dto';
+import { getManager } from 'typeorm';
+import { OfficeMember } from '../officeMembers/officeMember.entity';
+import { OfficeRoleType } from '../officeRoles/@types/OfficeRoleType';
+import { CreatePrivateInvitationDto } from './@types/dto/CreatePrivateInvitation.dto';
 import { OfficeInvitationDto } from './@types/dto/OfficeInvitation.dto';
 import { IOfficeInvitationService } from './@types/IOfficeInvitationService';
-import { IOfficeInvitationValidate } from './@types/IOfficeInvitationValidate';
-import { mapOfficeInvitationToOfficeInvitationDto } from './officeInvitation.mapping';
-import { OfficeInvitationRepository } from './officeInvitation.repository';
+import { OfficeInvitationServiceParams } from './@types/OfficeInvitationServiceParams';
+import { OfficeInvitation } from './officeInvitation.entity';
 
-export const OfficeInvitationService = (
-	officeInvitationRepository: OfficeInvitationRepository,
-	officeInvitationValidate: IOfficeInvitationValidate
-): IOfficeInvitationService => {
-	const createPublicOfficeInvitation = async (
-		invitationDto: CreatePublicOfficeInvitationDto
+export const OfficeInvitationService = ({
+	officeInvitationRepository,
+	officeRepository,
+	officeMemberRepository,
+	officeRoleRepository,
+	officeInvitationCreator,
+	officeInvitationValidate,
+	officeInvitationTokenGenerator
+}: OfficeInvitationServiceParams): IOfficeInvitationService => {
+	const createPrivateInvitation = async (
+		createInvitationDto: CreatePrivateInvitationDto
 	): Promise<OfficeInvitationDto> => {
-		await officeInvitationValidate.checkCreatePublicInvitationTokenData(
-			invitationDto
+		await officeInvitationValidate.checkCreatePrivateInvitation(
+			createInvitationDto
 		);
 
-		const { inviterId, officeId } = invitationDto;
+		const { inviterId, email, officeId } = createInvitationDto;
+		const token = officeInvitationTokenGenerator.generate();
 
-		const officeInvitation = await officeInvitationRepository.create({
-			officeId,
-			createdByUserId: inviterId
-		});
-
-		return mapOfficeInvitationToOfficeInvitationDto(officeInvitation);
-	};
-
-	const createOfficeInvitationByEmail = async (
-		invitationDto: CreateOfficeInvitationByEmailDto
-	): Promise<OfficeInvitationDto> => {
-		await officeInvitationValidate.checkCreateInvitationTokenByEmailData(
-			invitationDto
-		);
-
-		const { invitedEmail, inviterId, officeId } = invitationDto;
-
-		const officeInvitation = await officeInvitationRepository.create({
-			officeId,
+		await officeInvitationRepository.save({
 			createdByUserId: inviterId,
-			invitedEmail: invitedEmail
+			officeId,
+			invitedEmail: email,
+			token,
+			expiredAt: new Date(Date.now() + 30 * 60 * 1000)
 		});
 
-		return mapOfficeInvitationToOfficeInvitationDto(officeInvitation);
+		return officeInvitationCreator.createPrivateOfficeInvitationByToken(
+			token
+		);
 	};
 
-	const findInvitationByInvitedEmailAndInvitationToken = async (
-		invitedEmail: string,
+	const findPrivateInvitation = async (
+		userId: number,
 		token: string
 	): Promise<OfficeInvitationDto> => {
-		await officeInvitationRepository.existsOfficeInvitationToken(token);
+		await officeInvitationValidate.checkUserCanJoinByPrivateInvitation(
+			userId,
+			token
+		);
+
 		const officeInvitation =
-			await officeInvitationRepository.findOfficeInvitationByInvitedEmailAndInvitationToken(
-				invitedEmail,
+			await officeInvitationCreator.createPrivateOfficeInvitationByToken(
 				token
 			);
 
-		return mapOfficeInvitationToOfficeInvitationDto(officeInvitation!);
+		return officeInvitation;
 	};
 
-	const acceptInvitationByInvitationToken = async (inviteToken: string) => {};
+	const findPublicInvitation = async (
+		userId: number,
+		inviteCode: string
+	): Promise<OfficeInvitationDto> => {
+		await officeInvitationValidate.checkUserCanJoinByPublicInvitation(
+			userId,
+			inviteCode
+		);
 
-	const deleteInvitation = async (inviteToken: string) => {};
+		const officeInvitation =
+			await officeInvitationCreator.createPublicOfficeInvitation(
+				inviteCode
+			);
+
+		return officeInvitation;
+	};
+
+	const acceptPrivateInvitation = async (
+		userId: number,
+		inviteToken: string
+	): Promise<void> => {
+		await officeInvitationValidate.checkUserCanJoinByPrivateInvitation(
+			userId,
+			inviteToken
+		);
+
+		const officeInvitation =
+			await officeInvitationRepository.findByInvitationToken(inviteToken);
+
+		const memberRole = await officeRoleRepository.findOfficeRoleByName(
+			OfficeRoleType.MEMBER
+		);
+
+		getManager().transaction(async transactionManager => {
+			const officeMember = officeMemberRepository.create({
+				officeId: officeInvitation!.officeId,
+				memberId: userId,
+				roles: [{ officeRoleId: memberRole!.id }],
+				transform: {}
+			});
+
+			await transactionManager.save<OfficeMember>(officeMember);
+			await transactionManager.remove(OfficeInvitation, officeInvitation);
+		});
+	};
+
+	const acceptPublicInvitation = async (
+		userId: number,
+		inviteCode: string
+	): Promise<void> => {
+		await officeInvitationValidate.checkUserCanJoinByPublicInvitation(
+			userId,
+			inviteCode
+		);
+
+		const office = await officeRepository
+			.queryBuilder()
+			.findByInvitationCode(inviteCode)
+			.build()
+			.getOne();
+
+		const memberRole = await officeRoleRepository.findOfficeRoleByName(
+			OfficeRoleType.MEMBER
+		);
+
+		await officeMemberRepository.save({
+			officeId: office!.id,
+			memberId: userId,
+			transform: {},
+			roles: [{ officeRoleId: memberRole!.id }]
+		});
+	};
+
+	const deleteInvitation = async (inviteToken: string): Promise<void> => {};
 
 	return {
-		createPublicOfficeInvitation,
-		createOfficeInvitationByEmail,
-		acceptInvitationByInvitationToken,
+		createPrivateInvitation,
+		findPrivateInvitation,
+		findPublicInvitation,
+		acceptPrivateInvitation,
+		acceptPublicInvitation,
 		deleteInvitation
 	};
 };

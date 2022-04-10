@@ -10,7 +10,7 @@ import { UserRepository } from './user.repository';
 import { CreateUserExternalDto } from './@types/dto/CreateUserExternal.dto';
 import { UserStatus } from './@types/UserStatus';
 import { UpdatePasswordDto } from './@types/dto/UpdatePassword.dto';
-import { IPasswordEncoder } from '../passwordEncoder/@types/IPasswordEncoder';
+import { IPasswordEncoder } from './components/passwordEncoder/@types/IPasswordEncoder';
 
 export const UserService = (
 	userRepository: UserRepository,

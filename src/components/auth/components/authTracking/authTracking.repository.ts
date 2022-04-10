@@ -1,4 +1,4 @@
-import { BaseRepository } from '../base/BaseRepository';
+import { BaseRepository } from '@src/components/base/BaseRepository';
 import { AuthTracking } from './authTracking.entity';
 
 export class AuthTrackingRepository extends BaseRepository<AuthTracking> {

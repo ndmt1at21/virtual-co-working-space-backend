@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { User } from '@components/users/user.entity';
 import { UserRepository } from '@components/users/user.repository';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
-import { IAuthTokenService } from '@components/authToken/@types/IAuthTokenService';
+import { IAuthTokenService } from '@src/components/auth/components/authToken/@types/IAuthTokenService';
 import { AuthErrorMessages } from './auth.error';
 import { UserRoleType } from '@components/users/@types/UserRoleType';
 import { IAuthMiddleware } from './@types/IAuthMiddleware';

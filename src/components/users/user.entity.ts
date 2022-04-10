@@ -1,6 +1,6 @@
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '@src/components/base/BaseEntity';
-import { UserLoginProvider } from './@types/UserLoginProvider';
+import { UserLoginProvider } from '../UserLoginProvider';
 import { UserRoleType } from './@types/UserRoleType';
 import { UserStatus } from './@types/UserStatus';
 

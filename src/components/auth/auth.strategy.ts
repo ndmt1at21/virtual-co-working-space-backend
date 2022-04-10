@@ -2,7 +2,7 @@ import passport from 'passport';
 import config from '@src/config';
 import { Strategy as PassportGoogleStrategy } from 'passport-google-oauth2';
 import { Strategy as PassportFacebookStrategy } from 'passport-facebook';
-import { UserLoginProvider } from '@components/users/@types/UserLoginProvider';
+import { UserLoginProvider } from '@src/components/UserLoginProvider';
 import { OAuth2ProfileDto } from './@types/dto/OAuth2Profile.dto';
 import { AuthErrorMessages } from './auth.error';
 

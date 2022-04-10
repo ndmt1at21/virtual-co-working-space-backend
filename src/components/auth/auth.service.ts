@@ -5,14 +5,14 @@ import { OAuth2ProfileDto } from './@types/dto/OAuth2Profile.dto';
 import { UserDto } from '@components/users/@types/dto/User.dto';
 import { ForgotPasswordDto } from './@types/dto/ForgotPassword.dto';
 import { ResetPasswordDto } from './@types/dto/ResetPassword.dto';
-import { IAuthTokenService } from '../authToken/@types/IAuthTokenService';
+import { IAuthTokenService } from './components/authToken/@types/IAuthTokenService';
 import { CredentialsDto } from './@types/dto/Credentials.dto';
 import { IUserService } from '../users/@types/IUserService';
-import { IPasswordResetTokenService } from '../passwordResetToken/@types/IPasswordService';
-import { PasswordResetTokenDto } from '../passwordResetToken/@types/dto/PasswordResetToken.dto';
 import { CreateUserDto } from '../users/@types/dto/CreateUser.dto';
 import { IActiveUserTokenService } from '../activeUserToken/@types/IActiveUserTokenService';
 import { LocalRegisterDto } from './@types/dto/LocalRegister.dto';
+import { PasswordResetTokenDto } from './components/passwordResetToken/@types/dto/PasswordResetToken.dto';
+import { IPasswordResetTokenService } from './components/passwordResetToken/@types/IPasswordService';
 
 export const AuthService = (
 	userService: IUserService,

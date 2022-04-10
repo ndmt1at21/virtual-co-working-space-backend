@@ -1,6 +1,6 @@
 import { Queue } from 'bull';
 import { UserDto } from '@src/components/users/@types/dto/User.dto';
-import { IAuthMailQueueProducer } from '../../@types/IAuthMailQueueProducer';
+import { IAuthMailQueueProducer } from '../@types/IAuthMailQueueProducer';
 
 export const AuthMailQueueProducer = (queue: Queue): IAuthMailQueueProducer => {
 	const addRegisterConfirmationJob = (

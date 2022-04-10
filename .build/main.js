@@ -2,6 +2,22 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 7240:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UserLoginProvider = void 0;
+var UserLoginProvider;
+(function (UserLoginProvider) {
+    UserLoginProvider["GOOGLE"] = "google";
+    UserLoginProvider["FACEBOOK"] = "facebook";
+    UserLoginProvider["LOCAL"] = "local";
+})(UserLoginProvider = exports.UserLoginProvider || (exports.UserLoginProvider = {}));
+
+
+/***/ }),
+
 /***/ 650:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -354,13 +370,13 @@ const officeMember_entity_1 = __webpack_require__(5970);
 const officeMemberTransform_entity_1 = __webpack_require__(1230);
 const officeRole_entity_1 = __webpack_require__(1500);
 const office_entity_1 = __webpack_require__(4843);
-const passwordResetToken_entity_1 = __webpack_require__(3134);
-const refreshToken_entity_1 = __webpack_require__(3669);
 const user_entity_1 = __webpack_require__(4614);
 const typeorm_1 = __webpack_require__(5250);
 const cache_1 = __webpack_require__(366);
 const officeMemberRole_entity_1 = __webpack_require__(478);
 const officeInvitation_entity_1 = __webpack_require__(9916);
+const refreshToken_entity_1 = __webpack_require__(5161);
+const passwordResetToken_entity_1 = __webpack_require__(6722);
 const ormPostgresOptions = {
     type: 'postgres',
     host: config_1.default.db.pg.DB_HOST,
@@ -1272,19 +1288,19 @@ exports.AuthErrorMessages = {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createAuthMailQueue = exports.createAuthMailQueueProducer = exports.createAuthMailWorker = exports.createAuthValidate = exports.createAuthMiddleware = exports.createAuthService = exports.createAuthController = void 0;
-const authToken_factory_1 = __webpack_require__(3241);
+const authToken_factory_1 = __webpack_require__(6848);
 const logger_1 = __webpack_require__(7767);
 const user_factory_1 = __webpack_require__(6586);
 const auth_controller_1 = __webpack_require__(7579);
 const auth_middleware_1 = __webpack_require__(5658);
 const auth_service_1 = __webpack_require__(305);
 const auth_validate_1 = __webpack_require__(9640);
-const passwordResetToken_factory_1 = __webpack_require__(1538);
 const activeUserToken_factory_1 = __webpack_require__(389);
-const mail_producer_1 = __webpack_require__(5703);
+const mail_producer_1 = __webpack_require__(8663);
 const queue_1 = __webpack_require__(247);
 const mail_factory_1 = __webpack_require__(1876);
-const mail_worker_1 = __webpack_require__(8888);
+const mail_worker_1 = __webpack_require__(2363);
+const passwordResetToken_factory_1 = __webpack_require__(9611);
 function createAuthController() {
     const authService = createAuthService();
     const authMailQueueProducer = createAuthMailQueueProducer();
@@ -1544,7 +1560,7 @@ const passport_1 = __importDefault(__webpack_require__(3511));
 const config_1 = __importDefault(__webpack_require__(2275));
 const passport_google_oauth2_1 = __webpack_require__(8117);
 const passport_facebook_1 = __webpack_require__(3210);
-const UserLoginProvider_1 = __webpack_require__(6237);
+const UserLoginProvider_1 = __webpack_require__(7240);
 const auth_error_1 = __webpack_require__(1204);
 const GoogleStrategy = () => {
     const strategy = new passport_google_oauth2_1.Strategy({
@@ -1613,7 +1629,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthValidate = void 0;
 const appError_1 = __webpack_require__(2720);
 const bcrypt_1 = __webpack_require__(7096);
-const UserLoginProvider_1 = __webpack_require__(6237);
+const UserLoginProvider_1 = __webpack_require__(7240);
 const UserStatus_1 = __webpack_require__(6648);
 const auth_error_1 = __webpack_require__(1204);
 const user_error_1 = __webpack_require__(2148);
@@ -1680,6 +1696,573 @@ exports.AuthValidate = AuthValidate;
 
 /***/ }),
 
+/***/ 8221:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AuthTokenErrorMessages = void 0;
+exports.AuthTokenErrorMessages = {
+    INVALID_ACCESS_TOKEN: 'Access token is invalid',
+    INVALID_REFRESH_TOKEN: 'Error validating refresh token',
+    REFRESH_TOKEN_EXPIRED: 'Refresh token has expired. Please login again',
+    ACCESS_TOKEN_EXPIRED: 'Access token has expired'
+};
+
+
+/***/ }),
+
+/***/ 6848:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createAuthTokenValidate = exports.createAuthTokenService = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const refreshToken_repository_1 = __webpack_require__(1177);
+const authToken_service_1 = __webpack_require__(9646);
+const authToken_validate_1 = __webpack_require__(4731);
+function createAuthTokenService() {
+    const refreshTokenRepository = (0, typeorm_1.getCustomRepository)(refreshToken_repository_1.RefreshTokenRepository);
+    const authTokenValidate = createAuthTokenValidate();
+    const authTokenService = (0, authToken_service_1.AuthTokenService)(refreshTokenRepository, authTokenValidate);
+    return authTokenService;
+}
+exports.createAuthTokenService = createAuthTokenService;
+function createAuthTokenValidate() {
+    const authTokenValidate = (0, authToken_validate_1.AuthTokenValidate)();
+    return authTokenValidate;
+}
+exports.createAuthTokenValidate = createAuthTokenValidate;
+
+
+/***/ }),
+
+/***/ 9646:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AuthTokenService = void 0;
+const jsonwebtoken_1 = __importDefault(__webpack_require__(9344));
+const crypto_1 = __importDefault(__webpack_require__(6113));
+const config_1 = __importDefault(__webpack_require__(2275));
+const util_1 = __importDefault(__webpack_require__(3837));
+const appError_1 = __webpack_require__(2720);
+const authToken_error_1 = __webpack_require__(8221);
+const AuthTokenService = (refreshTokenRepository, authTokenValidate) => {
+    const createAccessTokenAndRefreshToken = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+        return [createAccessToken(userId), yield createRefreshToken(userId)];
+    });
+    const createAccessToken = (userId) => {
+        return jsonwebtoken_1.default.sign({ userId }, config_1.default.auth.JWT_SECRET, {
+            issuer: config_1.default.auth.JWT_ISSUER,
+            expiresIn: Date.now() + config_1.default.auth.JWT_ACCESS_TOKEN_EXPIRES_TIME,
+            algorithm: 'HS256'
+        });
+    };
+    const createRefreshToken = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+        const token = crypto_1.default
+            .randomBytes(config_1.default.auth.REFRESH_TOKEN_LENGTH)
+            .toString('hex');
+        yield refreshTokenRepository.save({
+            token,
+            userId,
+            expiresAt: new Date(Date.now() + config_1.default.auth.REFRESH_TOKEN_EXPIRES_TIME)
+        });
+        return token;
+    });
+    const blockRefreshToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
+        yield refreshTokenRepository.blockByToken(refreshToken);
+    });
+    const deleteRefreshToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
+        yield refreshTokenRepository.deleteByToken(refreshToken);
+    });
+    const getUserIdFromAccessToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
+        const payload = (yield util_1.default.promisify(jsonwebtoken_1.default.verify)(token, config_1.default.auth.JWT_SECRET));
+        return payload.userId;
+    });
+    const validateAccessToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
+        let jwtPayload;
+        try {
+            jwtPayload = (yield util_1.default.promisify(jsonwebtoken_1.default.verify)(token, config_1.default.auth.JWT_SECRET));
+        }
+        catch (err) {
+            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.INVALID_ACCESS_TOKEN);
+        }
+        if (jwtPayload.iss !== config_1.default.auth.JWT_ISSUER) {
+            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.INVALID_ACCESS_TOKEN);
+        }
+        if (!jwtPayload.exp || jwtPayload.exp < Date.now()) {
+            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.ACCESS_TOKEN_EXPIRED);
+        }
+        return true;
+    });
+    const validateRefreshToken = (userId, refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
+        const refreshTokenEntity = yield refreshTokenRepository.findByTokenAndUserId(userId, refreshToken);
+        authTokenValidate.checkRefreshTokenExists(refreshTokenEntity);
+        authTokenValidate.checkRefreshTokenActive(refreshTokenEntity);
+        authTokenValidate.checkRefreshTokenNotExpired(refreshTokenEntity);
+        return true;
+    });
+    const validateRefreshTokenCanRenewAccessToken = (userId, refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield validateRefreshToken(userId, refreshToken);
+    });
+    return {
+        createAccessTokenAndRefreshToken,
+        createAccessToken,
+        createRefreshToken,
+        blockRefreshToken,
+        deleteRefreshToken,
+        validateAccessToken,
+        validateRefreshToken,
+        validateRefreshTokenCanRenewAccessToken,
+        getUserIdFromAccessToken
+    };
+};
+exports.AuthTokenService = AuthTokenService;
+
+
+/***/ }),
+
+/***/ 4731:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AuthTokenValidate = void 0;
+const appError_1 = __webpack_require__(2720);
+const RefreshTokenStatus_1 = __webpack_require__(1422);
+const authToken_error_1 = __webpack_require__(8221);
+const AuthTokenValidate = () => {
+    function checkRefreshTokenExists(refreshToken) {
+        if (!refreshToken) {
+            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.INVALID_REFRESH_TOKEN);
+        }
+    }
+    function checkRefreshTokenActive(refreshToken) {
+        if (refreshToken.status === RefreshTokenStatus_1.RefreshTokenStatus.BLOCKED) {
+            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.INVALID_REFRESH_TOKEN);
+        }
+    }
+    function checkRefreshTokenNotExpired(refreshToken) {
+        if (refreshToken.expiresAt.getTime() < Date.now()) {
+            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.REFRESH_TOKEN_EXPIRED);
+        }
+    }
+    return {
+        checkRefreshTokenExists,
+        checkRefreshTokenActive,
+        checkRefreshTokenNotExpired
+    };
+};
+exports.AuthTokenValidate = AuthTokenValidate;
+
+
+/***/ }),
+
+/***/ 7166:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PasswordResetTokenCreator = void 0;
+const PasswordResetTokenCreator = () => {
+    const mapPasswordResetTokenToPasswordResetTokenDto = (passwordResetTokenEntity) => {
+        const { id, userId, passwordResetToken, passwordResetTokenExpired, createdAt } = passwordResetTokenEntity;
+        return {
+            id,
+            userId,
+            passwordResetToken,
+            passwordResetTokenExpired,
+            createdAt
+        };
+    };
+    return { mapPasswordResetTokenToPasswordResetTokenDto };
+};
+exports.PasswordResetTokenCreator = PasswordResetTokenCreator;
+
+
+/***/ }),
+
+/***/ 6722:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PasswordResetToken = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const BaseEntity_1 = __webpack_require__(777);
+const user_entity_1 = __webpack_require__(4614);
+let PasswordResetToken = class PasswordResetToken extends BaseEntity_1.BaseEntity {
+};
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], PasswordResetToken.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'user_id' }),
+    __metadata("design:type", Number)
+], PasswordResetToken.prototype, "userId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ unique: true, name: 'password_reset_token' }),
+    __metadata("design:type", String)
+], PasswordResetToken.prototype, "passwordResetToken", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'password_reset_token_expired' }),
+    __metadata("design:type", Date)
+], PasswordResetToken.prototype, "passwordResetTokenExpired", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
+    (0, typeorm_1.JoinColumn)({ name: 'user_id' }),
+    __metadata("design:type", user_entity_1.User)
+], PasswordResetToken.prototype, "user", void 0);
+PasswordResetToken = __decorate([
+    (0, typeorm_1.Entity)({ name: 'password_reset_token' })
+], PasswordResetToken);
+exports.PasswordResetToken = PasswordResetToken;
+
+
+/***/ }),
+
+/***/ 635:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PasswordResetTokenMessages = void 0;
+exports.PasswordResetTokenMessages = {
+    TOKEN_EXPIRED: 'Password reset token expired',
+    TOKEN_INVALID: 'Password reset token invalid'
+};
+
+
+/***/ }),
+
+/***/ 9611:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createPasswordResetTokenCreator = exports.createPasswordResetTokenService = exports.createPasswordResetTokenRepository = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const passwordResetToken_creator_1 = __webpack_require__(7166);
+const passwordResetToken_repository_1 = __webpack_require__(4044);
+const passwordResetToken_service_1 = __webpack_require__(9552);
+const createPasswordResetTokenRepository = () => {
+    const passwordResetTokenRepository = (0, typeorm_1.getCustomRepository)(passwordResetToken_repository_1.PasswordResetTokenRepository);
+    return passwordResetTokenRepository;
+};
+exports.createPasswordResetTokenRepository = createPasswordResetTokenRepository;
+const createPasswordResetTokenService = () => {
+    const passwordResetTokenRepository = (0, exports.createPasswordResetTokenRepository)();
+    const passwordResetTokenCreator = (0, exports.createPasswordResetTokenCreator)();
+    return (0, passwordResetToken_service_1.PasswordResetTokenService)(passwordResetTokenRepository, passwordResetTokenCreator);
+};
+exports.createPasswordResetTokenService = createPasswordResetTokenService;
+const createPasswordResetTokenCreator = () => {
+    return (0, passwordResetToken_creator_1.PasswordResetTokenCreator)();
+};
+exports.createPasswordResetTokenCreator = createPasswordResetTokenCreator;
+
+
+/***/ }),
+
+/***/ 4044:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PasswordResetTokenRepository = void 0;
+const BaseRepository_1 = __webpack_require__(7325);
+const typeorm_1 = __webpack_require__(5250);
+const passwordResetToken_entity_1 = __webpack_require__(6722);
+let PasswordResetTokenRepository = class PasswordResetTokenRepository extends BaseRepository_1.BaseRepository {
+    findByToken(resetToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.findOne({
+                where: {
+                    passwordResetToken: resetToken
+                }
+            });
+        });
+    }
+    deleteByUserId(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.softDelete({ userId });
+        });
+    }
+};
+PasswordResetTokenRepository = __decorate([
+    (0, typeorm_1.EntityRepository)(passwordResetToken_entity_1.PasswordResetToken)
+], PasswordResetTokenRepository);
+exports.PasswordResetTokenRepository = PasswordResetTokenRepository;
+
+
+/***/ }),
+
+/***/ 9552:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PasswordResetTokenService = void 0;
+const crypto_1 = __importDefault(__webpack_require__(6113));
+const config_1 = __importDefault(__webpack_require__(2275));
+const appError_1 = __webpack_require__(2720);
+const passwordResetToken_error_1 = __webpack_require__(635);
+const PasswordResetTokenService = (passwordResetTokenRepository, passwordResetTokenCreator) => {
+    const findByPlainToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
+        const encryptedToken = encryptToken(token);
+        const resetToken = yield passwordResetTokenRepository.findByToken(encryptedToken);
+        if (!resetToken) {
+            throw new appError_1.NotFoundError(passwordResetToken_error_1.PasswordResetTokenMessages.TOKEN_INVALID);
+        }
+        return passwordResetTokenCreator.mapPasswordResetTokenToPasswordResetTokenDto(resetToken);
+    });
+    const createToken = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+        const tokenPlain = crypto_1.default
+            .randomBytes(config_1.default.auth.RESET_PASSWORD_TOKEN_LENGTH)
+            .toString('hex');
+        const tokenEncrypt = encryptToken(tokenPlain);
+        const createdToken = yield passwordResetTokenRepository.save({
+            userId,
+            passwordResetToken: tokenEncrypt,
+            passwordResetTokenExpired: new Date(Date.now() + config_1.default.auth.RESET_PASSWORD_TOKEN_EXPIRES_TIME)
+        });
+        return passwordResetTokenCreator.mapPasswordResetTokenToPasswordResetTokenDto(Object.assign(Object.assign({}, createdToken), { passwordResetToken: tokenPlain }));
+    });
+    const validateToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
+        const tokenEncrypt = encryptToken(token);
+        const resetToken = yield passwordResetTokenRepository.findByToken(tokenEncrypt);
+        if (!resetToken) {
+            throw new appError_1.IllegalArgumentError(passwordResetToken_error_1.PasswordResetTokenMessages.TOKEN_INVALID);
+        }
+        if (resetToken.passwordResetTokenExpired.getTime() < Date.now()) {
+            throw new appError_1.IllegalArgumentError(passwordResetToken_error_1.PasswordResetTokenMessages.TOKEN_EXPIRED);
+        }
+        return true;
+    });
+    const deleteByUserId = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+        yield passwordResetTokenRepository.deleteByUserId(userId);
+    });
+    function encryptToken(token) {
+        return crypto_1.default.createHash('sha256').update(token).digest('hex');
+    }
+    return {
+        findByPlainToken,
+        createToken,
+        validateToken,
+        deleteByUserId
+    };
+};
+exports.PasswordResetTokenService = PasswordResetTokenService;
+
+
+/***/ }),
+
+/***/ 1422:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RefreshTokenStatus = void 0;
+var RefreshTokenStatus;
+(function (RefreshTokenStatus) {
+    RefreshTokenStatus["ACTIVE"] = "active";
+    RefreshTokenStatus["BLOCKED"] = "blocked";
+})(RefreshTokenStatus = exports.RefreshTokenStatus || (exports.RefreshTokenStatus = {}));
+
+
+/***/ }),
+
+/***/ 5161:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RefreshToken = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const user_entity_1 = __webpack_require__(4614);
+const RefreshTokenStatus_1 = __webpack_require__(1422);
+const BaseEntity_1 = __webpack_require__(777);
+let RefreshToken = class RefreshToken extends BaseEntity_1.BaseEntity {
+};
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], RefreshToken.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], RefreshToken.prototype, "token", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'user_id' }),
+    __metadata("design:type", Number)
+], RefreshToken.prototype, "userId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: 'enum',
+        enum: RefreshTokenStatus_1.RefreshTokenStatus,
+        default: RefreshTokenStatus_1.RefreshTokenStatus.ACTIVE
+    }),
+    __metadata("design:type", String)
+], RefreshToken.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'expires_at' }),
+    __metadata("design:type", Date)
+], RefreshToken.prototype, "expiresAt", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
+    (0, typeorm_1.JoinColumn)({ name: 'user_id' }),
+    __metadata("design:type", user_entity_1.User)
+], RefreshToken.prototype, "user", void 0);
+RefreshToken = __decorate([
+    (0, typeorm_1.Entity)({ name: 'refresh_token' }),
+    (0, typeorm_1.Index)(['token', 'userId'], { unique: true })
+], RefreshToken);
+exports.RefreshToken = RefreshToken;
+
+
+/***/ }),
+
+/***/ 1177:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RefreshTokenRepository = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const BaseRepository_1 = __webpack_require__(7325);
+const refreshToken_entity_1 = __webpack_require__(5161);
+const RefreshTokenStatus_1 = __webpack_require__(1422);
+let RefreshTokenRepository = class RefreshTokenRepository extends BaseRepository_1.BaseRepository {
+    existsTokenByUserId(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const count = yield this.count({
+                where: {
+                    userId
+                }
+            });
+            return count === 1;
+        });
+    }
+    findByTokenAndUserId(userId, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.findOne({
+                where: {
+                    userId,
+                    token
+                }
+            });
+        });
+    }
+    findByToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.findOne({
+                where: {
+                    token
+                }
+            });
+        });
+    }
+    deleteByToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.softDelete({
+                token
+            });
+        });
+    }
+    blockByToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.update({
+                token
+            }, {
+                status: RefreshTokenStatus_1.RefreshTokenStatus.BLOCKED
+            });
+        });
+    }
+};
+RefreshTokenRepository = __decorate([
+    (0, typeorm_1.EntityRepository)(refreshToken_entity_1.RefreshToken)
+], RefreshTokenRepository);
+exports.RefreshTokenRepository = RefreshTokenRepository;
+
+
+/***/ }),
+
 /***/ 4860:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -1704,7 +2287,7 @@ __exportStar(__webpack_require__(3204), exports);
 
 /***/ }),
 
-/***/ 5703:
+/***/ 8663:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1728,7 +2311,7 @@ exports.AuthMailQueueProducer = AuthMailQueueProducer;
 
 /***/ }),
 
-/***/ 8888:
+/***/ 2363:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1806,7 +2389,7 @@ exports.AuthMailWorker = AuthMailWorker;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createSocketMiddleware = void 0;
 const auth_factory_1 = __webpack_require__(6901);
-const authToken_factory_1 = __webpack_require__(3241);
+const authToken_factory_1 = __webpack_require__(6848);
 const user_factory_1 = __webpack_require__(6586);
 const authSocket_middleware_1 = __webpack_require__(2578);
 function createSocketMiddleware() {
@@ -1881,183 +2464,6 @@ const AuthSocketMiddleware = (userRepository, authTokenService, authValidate) =>
     return { protect, restrictTo, restrictToGuest };
 };
 exports.AuthSocketMiddleware = AuthSocketMiddleware;
-
-
-/***/ }),
-
-/***/ 8999:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthTokenErrorMessages = void 0;
-exports.AuthTokenErrorMessages = {
-    INVALID_ACCESS_TOKEN: 'Access token is invalid',
-    INVALID_REFRESH_TOKEN: 'Error validating refresh token',
-    REFRESH_TOKEN_EXPIRED: 'Refresh token has expired. Please login again',
-    ACCESS_TOKEN_EXPIRED: 'Access token has expired'
-};
-
-
-/***/ }),
-
-/***/ 3241:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createAuthTokenValidate = exports.createAuthTokenService = void 0;
-const typeorm_1 = __webpack_require__(5250);
-const refreshToken_repository_1 = __webpack_require__(1663);
-const authToken_service_1 = __webpack_require__(8172);
-const authToken_validate_1 = __webpack_require__(79);
-function createAuthTokenService() {
-    const refreshTokenRepository = (0, typeorm_1.getCustomRepository)(refreshToken_repository_1.RefreshTokenRepository);
-    const authTokenValidate = createAuthTokenValidate();
-    const authTokenService = (0, authToken_service_1.AuthTokenService)(refreshTokenRepository, authTokenValidate);
-    return authTokenService;
-}
-exports.createAuthTokenService = createAuthTokenService;
-function createAuthTokenValidate() {
-    const authTokenValidate = (0, authToken_validate_1.AuthTokenValidate)();
-    return authTokenValidate;
-}
-exports.createAuthTokenValidate = createAuthTokenValidate;
-
-
-/***/ }),
-
-/***/ 8172:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthTokenService = void 0;
-const jsonwebtoken_1 = __importDefault(__webpack_require__(9344));
-const crypto_1 = __importDefault(__webpack_require__(6113));
-const config_1 = __importDefault(__webpack_require__(2275));
-const util_1 = __importDefault(__webpack_require__(3837));
-const appError_1 = __webpack_require__(2720);
-const authToken_error_1 = __webpack_require__(8999);
-const AuthTokenService = (refreshTokenRepository, authTokenValidate) => {
-    const createAccessTokenAndRefreshToken = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-        return [createAccessToken(userId), yield createRefreshToken(userId)];
-    });
-    const createAccessToken = (userId) => {
-        return jsonwebtoken_1.default.sign({ userId }, config_1.default.auth.JWT_SECRET, {
-            issuer: config_1.default.auth.JWT_ISSUER,
-            expiresIn: Date.now() + config_1.default.auth.JWT_ACCESS_TOKEN_EXPIRES_TIME,
-            algorithm: 'HS256'
-        });
-    };
-    const createRefreshToken = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-        const token = crypto_1.default
-            .randomBytes(config_1.default.auth.REFRESH_TOKEN_LENGTH)
-            .toString('hex');
-        yield refreshTokenRepository.save({
-            token,
-            userId,
-            expiresAt: new Date(Date.now() + config_1.default.auth.REFRESH_TOKEN_EXPIRES_TIME)
-        });
-        return token;
-    });
-    const blockRefreshToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
-        yield refreshTokenRepository.blockByToken(refreshToken);
-    });
-    const deleteRefreshToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
-        yield refreshTokenRepository.deleteByToken(refreshToken);
-    });
-    const getUserIdFromAccessToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
-        const payload = (yield util_1.default.promisify(jsonwebtoken_1.default.verify)(token, config_1.default.auth.JWT_SECRET));
-        return payload.userId;
-    });
-    const validateAccessToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
-        let jwtPayload;
-        try {
-            jwtPayload = (yield util_1.default.promisify(jsonwebtoken_1.default.verify)(token, config_1.default.auth.JWT_SECRET));
-        }
-        catch (err) {
-            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.INVALID_ACCESS_TOKEN);
-        }
-        if (jwtPayload.iss !== config_1.default.auth.JWT_ISSUER) {
-            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.INVALID_ACCESS_TOKEN);
-        }
-        if (!jwtPayload.exp || jwtPayload.exp < Date.now()) {
-            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.ACCESS_TOKEN_EXPIRED);
-        }
-        return true;
-    });
-    const validateRefreshToken = (userId, refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
-        const refreshTokenEntity = yield refreshTokenRepository.findByTokenAndUserId(userId, refreshToken);
-        authTokenValidate.checkRefreshTokenExists(refreshTokenEntity);
-        authTokenValidate.checkRefreshTokenActive(refreshTokenEntity);
-        authTokenValidate.checkRefreshTokenNotExpired(refreshTokenEntity);
-        return true;
-    });
-    const validateRefreshTokenCanRenewAccessToken = (userId, refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
-        return yield validateRefreshToken(userId, refreshToken);
-    });
-    return {
-        createAccessTokenAndRefreshToken,
-        createAccessToken,
-        createRefreshToken,
-        blockRefreshToken,
-        deleteRefreshToken,
-        validateAccessToken,
-        validateRefreshToken,
-        validateRefreshTokenCanRenewAccessToken,
-        getUserIdFromAccessToken
-    };
-};
-exports.AuthTokenService = AuthTokenService;
-
-
-/***/ }),
-
-/***/ 79:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthTokenValidate = void 0;
-const appError_1 = __webpack_require__(2720);
-const authToken_error_1 = __webpack_require__(8999);
-const RefreshTokenStatus_1 = __webpack_require__(4574);
-const AuthTokenValidate = () => {
-    function checkRefreshTokenExists(refreshToken) {
-        if (!refreshToken) {
-            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.INVALID_REFRESH_TOKEN);
-        }
-    }
-    function checkRefreshTokenActive(refreshToken) {
-        if (refreshToken.status === RefreshTokenStatus_1.RefreshTokenStatus.BLOCKED) {
-            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.INVALID_REFRESH_TOKEN);
-        }
-    }
-    function checkRefreshTokenNotExpired(refreshToken) {
-        if (refreshToken.expiresAt.getTime() < Date.now()) {
-            throw new appError_1.UnauthorizedError(authToken_error_1.AuthTokenErrorMessages.REFRESH_TOKEN_EXPIRED);
-        }
-    }
-    return {
-        checkRefreshTokenExists,
-        checkRefreshTokenActive,
-        checkRefreshTokenNotExpired
-    };
-};
-exports.AuthTokenValidate = AuthTokenValidate;
 
 
 /***/ }),
@@ -3104,6 +3510,24 @@ exports.CreatePrivateInvitationDto = CreatePrivateInvitationDto;
 
 /***/ }),
 
+/***/ 7398:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationTokenGenerator = void 0;
+const uuid_1 = __webpack_require__(5828);
+const OfficeInvitationTokenGenerator = () => {
+    const generate = () => {
+        return (0, uuid_1.v4)();
+    };
+    return { generate };
+};
+exports.OfficeInvitationTokenGenerator = OfficeInvitationTokenGenerator;
+
+
+/***/ }),
+
 /***/ 5845:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -3435,7 +3859,7 @@ const typeorm_1 = __webpack_require__(5250);
 const queue_1 = __webpack_require__(247);
 const logger_1 = __webpack_require__(7767);
 const mail_factory_1 = __webpack_require__(1876);
-const officeInvitationTokenGenerator_1 = __webpack_require__(1522);
+const officeInvitationTokenGenerator_1 = __webpack_require__(7398);
 const officeMember_factory_1 = __webpack_require__(4491);
 const officeRole_factory_1 = __webpack_require__(9842);
 const office_factory_1 = __webpack_require__(4903);
@@ -3753,41 +4177,6 @@ const OfficeInvitationValidate = ({ officeInvitationRepository, officeRepository
     };
 };
 exports.OfficeInvitationValidate = OfficeInvitationValidate;
-
-
-/***/ }),
-
-/***/ 8293:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const nanoid_1 = __webpack_require__(754);
-const generator = {
-    generate: () => {
-        const nanoid = (0, nanoid_1.customAlphabet)('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-        return nanoid(9);
-    }
-};
-exports["default"] = generator;
-
-
-/***/ }),
-
-/***/ 1522:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.OfficeInvitationTokenGenerator = void 0;
-const uuid_1 = __webpack_require__(5828);
-const OfficeInvitationTokenGenerator = () => {
-    const generate = () => {
-        return (0, uuid_1.v4)();
-    };
-    return { generate };
-};
-exports.OfficeInvitationTokenGenerator = OfficeInvitationTokenGenerator;
 
 
 /***/ }),
@@ -5553,6 +5942,23 @@ exports.UpdateOfficeDto = UpdateOfficeDto;
 
 /***/ }),
 
+/***/ 236:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const nanoid_1 = __webpack_require__(754);
+const generator = {
+    generate: () => {
+        const nanoid = (0, nanoid_1.customAlphabet)('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        return nanoid(9);
+    }
+};
+exports["default"] = generator;
+
+
+/***/ }),
+
 /***/ 1747:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -5880,7 +6286,7 @@ const office_repository_1 = __webpack_require__(9772);
 const office_service_1 = __webpack_require__(7174);
 const office_validate_1 = __webpack_require__(1241);
 const officeRole_factory_1 = __webpack_require__(9842);
-const officeInvitationCodeGenerator_1 = __importDefault(__webpack_require__(8293));
+const officeInvitationCodeGenerator_1 = __importDefault(__webpack_require__(236));
 const office_socketHandler_1 = __webpack_require__(6456);
 function createOfficeController() {
     return (0, office_controller_1.OfficeController)(createOfficeService());
@@ -6262,435 +6668,6 @@ exports.OfficeValidate = OfficeValidate;
 
 /***/ }),
 
-/***/ 8547:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PasswordEncoder = void 0;
-const config_1 = __importDefault(__webpack_require__(2275));
-const bcrypt_1 = __webpack_require__(7096);
-const PasswordEncoder = () => {
-    const encode = (password) => {
-        const encryptedPassword = (0, bcrypt_1.hashSync)(password, config_1.default.auth.BCRYPT_SALT_ROUNDS);
-        return encryptedPassword;
-    };
-    return { encode };
-};
-exports.PasswordEncoder = PasswordEncoder;
-
-
-/***/ }),
-
-/***/ 2586:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PasswordResetTokenCreator = void 0;
-const PasswordResetTokenCreator = () => {
-    const mapPasswordResetTokenToPasswordResetTokenDto = (passwordResetTokenEntity) => {
-        const { id, userId, passwordResetToken, passwordResetTokenExpired, createdAt } = passwordResetTokenEntity;
-        return {
-            id,
-            userId,
-            passwordResetToken,
-            passwordResetTokenExpired,
-            createdAt
-        };
-    };
-    return { mapPasswordResetTokenToPasswordResetTokenDto };
-};
-exports.PasswordResetTokenCreator = PasswordResetTokenCreator;
-
-
-/***/ }),
-
-/***/ 3134:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PasswordResetToken = void 0;
-const typeorm_1 = __webpack_require__(5250);
-const BaseEntity_1 = __webpack_require__(777);
-const user_entity_1 = __webpack_require__(4614);
-let PasswordResetToken = class PasswordResetToken extends BaseEntity_1.BaseEntity {
-};
-__decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)(),
-    __metadata("design:type", Number)
-], PasswordResetToken.prototype, "id", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ name: 'user_id' }),
-    __metadata("design:type", Number)
-], PasswordResetToken.prototype, "userId", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ unique: true, name: 'password_reset_token' }),
-    __metadata("design:type", String)
-], PasswordResetToken.prototype, "passwordResetToken", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ name: 'password_reset_token_expired' }),
-    __metadata("design:type", Date)
-], PasswordResetToken.prototype, "passwordResetTokenExpired", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
-    (0, typeorm_1.JoinColumn)({ name: 'user_id' }),
-    __metadata("design:type", user_entity_1.User)
-], PasswordResetToken.prototype, "user", void 0);
-PasswordResetToken = __decorate([
-    (0, typeorm_1.Entity)({ name: 'password_reset_token' })
-], PasswordResetToken);
-exports.PasswordResetToken = PasswordResetToken;
-
-
-/***/ }),
-
-/***/ 2752:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PasswordResetTokenMessages = void 0;
-exports.PasswordResetTokenMessages = {
-    TOKEN_EXPIRED: 'Password reset token expired',
-    TOKEN_INVALID: 'Password reset token invalid'
-};
-
-
-/***/ }),
-
-/***/ 1538:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createPasswordResetTokenCreator = exports.createPasswordResetTokenService = exports.createPasswordResetTokenRepository = void 0;
-const typeorm_1 = __webpack_require__(5250);
-const passwordResetToken_creator_1 = __webpack_require__(2586);
-const passwordResetToken_repository_1 = __webpack_require__(9070);
-const passwordResetToken_service_1 = __webpack_require__(9894);
-const createPasswordResetTokenRepository = () => {
-    const passwordResetTokenRepository = (0, typeorm_1.getCustomRepository)(passwordResetToken_repository_1.PasswordResetTokenRepository);
-    return passwordResetTokenRepository;
-};
-exports.createPasswordResetTokenRepository = createPasswordResetTokenRepository;
-const createPasswordResetTokenService = () => {
-    const passwordResetTokenRepository = (0, exports.createPasswordResetTokenRepository)();
-    const passwordResetTokenCreator = (0, exports.createPasswordResetTokenCreator)();
-    return (0, passwordResetToken_service_1.PasswordResetTokenService)(passwordResetTokenRepository, passwordResetTokenCreator);
-};
-exports.createPasswordResetTokenService = createPasswordResetTokenService;
-const createPasswordResetTokenCreator = () => {
-    return (0, passwordResetToken_creator_1.PasswordResetTokenCreator)();
-};
-exports.createPasswordResetTokenCreator = createPasswordResetTokenCreator;
-
-
-/***/ }),
-
-/***/ 9070:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PasswordResetTokenRepository = void 0;
-const typeorm_1 = __webpack_require__(5250);
-const BaseRepository_1 = __webpack_require__(7325);
-const passwordResetToken_entity_1 = __webpack_require__(3134);
-let PasswordResetTokenRepository = class PasswordResetTokenRepository extends BaseRepository_1.BaseRepository {
-    findByToken(resetToken) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.findOne({
-                where: {
-                    passwordResetToken: resetToken
-                }
-            });
-        });
-    }
-    deleteByUserId(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.softDelete({ userId });
-        });
-    }
-};
-PasswordResetTokenRepository = __decorate([
-    (0, typeorm_1.EntityRepository)(passwordResetToken_entity_1.PasswordResetToken)
-], PasswordResetTokenRepository);
-exports.PasswordResetTokenRepository = PasswordResetTokenRepository;
-
-
-/***/ }),
-
-/***/ 9894:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PasswordResetTokenService = void 0;
-const crypto_1 = __importDefault(__webpack_require__(6113));
-const config_1 = __importDefault(__webpack_require__(2275));
-const appError_1 = __webpack_require__(2720);
-const passwordResetToken_error_1 = __webpack_require__(2752);
-const PasswordResetTokenService = (passwordResetTokenRepository, passwordResetTokenCreator) => {
-    const findByPlainToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
-        const encryptedToken = encryptToken(token);
-        const resetToken = yield passwordResetTokenRepository.findByToken(encryptedToken);
-        if (!resetToken) {
-            throw new appError_1.NotFoundError(passwordResetToken_error_1.PasswordResetTokenMessages.TOKEN_INVALID);
-        }
-        return passwordResetTokenCreator.mapPasswordResetTokenToPasswordResetTokenDto(resetToken);
-    });
-    const createToken = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-        const tokenPlain = crypto_1.default
-            .randomBytes(config_1.default.auth.RESET_PASSWORD_TOKEN_LENGTH)
-            .toString('hex');
-        const tokenEncrypt = encryptToken(tokenPlain);
-        const createdToken = yield passwordResetTokenRepository.save({
-            userId,
-            passwordResetToken: tokenEncrypt,
-            passwordResetTokenExpired: new Date(Date.now() + config_1.default.auth.RESET_PASSWORD_TOKEN_EXPIRES_TIME)
-        });
-        return passwordResetTokenCreator.mapPasswordResetTokenToPasswordResetTokenDto(Object.assign(Object.assign({}, createdToken), { passwordResetToken: tokenPlain }));
-    });
-    const validateToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
-        const tokenEncrypt = encryptToken(token);
-        const resetToken = yield passwordResetTokenRepository.findByToken(tokenEncrypt);
-        if (!resetToken) {
-            throw new appError_1.IllegalArgumentError(passwordResetToken_error_1.PasswordResetTokenMessages.TOKEN_INVALID);
-        }
-        if (resetToken.passwordResetTokenExpired.getTime() < Date.now()) {
-            throw new appError_1.IllegalArgumentError(passwordResetToken_error_1.PasswordResetTokenMessages.TOKEN_EXPIRED);
-        }
-        return true;
-    });
-    const deleteByUserId = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-        yield passwordResetTokenRepository.deleteByUserId(userId);
-    });
-    function encryptToken(token) {
-        return crypto_1.default.createHash('sha256').update(token).digest('hex');
-    }
-    return {
-        findByPlainToken,
-        createToken,
-        validateToken,
-        deleteByUserId
-    };
-};
-exports.PasswordResetTokenService = PasswordResetTokenService;
-
-
-/***/ }),
-
-/***/ 4574:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RefreshTokenStatus = void 0;
-var RefreshTokenStatus;
-(function (RefreshTokenStatus) {
-    RefreshTokenStatus["ACTIVE"] = "active";
-    RefreshTokenStatus["BLOCKED"] = "blocked";
-})(RefreshTokenStatus = exports.RefreshTokenStatus || (exports.RefreshTokenStatus = {}));
-
-
-/***/ }),
-
-/***/ 3669:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RefreshToken = void 0;
-const typeorm_1 = __webpack_require__(5250);
-const user_entity_1 = __webpack_require__(4614);
-const RefreshTokenStatus_1 = __webpack_require__(4574);
-const BaseEntity_1 = __webpack_require__(777);
-let RefreshToken = class RefreshToken extends BaseEntity_1.BaseEntity {
-};
-__decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)(),
-    __metadata("design:type", Number)
-], RefreshToken.prototype, "id", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], RefreshToken.prototype, "token", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ name: 'user_id' }),
-    __metadata("design:type", Number)
-], RefreshToken.prototype, "userId", void 0);
-__decorate([
-    (0, typeorm_1.Column)({
-        type: 'enum',
-        enum: RefreshTokenStatus_1.RefreshTokenStatus,
-        default: RefreshTokenStatus_1.RefreshTokenStatus.ACTIVE
-    }),
-    __metadata("design:type", String)
-], RefreshToken.prototype, "status", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ name: 'expires_at' }),
-    __metadata("design:type", Date)
-], RefreshToken.prototype, "expiresAt", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
-    (0, typeorm_1.JoinColumn)({ name: 'user_id' }),
-    __metadata("design:type", user_entity_1.User)
-], RefreshToken.prototype, "user", void 0);
-RefreshToken = __decorate([
-    (0, typeorm_1.Entity)({ name: 'refresh_token' }),
-    (0, typeorm_1.Index)(['token', 'userId'], { unique: true })
-], RefreshToken);
-exports.RefreshToken = RefreshToken;
-
-
-/***/ }),
-
-/***/ 1663:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RefreshTokenRepository = void 0;
-const typeorm_1 = __webpack_require__(5250);
-const BaseRepository_1 = __webpack_require__(7325);
-const refreshToken_entity_1 = __webpack_require__(3669);
-const RefreshTokenStatus_1 = __webpack_require__(4574);
-let RefreshTokenRepository = class RefreshTokenRepository extends BaseRepository_1.BaseRepository {
-    existsTokenByUserId(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const count = yield this.count({
-                where: {
-                    userId
-                }
-            });
-            return count === 1;
-        });
-    }
-    findByTokenAndUserId(userId, token) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.findOne({
-                where: {
-                    userId,
-                    token
-                }
-            });
-        });
-    }
-    findByToken(token) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.findOne({
-                where: {
-                    token
-                }
-            });
-        });
-    }
-    deleteByToken(token) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.softDelete({
-                token
-            });
-        });
-    }
-    blockByToken(token) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.update({
-                token
-            }, {
-                status: RefreshTokenStatus_1.RefreshTokenStatus.BLOCKED
-            });
-        });
-    }
-};
-RefreshTokenRepository = __decorate([
-    (0, typeorm_1.EntityRepository)(refreshToken_entity_1.RefreshToken)
-], RefreshTokenRepository);
-exports.RefreshTokenRepository = RefreshTokenRepository;
-
-
-/***/ }),
-
-/***/ 6237:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UserLoginProvider = void 0;
-var UserLoginProvider;
-(function (UserLoginProvider) {
-    UserLoginProvider["GOOGLE"] = "google";
-    UserLoginProvider["FACEBOOK"] = "facebook";
-    UserLoginProvider["LOCAL"] = "local";
-})(UserLoginProvider = exports.UserLoginProvider || (exports.UserLoginProvider = {}));
-
-
-/***/ }),
-
 /***/ 7927:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -6800,6 +6777,29 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "avatar", void 0);
 exports.UpdateUserDto = UpdateUserDto;
+
+
+/***/ }),
+
+/***/ 7203:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PasswordEncoder = void 0;
+const config_1 = __importDefault(__webpack_require__(2275));
+const bcrypt_1 = __webpack_require__(7096);
+const PasswordEncoder = () => {
+    const encode = (password) => {
+        const encryptedPassword = (0, bcrypt_1.hashSync)(password, config_1.default.auth.BCRYPT_SALT_ROUNDS);
+        return encryptedPassword;
+    };
+    return { encode };
+};
+exports.PasswordEncoder = PasswordEncoder;
 
 
 /***/ }),
@@ -6996,7 +6996,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.User = void 0;
 const typeorm_1 = __webpack_require__(5250);
 const BaseEntity_1 = __webpack_require__(777);
-const UserLoginProvider_1 = __webpack_require__(6237);
+const UserLoginProvider_1 = __webpack_require__(7240);
 const UserRoleType_1 = __webpack_require__(7927);
 const UserStatus_1 = __webpack_require__(6648);
 let User = class User extends BaseEntity_1.BaseEntity {
@@ -7076,7 +7076,7 @@ exports.UserErrorMessage = {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createUserValidate = exports.createUserCreator = exports.createUserService = exports.createUserRepository = void 0;
 const typeorm_1 = __webpack_require__(5250);
-const passwordEncoder_1 = __webpack_require__(8547);
+const passwordEncoder_1 = __webpack_require__(7203);
 const user_creator_1 = __webpack_require__(3066);
 const user_repository_1 = __webpack_require__(7122);
 const user_service_1 = __webpack_require__(8111);

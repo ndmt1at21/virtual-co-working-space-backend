@@ -2,7 +2,7 @@ import { getCustomRepository } from 'typeorm';
 import { getQueue } from '../app/loaders/queue/queue';
 import { officeInvitationLogger } from '../logger';
 import { createMailService } from '../mail/mail.factory';
-import { OfficeInvitationTokenGenerator } from '../officeInvitationTokenGenerator';
+import { OfficeInvitationTokenGenerator } from './components/officeInvitationTokenGenerator';
 import { createOfficeMemberRepository } from '../officeMembers/officeMember.factory';
 import { createOfficeRoleRepository } from '../officeRoles/officeRole.factory';
 import {

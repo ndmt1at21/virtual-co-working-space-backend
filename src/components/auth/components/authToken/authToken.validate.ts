@@ -1,7 +1,7 @@
 import { UnauthorizedError } from '@src/utils/appError';
+import { RefreshTokenStatus } from '../refreshToken/@types/RefreshTokenStatus';
+import { RefreshToken } from '../refreshToken/refreshToken.entity';
 import { AuthTokenErrorMessages } from './authToken.error';
-import { RefreshToken } from '@components/refreshToken/refreshToken.entity';
-import { RefreshTokenStatus } from '@components/refreshToken/@types/RefreshTokenStatus';
 
 export const AuthTokenValidate = () => {
 	function checkRefreshTokenExists(refreshToken: RefreshToken | undefined) {

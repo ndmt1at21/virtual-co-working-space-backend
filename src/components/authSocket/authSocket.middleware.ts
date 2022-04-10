@@ -2,7 +2,7 @@ import { UserRepository } from '@components/users/user.repository';
 import { UserRoleType } from '../users/@types/UserRoleType';
 import { IAuthValidate } from '../auth/@types/IAuthValidate';
 import { AuthErrorMessages } from '../auth/auth.error';
-import { IAuthTokenService } from '../authToken/@types/IAuthTokenService';
+import { IAuthTokenService } from '../auth/components/authToken/@types/IAuthTokenService';
 import { catchAsyncSocketMiddleware } from '@src/utils/catchAsyncSocketMiddleware';
 import { UnauthorizedError } from '@src/utils/appError';
 import { User } from '../users/user.entity';

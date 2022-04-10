@@ -10,7 +10,7 @@ import { OfficeRepository } from './office.repository';
 import { OfficeService } from './office.service';
 import { OfficeValidate } from './office.validate';
 import { createOfficeRoleRepository } from '@components/officeRoles/officeRole.factory';
-import generator from '@components/officeInvitationCodeGenerator';
+import generator from '@src/components/offices/components/officeInvitationCodeGenerator';
 import { OfficeSocketHandler } from './office.socketHandler';
 import { Server, Socket } from 'socket.io';
 

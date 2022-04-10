@@ -1,4 +1,4 @@
-import { UserLoginProvider } from '../UserLoginProvider';
+import { UserLoginProvider } from '../../../UserLoginProvider';
 
 export type CreateUserExternalDto = {
 	email: string;

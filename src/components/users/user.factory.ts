@@ -1,5 +1,5 @@
 import { getCustomRepository } from 'typeorm';
-import { PasswordEncoder } from '../passwordEncoder';
+import { PasswordEncoder } from './components/passwordEncoder';
 import { UserCreator } from './user.creator';
 import { UserRepository } from './user.repository';
 import { UserService } from './user.service';

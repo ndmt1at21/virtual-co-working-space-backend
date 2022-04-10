@@ -1,6 +1,6 @@
 import { UnauthorizedError } from '@src/utils/appError';
 import { compareSync } from 'bcrypt';
-import { UserLoginProvider } from '@components/users/@types/UserLoginProvider';
+import { UserLoginProvider } from '@src/components/UserLoginProvider';
 import { UserStatus } from '@components/users/@types/UserStatus';
 import { UserRepository } from '@components/users/user.repository';
 import { IAuthValidate } from './@types/IAuthValidate';

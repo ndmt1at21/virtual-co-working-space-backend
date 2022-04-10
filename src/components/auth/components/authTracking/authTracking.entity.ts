@@ -1,5 +1,5 @@
+import { BaseEntity } from '@src/components/base/BaseEntity';
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
-import { BaseEntity } from '../base/BaseEntity';
 
 @Entity({ name: 'auth_tracking' })
 export class AuthTracking extends BaseEntity {

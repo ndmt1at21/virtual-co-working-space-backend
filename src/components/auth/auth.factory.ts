@@ -1,4 +1,4 @@
-import { createAuthTokenService } from '@components/authToken/authToken.factory';
+import { createAuthTokenService } from '@src/components/auth/components/authToken/authToken.factory';
 import { authLogger } from '@components/logger';
 import {
 	createUserRepository,
@@ -8,12 +8,12 @@ import { AuthController } from './auth.controller';
 import { AuthMiddleware } from './auth.middleware';
 import { AuthService } from './auth.service';
 import { AuthValidate } from './auth.validate';
-import { createPasswordResetTokenService } from '../passwordResetToken/passwordResetToken.factory';
 import { createActiveUserTokenService } from '../activeUserToken/activeUserToken.factory';
-import { AuthMailQueueProducer } from './jobs/mail/mail.producer';
+import { AuthMailQueueProducer } from './mail/mail.producer';
 import { getQueue } from '../app/loaders/queue/queue';
 import { createMailService } from '../mail/mail.factory';
-import { AuthMailWorker } from './jobs/mail/mail.worker';
+import { AuthMailWorker } from './mail/mail.worker';
+import { createPasswordResetTokenService } from './components/passwordResetToken/passwordResetToken.factory';
 
 export function createAuthController() {
 	const authService = createAuthService();

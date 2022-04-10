@@ -1,4 +1,4 @@
-import { IOfficeInvitationTokenGenerator } from '@src/components/officeInvitationTokenGenerator/@types/IOfficeInvitationTokenGenerator';
+import { IOfficeInvitationTokenGenerator } from '@src/components/officeInvitation/components/officeInvitationTokenGenerator/@types/IOfficeInvitationTokenGenerator';
 import { OfficeMemberRepository } from '@src/components/officeMembers/officeMember.repository';
 import { OfficeRoleRepository } from '@src/components/officeRoles/officeRole.repository';
 import { OfficeRepository } from '@src/components/offices/office.repository';

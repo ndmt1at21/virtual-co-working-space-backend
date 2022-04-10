@@ -5,9 +5,9 @@ export const AuthTrackingService = (
 	authTrackingRepository: AuthTrackingRepository
 ): IAuthTrackingService => {
 	const createAuthTracking = async (userId: number): Promise<void> => {
-		await authTrackingRepository.create({
-			userId
-		});
+		// await authTrackingRepository.create({
+		// 	userId
+		// });
 	};
 
 	const updateLastLogin = async (userId: number): Promise<void> => {

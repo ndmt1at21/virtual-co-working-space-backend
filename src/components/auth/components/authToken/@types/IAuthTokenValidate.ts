@@ -1,4 +1,4 @@
-import { RefreshToken } from '@src/components/refreshToken/refreshToken.entity';
+import { RefreshToken } from '../../refreshToken/refreshToken.entity';
 
 export interface IAuthTokenValidate {
 	checkRefreshTokenExists(refreshToken: RefreshToken | undefined): void;

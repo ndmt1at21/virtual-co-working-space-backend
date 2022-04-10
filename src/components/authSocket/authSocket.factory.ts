@@ -1,5 +1,5 @@
 import { createAuthValidate } from '../auth/auth.factory';
-import { createAuthTokenService } from '../authToken/authToken.factory';
+import { createAuthTokenService } from '../auth/components/authToken/authToken.factory';
 import { createUserRepository } from '../users/user.factory';
 import { AuthSocketMiddleware } from './authSocket.middleware';
 

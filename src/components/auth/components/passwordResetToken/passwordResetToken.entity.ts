@@ -6,7 +6,7 @@ import {
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { BaseEntity } from '@src/components/base/BaseEntity';
-import { User } from '../users/user.entity';
+import { User } from '@src/components/users/user.entity';
 
 @Entity({ name: 'password_reset_token' })
 export class PasswordResetToken extends BaseEntity {

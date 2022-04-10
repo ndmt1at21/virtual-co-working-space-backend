@@ -1,5 +1,5 @@
 import { Pageable } from '@src/@types/Pageable';
-import { IOfficeInvitationCodeGenerator } from '../officeInvitationCodeGenerator/@types/IOfficeInvitationCodeGenerator';
+import { IOfficeInvitationCodeGenerator } from './components/officeInvitationCodeGenerator/@types/IOfficeInvitationCodeGenerator';
 import { mapOfficeItemToOfficeItemOverviewDto } from '../officeItems/officeItem.mapping';
 import { OfficeItemRepository } from '../officeItems/officeItem.repository';
 import { IOfficeMemberCreator } from '../officeMembers/@types/IOfficeMemberCreator';

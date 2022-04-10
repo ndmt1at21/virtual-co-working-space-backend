@@ -6,8 +6,6 @@ import { OfficeMember } from '@src/components/officeMembers/officeMember.entity'
 import { OfficeMemberTransform } from '@src/components/officeMemberTransform/officeMemberTransform.entity';
 import { OfficeRole } from '@src/components/officeRoles/officeRole.entity';
 import { Office } from '@src/components/offices/office.entity';
-import { PasswordResetToken } from '@src/components/passwordResetToken/passwordResetToken.entity';
-import { RefreshToken } from '@src/components/refreshToken/refreshToken.entity';
 import { User } from '@src/components/users/user.entity';
 import { createConnection } from 'typeorm';
 import { MongoConnectionOptions } from 'typeorm/driver/mongodb/MongoConnectionOptions';
@@ -15,6 +13,8 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 import { CacheConnectOption, createCacheConnection } from './cache';
 import { OfficeMemberRole } from '@src/components/officeMemberRole/officeMemberRole.entity';
 import { OfficeInvitation } from '@src/components/officeInvitation/officeInvitation.entity';
+import { RefreshToken } from '@src/components/auth/components/refreshToken/refreshToken.entity';
+import { PasswordResetToken } from '@src/components/auth/components/passwordResetToken/passwordResetToken.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',

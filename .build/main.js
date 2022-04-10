@@ -360,6 +360,7 @@ const user_entity_1 = __webpack_require__(4614);
 const typeorm_1 = __webpack_require__(5250);
 const cache_1 = __webpack_require__(366);
 const officeMemberRole_entity_1 = __webpack_require__(478);
+const officeInvitation_entity_1 = __webpack_require__(9916);
 const ormPostgresOptions = {
     type: 'postgres',
     host: config_1.default.db.pg.DB_HOST,
@@ -380,7 +381,8 @@ const ormPostgresOptions = {
         officeMember_entity_1.OfficeMember,
         officeRole_entity_1.OfficeRole,
         officeMemberTransform_entity_1.OfficeMemberTransform,
-        officeMemberRole_entity_1.OfficeMemberRole
+        officeMemberRole_entity_1.OfficeMemberRole,
+        officeInvitation_entity_1.OfficeInvitation
     ]
 };
 const ormMongoOptions = {
@@ -504,8 +506,10 @@ Object.defineProperty(exports, "loadServices", ({ enumerable: true, get: functio
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.loadBackgroundJobs = void 0;
 const auth_job_1 = __webpack_require__(3574);
+const officeInvitation_job_1 = __webpack_require__(1868);
 const loadBackgroundJobs = () => {
     (0, auth_job_1.loadAuthBackgroundJobs)();
+    (0, officeInvitation_job_1.loadInvitationBackgroundJobs)();
 };
 exports.loadBackgroundJobs = loadBackgroundJobs;
 
@@ -532,7 +536,7 @@ const mainMiddleware = (app, logger) => {
     app.use(express_1.default.json());
     app.use(express_1.default.urlencoded({ extended: true }));
     app.use(express_1.default.static('public'));
-    app.use((0, rateLimit_1.rateLimiting)({ maxPerIp: 50, timeMs: 10000 }));
+    app.use((0, rateLimit_1.rateLimiting)({ maxPerIp: 20, timeMs: 1000 }));
     app.use((0, helmet_1.default)({
         contentSecurityPolicy: isProduction,
         crossOriginEmbedderPolicy: isProduction
@@ -566,6 +570,7 @@ const offices_1 = __webpack_require__(1747);
 const officeItems_1 = __webpack_require__(9817);
 const officeMembers_1 = __webpack_require__(7114);
 const cloudUpload_api_1 = __webpack_require__(6571);
+const officeInvitation_api_1 = __webpack_require__(5284);
 const mainRoutes = (app) => {
     const API_PREFIX = '/api/v1';
     const authRouter = (0, auth_1.AuthRouter)();
@@ -575,6 +580,7 @@ const mainRoutes = (app) => {
     const officeItemRouter = (0, officeItems_1.OfficeItemRouter)();
     const officeMemberRouter = (0, officeMembers_1.OfficeMemberRouter)();
     const cloudUploadRouter = (0, cloudUpload_api_1.CloudUploadRouter)();
+    const officeInvitationRouter = (0, officeInvitation_api_1.OfficeInvitationRouter)();
     app.use(`${API_PREFIX}/auth`, authRouter);
     app.use(`${API_PREFIX}/users`, userRouter);
     app.use(`${API_PREFIX}/items`, itemRouter);
@@ -582,6 +588,7 @@ const mainRoutes = (app) => {
     app.use(`${API_PREFIX}/office-items`, officeItemRouter);
     app.use(`${API_PREFIX}/office-members`, officeMemberRouter);
     app.use(`${API_PREFIX}/uploads`, cloudUploadRouter);
+    app.use(`${API_PREFIX}/invites`, officeInvitationRouter);
 };
 exports.mainRoutes = mainRoutes;
 
@@ -651,8 +658,17 @@ const mailQueue = {
         }
     }
 };
+const officeInvitationQueue = {
+    queueName: 'office_invitation',
+    options: {
+        redis: {
+            host: 'localhost',
+            port: 6379
+        }
+    }
+};
 const createMessageQueues = () => __awaiter(void 0, void 0, void 0, function* () {
-    (0, queue_1.createQueues)([mailQueue]);
+    (0, queue_1.createQueues)([mailQueue, officeInvitationQueue]);
 });
 exports.createMessageQueues = createMessageQueues;
 
@@ -773,7 +789,7 @@ const client = (0, redis_1.createClient)();
 client.connect();
 client.on('connect', () => console.log('Redis for rate limiting is connected'));
 client.on('error', err => console.log('Redis for rate limiting error: ', err));
-const rateLimiting = ({ timeMs, maxPerIp }) => {
+const rateLimiting = ({ timeMs, maxPerIp, errMessage }) => {
     client.flushAll();
     return (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const ip = req.connection.remoteAddress ||
@@ -783,7 +799,7 @@ const rateLimiting = ({ timeMs, maxPerIp }) => {
         if (nRequest === 1)
             yield expireNumberRequestOfIp(ip, timeMs);
         if (nRequest > maxPerIp) {
-            return next(new appError_1.TooManyRequestError(rateLimit_error_1.RateLimitErrorMessages.RATE_LIMIT_EXCEEDED));
+            return next(new appError_1.TooManyRequestError(errMessage || rateLimit_error_1.RateLimitErrorMessages.RATE_LIMIT_EXCEEDED));
         }
         next();
     });
@@ -2833,7 +2849,7 @@ exports.ItemService = ItemService;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.cloudLogger = exports.officeItemLogger = exports.mailLogger = exports.messageService = exports.authLogger = exports.userLogger = exports.serverLogger = void 0;
+exports.officeInvitationLogger = exports.cloudLogger = exports.officeItemLogger = exports.mailLogger = exports.messageService = exports.authLogger = exports.userLogger = exports.serverLogger = void 0;
 const winston_1 = __webpack_require__(7773);
 const debugFormat = winston_1.format.combine(winston_1.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), winston_1.format.align(), winston_1.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`));
 const defaultFormat = winston_1.format.combine(winston_1.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), winston_1.format.json());
@@ -2891,6 +2907,13 @@ exports.officeItemLogger = (0, winston_1.createLogger)({
 });
 exports.cloudLogger = (0, winston_1.createLogger)({
     defaultMeta: { service: 'cloud-service' },
+    transports: [
+        new winston_1.transports.File(commonOptions),
+        new winston_1.transports.Console(debugOptions)
+    ]
+});
+exports.officeInvitationLogger = (0, winston_1.createLogger)({
+    defaultMeta: { service: 'office-invitation-service' },
     transports: [
         new winston_1.transports.File(commonOptions),
         new winston_1.transports.Console(debugOptions)
@@ -3046,6 +3069,694 @@ exports.MailService = MailService;
 
 /***/ }),
 
+/***/ 1421:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreatePrivateInvitationDto = void 0;
+const class_transformer_1 = __webpack_require__(136);
+const class_validator_1 = __webpack_require__(5849);
+class CreatePrivateInvitationDto {
+}
+__decorate([
+    (0, class_validator_1.IsDefined)(),
+    (0, class_validator_1.IsEmail)({ message: 'Invited email is not valid' }),
+    (0, class_transformer_1.Expose)(),
+    __metadata("design:type", String)
+], CreatePrivateInvitationDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsDefined)({ message: 'Office id must be specified' }),
+    (0, class_transformer_1.Expose)(),
+    __metadata("design:type", Number)
+], CreatePrivateInvitationDto.prototype, "officeId", void 0);
+exports.CreatePrivateInvitationDto = CreatePrivateInvitationDto;
+
+
+/***/ }),
+
+/***/ 5845:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationMailQueueProducer = void 0;
+const OfficeInvitationMailQueueProducer = (queue) => {
+    const addPrivateOfficeInviteJob = (invitation, clientUrl) => {
+        queue.add('invitation', { invitation, clientUrl });
+    };
+    return { addPrivateOfficeInviteJob };
+};
+exports.OfficeInvitationMailQueueProducer = OfficeInvitationMailQueueProducer;
+
+
+/***/ }),
+
+/***/ 9271:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationMailWorker = void 0;
+const path_1 = __importDefault(__webpack_require__(1017));
+const OfficeInvitationMailWorker = (queue, mailService, logger) => {
+    const load = () => {
+        loadPrivateOfficeInviteJob();
+    };
+    function loadPrivateOfficeInviteJob() {
+        queue.process('invitation', 10, (job) => __awaiter(this, void 0, void 0, function* () {
+            const officeInvitation = job.data.invitation;
+            const clientUrl = job.data.clientUrl;
+            if (!officeInvitation) {
+                const err = 'Office invitation is not defined';
+                logger.error(err);
+                throw new Error(err);
+            }
+            logger.info(`Start sending office invitation to ${officeInvitation.invitedEmail}`);
+            const result = yield mailService.sendMail({
+                from: 'ViSpace <noreply@authentication.vispace.tech>',
+                to: officeInvitation.invitedEmail,
+                subject: 'You have been invited to join a ViSpace office',
+                templateUrl: path_1.default.resolve('src/components/mailTemplates/privateInvitation.html'),
+                context: {
+                    invitationUrl: `${clientUrl}/invites/token/${officeInvitation.token}`
+                }
+            });
+            logger.info(`Invitation link has sent to ${officeInvitation.invitedEmail} successfully`);
+        }));
+    }
+    return { load };
+};
+exports.OfficeInvitationMailWorker = OfficeInvitationMailWorker;
+
+
+/***/ }),
+
+/***/ 5284:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationRouter = void 0;
+const express_1 = __webpack_require__(6860);
+const rateLimit_1 = __webpack_require__(4420);
+const auth_factory_1 = __webpack_require__(6901);
+const officeInvitation_factory_1 = __webpack_require__(9022);
+const OfficeInvitationRouter = () => {
+    const router = (0, express_1.Router)();
+    const authMiddleware = (0, auth_factory_1.createAuthMiddleware)();
+    const officeController = (0, officeInvitation_factory_1.createOfficeInvitationController)();
+    router.use(authMiddleware.protect);
+    router.post('/token/:inviteToken/join', officeController.joinWithPrivateInvitation);
+    router.get('/token/:inviteToken', officeController.getPrivateInvitation);
+    router.post('/:inviteCode/join', officeController.joinWithPublicInvitation);
+    router.get('/:inviteCode', officeController.getPublicInvitation);
+    router
+        .use((0, rateLimit_1.rateLimiting)({ maxPerIp: 5, timeMs: 1000 }))
+        .post('/', officeController.createOfficeInvitationByEmail);
+    return router;
+};
+exports.OfficeInvitationRouter = OfficeInvitationRouter;
+
+
+/***/ }),
+
+/***/ 1966:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationController = void 0;
+const config_1 = __importDefault(__webpack_require__(2275));
+const httpStatusCode_1 = __webpack_require__(7500);
+const appError_1 = __webpack_require__(2720);
+const catchAsyncRequestHandler_1 = __webpack_require__(3015);
+const requestValidation_1 = __webpack_require__(5718);
+const CreatePrivateInvitation_dto_1 = __webpack_require__(1421);
+const OfficeInvitationController = (officeInvitationService, officeInvitationMailQueueProducer) => {
+    const createOfficeInvitationByEmail = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const errors = yield (0, requestValidation_1.validateRequestBody)(CreatePrivateInvitation_dto_1.CreatePrivateInvitationDto, req.body);
+        if (errors.length > 0)
+            throw new appError_1.IllegalArgumentError('Invalid invitation data', errors);
+        const createInvitationDto = req.body;
+        const officeInvitation = yield officeInvitationService.createPrivateInvitation(Object.assign(Object.assign({}, createInvitationDto), { inviterId: req.user.id }));
+        const clientUrl = config_1.default.app.CLIENT_DOMAIN;
+        officeInvitationMailQueueProducer.addPrivateOfficeInviteJob(officeInvitation, clientUrl);
+        res.status(httpStatusCode_1.HttpStatusCode.CREATED).json({
+            message: 'Invitation has been sent'
+        });
+    }));
+    const getPrivateInvitation = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const token = req.params.inviteToken;
+        const invitation = yield officeInvitationService.findPrivateInvitation(req.user.id, token);
+        res.status(httpStatusCode_1.HttpStatusCode.OK).json({ data: { invitation } });
+    }));
+    const getPublicInvitation = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const officeInviteCode = req.params.inviteCode;
+        const invitation = yield officeInvitationService.findPublicInvitation(req.user.id, officeInviteCode);
+        res.status(httpStatusCode_1.HttpStatusCode.OK).json({ data: { invitation } });
+    }));
+    const joinWithPrivateInvitation = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const token = req.params.inviteToken;
+        yield officeInvitationService.acceptPrivateInvitation(req.user.id, token);
+        res.status(httpStatusCode_1.HttpStatusCode.OK).json({ message: 'Joined' });
+    }));
+    const joinWithPublicInvitation = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const officeInviteCode = req.params.inviteCode;
+        yield officeInvitationService.acceptPublicInvitation(req.user.id, officeInviteCode);
+        res.status(httpStatusCode_1.HttpStatusCode.OK).json({ message: 'Joined' });
+    }));
+    const deleteInvitation = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () { }));
+    return {
+        createOfficeInvitationByEmail,
+        getPrivateInvitation,
+        getPublicInvitation,
+        joinWithPrivateInvitation,
+        joinWithPublicInvitation,
+        deleteInvitation
+    };
+};
+exports.OfficeInvitationController = OfficeInvitationController;
+
+
+/***/ }),
+
+/***/ 9115:
+/***/ (function(__unused_webpack_module, exports) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationCreator = void 0;
+const OfficeInvitationCreator = (officeInvitationRepository, officeRepository) => {
+    const createPrivateOfficeInvitationByToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
+        const officeInvitation = yield officeInvitationRepository
+            .createQueryBuilder('office_invitation')
+            .where('office_invitation.token = :token', { token })
+            .leftJoinAndSelect('office_invitation.office', 'office')
+            .leftJoinAndSelect('office_invitation.createdBy', 'user')
+            .getOne();
+        const { office, createdBy, invitedEmail } = officeInvitation;
+        return {
+            id: officeInvitation.id,
+            inviter: {
+                id: createdBy.id,
+                email: createdBy.email,
+                name: createdBy.name
+            },
+            invitedEmail,
+            token: officeInvitation.token,
+            office: {
+                id: office.id,
+                name: office.name,
+                invitationCode: office.invitationCode,
+                createdAt: office.createdAt
+            }
+        };
+    });
+    const createPublicOfficeInvitation = (invitationCode) => __awaiter(void 0, void 0, void 0, function* () {
+        const office = yield officeRepository
+            .queryBuilder()
+            .findByInvitationCode(invitationCode)
+            .build()
+            .getOne();
+        const { id, createdAt, name } = office;
+        return {
+            office: {
+                id,
+                invitationCode,
+                name,
+                createdAt
+            }
+        };
+    });
+    return {
+        createPrivateOfficeInvitationByToken,
+        createPublicOfficeInvitation
+    };
+};
+exports.OfficeInvitationCreator = OfficeInvitationCreator;
+
+
+/***/ }),
+
+/***/ 9916:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitation = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const BaseEntity_1 = __webpack_require__(777);
+const user_entity_1 = __webpack_require__(4614);
+const office_entity_1 = __webpack_require__(4843);
+let OfficeInvitation = class OfficeInvitation extends BaseEntity_1.BaseEntity {
+};
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], OfficeInvitation.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ unique: true }),
+    (0, typeorm_1.Index)(),
+    __metadata("design:type", String)
+], OfficeInvitation.prototype, "token", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'office_id' }),
+    __metadata("design:type", Number)
+], OfficeInvitation.prototype, "officeId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'created_by_user_id' }),
+    __metadata("design:type", Number)
+], OfficeInvitation.prototype, "createdByUserId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'invited_email' }),
+    __metadata("design:type", String)
+], OfficeInvitation.prototype, "invitedEmail", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'expired_at' }),
+    __metadata("design:type", Date)
+], OfficeInvitation.prototype, "expiredAt", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
+    (0, typeorm_1.JoinColumn)({ name: 'created_by_user_id' }),
+    __metadata("design:type", user_entity_1.User)
+], OfficeInvitation.prototype, "createdBy", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => office_entity_1.Office, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.JoinColumn)({ name: 'office_id' }),
+    __metadata("design:type", office_entity_1.Office)
+], OfficeInvitation.prototype, "office", void 0);
+OfficeInvitation = __decorate([
+    (0, typeorm_1.Entity)({ name: 'office_invitation' })
+], OfficeInvitation);
+exports.OfficeInvitation = OfficeInvitation;
+
+
+/***/ }),
+
+/***/ 7418:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationErrorMessages = void 0;
+exports.OfficeInvitationErrorMessages = {
+    INVITATION_NOT_FOUND: 'Office invitation not found',
+    INVITATION_EXPIRED: 'Office invitation expired',
+    ALREADY_USED: 'Office invitation already used',
+    INVALID_INVITATION_TOKEN: 'Office invitation token invalid',
+    INVALID_INVITED_EMAIL: 'Invitation token is not valid for this user',
+    INVALID_INVITER: 'Inviter is not valid',
+    ALREADY_INVITED: 'User is already a member in office',
+    INVITER_NOT_IN_OFFICE: 'User is not a member of office'
+};
+
+
+/***/ }),
+
+/***/ 9022:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createOfficeInvitationRepository = exports.createOfficeInvitationTokenGenerator = exports.createOfficeInvitationValidate = exports.createOfficeInvitationCreator = exports.createOfficeInvitationMailWorker = exports.createOfficeInvitationMailProducer = exports.createOfficeInvitationService = exports.createOfficeInvitationController = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const queue_1 = __webpack_require__(247);
+const logger_1 = __webpack_require__(7767);
+const mail_factory_1 = __webpack_require__(1876);
+const officeInvitationTokenGenerator_1 = __webpack_require__(1522);
+const officeMember_factory_1 = __webpack_require__(4491);
+const officeRole_factory_1 = __webpack_require__(9842);
+const office_factory_1 = __webpack_require__(4903);
+const user_factory_1 = __webpack_require__(6586);
+const mail_producer_1 = __webpack_require__(5845);
+const mail_worker_1 = __webpack_require__(9271);
+const officeInvitation_controller_1 = __webpack_require__(1966);
+const officeInvitation_creator_1 = __webpack_require__(9115);
+const officeInvitation_repository_1 = __webpack_require__(6145);
+const officeInvitation_service_1 = __webpack_require__(5272);
+const officeInvitation_validate_1 = __webpack_require__(6766);
+function createOfficeInvitationController() {
+    const service = createOfficeInvitationService();
+    const mailProducer = createOfficeInvitationMailProducer();
+    return (0, officeInvitation_controller_1.OfficeInvitationController)(service, mailProducer);
+}
+exports.createOfficeInvitationController = createOfficeInvitationController;
+function createOfficeInvitationService() {
+    const officeInvitationRepository = createOfficeInvitationRepository();
+    const officeRepository = (0, office_factory_1.createOfficeRepository)();
+    const officeInvitationValidate = createOfficeInvitationValidate();
+    const officeMemberRepository = (0, officeMember_factory_1.createOfficeMemberRepository)();
+    const officeRoleRepository = (0, officeRole_factory_1.createOfficeRoleRepository)();
+    const officeInvitationCreator = createOfficeInvitationCreator();
+    const officeInvitationTokenGenerator = createOfficeInvitationTokenGenerator();
+    return (0, officeInvitation_service_1.OfficeInvitationService)({
+        officeInvitationCreator,
+        officeRepository,
+        officeInvitationRepository,
+        officeInvitationTokenGenerator,
+        officeInvitationValidate,
+        officeMemberRepository,
+        officeRoleRepository
+    });
+}
+exports.createOfficeInvitationService = createOfficeInvitationService;
+function createOfficeInvitationMailProducer() {
+    const queue = (0, queue_1.getQueue)('office_invitation');
+    return (0, mail_producer_1.OfficeInvitationMailQueueProducer)(queue);
+}
+exports.createOfficeInvitationMailProducer = createOfficeInvitationMailProducer;
+function createOfficeInvitationMailWorker() {
+    const queue = (0, queue_1.getQueue)('office_invitation');
+    const mailService = (0, mail_factory_1.createMailService)();
+    return (0, mail_worker_1.OfficeInvitationMailWorker)(queue, mailService, logger_1.officeInvitationLogger);
+}
+exports.createOfficeInvitationMailWorker = createOfficeInvitationMailWorker;
+function createOfficeInvitationCreator() {
+    const officeInvitationRepository = createOfficeInvitationRepository();
+    const officeRepository = (0, office_factory_1.createOfficeRepository)();
+    return (0, officeInvitation_creator_1.OfficeInvitationCreator)(officeInvitationRepository, officeRepository);
+}
+exports.createOfficeInvitationCreator = createOfficeInvitationCreator;
+function createOfficeInvitationValidate() {
+    const officeInvitationRepository = createOfficeInvitationRepository();
+    const officeMemberRepository = (0, officeMember_factory_1.createOfficeMemberRepository)();
+    const officeRepository = (0, office_factory_1.createOfficeRepository)();
+    const userRepository = (0, user_factory_1.createUserRepository)();
+    return (0, officeInvitation_validate_1.OfficeInvitationValidate)({
+        officeInvitationRepository,
+        officeRepository,
+        officeMemberRepository,
+        userRepository
+    });
+}
+exports.createOfficeInvitationValidate = createOfficeInvitationValidate;
+function createOfficeInvitationTokenGenerator() {
+    return (0, officeInvitationTokenGenerator_1.OfficeInvitationTokenGenerator)();
+}
+exports.createOfficeInvitationTokenGenerator = createOfficeInvitationTokenGenerator;
+function createOfficeInvitationRepository() {
+    return (0, typeorm_1.getCustomRepository)(officeInvitation_repository_1.OfficeInvitationRepository);
+}
+exports.createOfficeInvitationRepository = createOfficeInvitationRepository;
+
+
+/***/ }),
+
+/***/ 1868:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.loadInvitationBackgroundJobs = void 0;
+const officeInvitation_factory_1 = __webpack_require__(9022);
+const loadInvitationBackgroundJobs = () => {
+    const officeInvitationMailWorker = (0, officeInvitation_factory_1.createOfficeInvitationMailWorker)();
+    officeInvitationMailWorker.load();
+};
+exports.loadInvitationBackgroundJobs = loadInvitationBackgroundJobs;
+
+
+/***/ }),
+
+/***/ 6145:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationRepository = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const BaseRepository_1 = __webpack_require__(7325);
+const officeInvitation_entity_1 = __webpack_require__(9916);
+let OfficeInvitationRepository = class OfficeInvitationRepository extends BaseRepository_1.BaseRepository {
+    existsOfficeInvitationToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const count = yield this.createQueryBuilder('office_invitation')
+                .where('office_invitation.token = :token', { token })
+                .getCount();
+            return count === 1;
+        });
+    }
+    findByInvitationToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.createQueryBuilder('office_invitation')
+                .where('office_invitation.token = :token', { token })
+                .getOne();
+        });
+    }
+    findOfficeInvitationByInvitedEmailAndInvitationToken(invitedEmail, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.createQueryBuilder('office_invitation')
+                .where('office_invitation.token = :token', { token: token })
+                .andWhere('office_invitation.invited_email = :invitedEmail', {
+                invitedEmail: invitedEmail
+            })
+                .getOne();
+        });
+    }
+};
+OfficeInvitationRepository = __decorate([
+    (0, typeorm_1.EntityRepository)(officeInvitation_entity_1.OfficeInvitation)
+], OfficeInvitationRepository);
+exports.OfficeInvitationRepository = OfficeInvitationRepository;
+
+
+/***/ }),
+
+/***/ 5272:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationService = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const OfficeRoleType_1 = __webpack_require__(1548);
+const officeInvitation_entity_1 = __webpack_require__(9916);
+const OfficeInvitationService = ({ officeInvitationRepository, officeRepository, officeMemberRepository, officeRoleRepository, officeInvitationCreator, officeInvitationValidate, officeInvitationTokenGenerator }) => {
+    const createPrivateInvitation = (createInvitationDto) => __awaiter(void 0, void 0, void 0, function* () {
+        yield officeInvitationValidate.checkCreatePrivateInvitation(createInvitationDto);
+        const { inviterId, email, officeId } = createInvitationDto;
+        const token = officeInvitationTokenGenerator.generate();
+        yield officeInvitationRepository.save({
+            createdByUserId: inviterId,
+            officeId,
+            invitedEmail: email,
+            token,
+            expiredAt: new Date(Date.now() + 30 * 60 * 1000)
+        });
+        return officeInvitationCreator.createPrivateOfficeInvitationByToken(token);
+    });
+    const findPrivateInvitation = (userId, token) => __awaiter(void 0, void 0, void 0, function* () {
+        yield officeInvitationValidate.checkUserCanJoinByPrivateInvitation(userId, token);
+        const officeInvitation = yield officeInvitationCreator.createPrivateOfficeInvitationByToken(token);
+        return officeInvitation;
+    });
+    const findPublicInvitation = (userId, inviteCode) => __awaiter(void 0, void 0, void 0, function* () {
+        yield officeInvitationValidate.checkUserCanJoinByPublicInvitation(userId, inviteCode);
+        const officeInvitation = yield officeInvitationCreator.createPublicOfficeInvitation(inviteCode);
+        return officeInvitation;
+    });
+    const acceptPrivateInvitation = (userId, inviteToken) => __awaiter(void 0, void 0, void 0, function* () {
+        yield officeInvitationValidate.checkUserCanJoinByPrivateInvitation(userId, inviteToken);
+        const officeInvitation = yield officeInvitationRepository.findByInvitationToken(inviteToken);
+        const memberRole = yield officeRoleRepository.findOfficeRoleByName(OfficeRoleType_1.OfficeRoleType.MEMBER);
+        (0, typeorm_1.getManager)().transaction((transactionManager) => __awaiter(void 0, void 0, void 0, function* () {
+            const officeMember = officeMemberRepository.create({
+                officeId: officeInvitation.officeId,
+                memberId: userId,
+                roles: [{ officeRoleId: memberRole.id }],
+                transform: {}
+            });
+            yield transactionManager.save(officeMember);
+            yield transactionManager.remove(officeInvitation_entity_1.OfficeInvitation, officeInvitation);
+        }));
+    });
+    const acceptPublicInvitation = (userId, inviteCode) => __awaiter(void 0, void 0, void 0, function* () {
+        yield officeInvitationValidate.checkUserCanJoinByPublicInvitation(userId, inviteCode);
+        const office = yield officeRepository
+            .queryBuilder()
+            .findByInvitationCode(inviteCode)
+            .build()
+            .getOne();
+        const memberRole = yield officeRoleRepository.findOfficeRoleByName(OfficeRoleType_1.OfficeRoleType.MEMBER);
+        yield officeMemberRepository.save({
+            officeId: office.id,
+            memberId: userId,
+            transform: {},
+            roles: [{ officeRoleId: memberRole.id }]
+        });
+    });
+    const deleteInvitation = (inviteToken) => __awaiter(void 0, void 0, void 0, function* () { });
+    return {
+        createPrivateInvitation,
+        findPrivateInvitation,
+        findPublicInvitation,
+        acceptPrivateInvitation,
+        acceptPublicInvitation,
+        deleteInvitation
+    };
+};
+exports.OfficeInvitationService = OfficeInvitationService;
+
+
+/***/ }),
+
+/***/ 6766:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationValidate = void 0;
+const appError_1 = __webpack_require__(2720);
+const officeInvitation_error_1 = __webpack_require__(7418);
+const OfficeInvitationValidate = ({ officeInvitationRepository, officeRepository, officeMemberRepository, userRepository }) => {
+    const checkCreatePrivateInvitation = (invitationDto) => __awaiter(void 0, void 0, void 0, function* () {
+        const { email, inviterId, officeId } = invitationDto;
+        yield checkInviterInOffice(inviterId, officeId);
+        yield checkUserIsNotMemberByEmail(email, officeId);
+    });
+    const checkUserCanJoinByPrivateInvitation = (userId, token) => __awaiter(void 0, void 0, void 0, function* () {
+        const user = yield userRepository.findById(userId);
+        if (!user) {
+            throw new appError_1.NotFoundError('User not found');
+        }
+        const officeInvitation = yield officeInvitationRepository.findOfficeInvitationByInvitedEmailAndInvitationToken(user.email, token);
+        if (!officeInvitation) {
+            throw new appError_1.NotFoundError(officeInvitation_error_1.OfficeInvitationErrorMessages.INVITATION_NOT_FOUND);
+        }
+        if (officeInvitation.expiredAt.getTime() < Date.now()) {
+            throw new appError_1.IllegalArgumentError(officeInvitation_error_1.OfficeInvitationErrorMessages.INVITATION_EXPIRED);
+        }
+        yield checkUserIsNotMember(userId, officeInvitation.officeId);
+    });
+    const checkUserCanJoinByPublicInvitation = (userId, inviteCode) => __awaiter(void 0, void 0, void 0, function* () {
+        const office = yield officeRepository
+            .queryBuilder()
+            .findByInvitationCode(inviteCode)
+            .build()
+            .getOne();
+        if (!office)
+            throw new appError_1.NotFoundError(officeInvitation_error_1.OfficeInvitationErrorMessages.INVITATION_NOT_FOUND);
+        yield checkUserIsNotMember(userId, office.id);
+    });
+    function checkUserIsNotMember(userId, officeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userExists = yield officeMemberRepository.existsUserInOffice(userId, officeId);
+            if (userExists) {
+                throw new appError_1.IllegalArgumentError(officeInvitation_error_1.OfficeInvitationErrorMessages.ALREADY_INVITED);
+            }
+        });
+    }
+    function checkUserIsNotMemberByEmail(userEmail, officeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const officeMember = yield officeMemberRepository.existsUserEmailInOffice(userEmail, officeId);
+            if (officeMember) {
+                throw new appError_1.IllegalArgumentError(officeInvitation_error_1.OfficeInvitationErrorMessages.ALREADY_INVITED);
+            }
+        });
+    }
+    function checkInviterInOffice(inviterId, officeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const officeMemberExists = yield officeMemberRepository.existsUserInOffice(inviterId, officeId);
+            if (!officeMemberExists)
+                throw new appError_1.IllegalArgumentError(officeInvitation_error_1.OfficeInvitationErrorMessages.INVITER_NOT_IN_OFFICE);
+        });
+    }
+    return {
+        checkCreatePrivateInvitation,
+        checkUserCanJoinByPrivateInvitation,
+        checkUserCanJoinByPublicInvitation
+    };
+};
+exports.OfficeInvitationValidate = OfficeInvitationValidate;
+
+
+/***/ }),
+
 /***/ 8293:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -3059,6 +3770,24 @@ const generator = {
     }
 };
 exports["default"] = generator;
+
+
+/***/ }),
+
+/***/ 1522:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OfficeInvitationTokenGenerator = void 0;
+const uuid_1 = __webpack_require__(5828);
+const OfficeInvitationTokenGenerator = () => {
+    const generate = () => {
+        return (0, uuid_1.v4)();
+    };
+    return { generate };
+};
+exports.OfficeInvitationTokenGenerator = OfficeInvitationTokenGenerator;
 
 
 /***/ }),
@@ -4274,6 +5003,16 @@ let OfficeMemberRepository = class OfficeMemberRepository extends BaseRepository
             return count === 1;
         });
     }
+    existsUserEmailInOffice(email, officeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const count = yield this.createQueryBuilder('office_member')
+                .leftJoin('office_member.member', 'user')
+                .where('user.email = :email', { email })
+                .andWhere('office_member.office_id = :officeId', { officeId })
+                .getCount();
+            return count === 1;
+        });
+    }
     setOfficeMemberOnlineStatusById(id, status) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.createQueryBuilder('office_member')
@@ -4289,6 +5028,14 @@ let OfficeMemberRepository = class OfficeMemberRepository extends BaseRepository
                 .where('office_member.office_id = :officeId', { officeId })
                 .leftJoin('office_member.member', 'user')
                 .where('user.email = :email', { email })
+                .getOne();
+        });
+    }
+    findOfficeMemberByMemberIdAndOfficeId(memberId, officeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.createQueryBuilder('office_member')
+                .where('office_member.office_id = :officeId', { officeId })
+                .andWhere('office_member.member_id = :memberId', { memberId })
                 .getOne();
         });
     }

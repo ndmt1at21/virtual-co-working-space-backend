@@ -4,6 +4,7 @@ import {
 	Entity,
 	JoinColumn,
 	ManyToOne,
+	OneToMany,
 	OneToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
@@ -21,7 +22,7 @@ export class ConversationMember extends BaseEntity {
 	@Column({ name: 'member_id' })
 	memberId: number;
 
-	@OneToOne(() => Conversation)
+	@ManyToOne(() => Conversation)
 	@JoinColumn({ name: 'conversation_id' })
 	conversation: Conversation;
 

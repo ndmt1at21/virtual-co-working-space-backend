@@ -2,18 +2,26 @@ import { getCustomRepository } from 'typeorm';
 import { ItemCreator } from './item.creator';
 import { ItemRepository } from './item.repository';
 import { ItemService } from './item.service';
-
-export function createItemRepository() {
-	return getCustomRepository(ItemRepository);
-}
+import { ItemValidate } from './item.validate';
 
 export function createItemService() {
 	const itemRepository = createItemRepository();
 	const itemCreator = createItemCreator();
-	const service = ItemService(itemRepository, itemCreator);
-	return service;
+	const itemValidate = createItemValidate();
+
+	return ItemService(itemRepository, itemCreator, itemValidate);
+}
+
+export function createItemValidate() {
+	const itemRepository = createItemRepository();
+	return ItemValidate(itemRepository);
 }
 
 export function createItemCreator() {
-	return ItemCreator();
+	const itemRepository = createItemRepository();
+	return ItemCreator(itemRepository);
+}
+
+export function createItemRepository() {
+	return getCustomRepository(ItemRepository);
 }

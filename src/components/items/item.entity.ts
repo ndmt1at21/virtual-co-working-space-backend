@@ -10,6 +10,6 @@ export class Item extends BaseEntity {
 	@Index({})
 	name: string;
 
-	@Column({ unique: true, name: 'model_path' })
+	@Column({ name: 'model_path' })
 	modelPath: string;
 }

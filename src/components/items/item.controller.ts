@@ -1,40 +1,98 @@
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
-import { pageParser } from '@src/utils/pageParser';
+import { PaginateQueryParser } from '@src/utils/paginateQueryParser';
 import { validateRequestBody } from '@src/utils/requestValidation';
 import { CreateItemDto } from './@types/dto/CreateItem.dto';
+import {
+	FindItemFilter,
+	FindItemOptions,
+	FindItemSort
+} from './@types/FindAllItemsOptions';
 import { IItemService } from './@types/IItemService';
 
 export const ItemController = (itemService: IItemService) => {
-	const getAll = catchAsyncRequestHandler(async (req, res, next) => {
-		const pageable = pageParser(req.query, {
-			defaultPage: 1,
-			defaultSize: 10
+	const getById = catchAsyncRequestHandler(async (req, res, next) => {
+		const item = await itemService.findItemById(+req.params.id);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { item }
 		});
-
-		const items = await itemService.findAll(pageable);
-
-		res.status(HttpStatusCode.OK).json(items);
 	});
 
-	const getById = catchAsyncRequestHandler(async (req, res, next) => {
-		const item = await itemService.findById(+req.params.id);
-		res.status(HttpStatusCode.OK).json(item);
+	const getAll = catchAsyncRequestHandler(async (req, res, next) => {
+		const findAllOptions = extractQueryFindAllOptions(req.query);
+		const items = await itemService.findAllItems(findAllOptions);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { items }
+		});
 	});
 
 	const create = catchAsyncRequestHandler(async (req, res, next) => {
-		const err = await validateRequestBody(CreateItemDto, req.body);
-		if (err) throw err;
+		const errs = await validateRequestBody(CreateItemDto, req.body);
+		if (errs.length > 0) throw errs;
 
 		const createItemDto = req.body as CreateItemDto;
-		const item = await itemService.create(createItemDto);
+		const item = await itemService.createItem(createItemDto);
 
-		res.status(HttpStatusCode.CREATED).json(item);
+		res.status(HttpStatusCode.CREATED).json({
+			code: HttpStatusCode.CREATED,
+			data: { item }
+		});
 	});
 
-	const deleteById = catchAsyncRequestHandler(async (req, res, next) => {});
+	const updateById = catchAsyncRequestHandler(async (req, res, next) => {
+		const errs = await validateRequestBody(CreateItemDto, req.body);
+		if (errs.length > 0) throw errs;
 
-	const updateById = catchAsyncRequestHandler(async (req, res, next) => {});
+		const updateItemDto = req.body as CreateItemDto;
+		const item = await itemService.updateItemById(
+			+req.params.id,
+			updateItemDto
+		);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { item }
+		});
+	});
+
+	const deleteById = catchAsyncRequestHandler(async (req, res, next) => {
+		await itemService.deleteItemById(+req.params.id);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK
+		});
+	});
+
+	function extractQueryFindAllOptions(originalQuery: any): FindItemOptions {
+		const query = PaginateQueryParser.parse(originalQuery, {
+			filter: { includes: ['name', 'path'] }
+		});
+
+		const filter: FindItemFilter = {};
+		const sort: FindItemSort = {};
+
+		if (query.filter) {
+			filter.name = query.filter.name;
+			filter.path = query.filter.path;
+		}
+
+		if (query.sort) {
+			sort.name = query.sort?.name?.order;
+			sort.path = query.sort?.path?.order;
+			sort.createdAt = query.sort?.created_at?.order;
+			sort.updatedAt = query.sort?.updated_at?.order;
+		}
+
+		return {
+			filter,
+			sort,
+			pageable: query.pageable
+		};
+	}
 
 	return { getAll, getById, create, deleteById, updateById };
 };

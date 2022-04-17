@@ -1,7 +1,6 @@
-import { Pageable } from '@src/@types/Pageable';
 import { SelectQueryBuilder } from 'typeorm';
+import { Pageable } from '../base/@types/FindAllOptions';
 import { RepositoryQueryBuilder } from '../base/RepositoryQueryBuilder';
-import { User } from '../users/user.entity';
 import { OfficeMember } from './officeMember.entity';
 import { OfficeMemberRepository } from './officeMember.repository';
 

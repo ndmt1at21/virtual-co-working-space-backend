@@ -5,9 +5,11 @@ import {
 	JoinColumn,
 	ManyToOne,
 	OneToMany,
+	OneToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { BaseEntity } from '../base/BaseEntity';
+import { Conversation } from '../conversations/conversation.entity';
 import { OfficeItem } from '../officeItems/officeItem.entity';
 import { OfficeMember } from '../officeMembers/officeMember.entity';
 import { User } from '../users/user.entity';
@@ -37,6 +39,10 @@ export class Office extends BaseEntity {
 		cascade: true
 	})
 	officeMembers: OfficeMember[];
+
+	@OneToOne(() => Conversation)
+	@JoinColumn({ name: 'conversation_id' })
+	conversation: Conversation;
 
 	@ManyToOne(() => User)
 	@JoinColumn({ name: 'created_by_user_id' })

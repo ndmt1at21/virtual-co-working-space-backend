@@ -1,5 +1,4 @@
-import { Pageable } from '@src/@types/Pageable';
-import { IOfficeInvitationCodeGenerator } from './components/officeInvitationCodeGenerator/@types/IOfficeInvitationCodeGenerator';
+import { Pageable } from '../base/@types/FindAllOptions';
 import { mapOfficeItemToOfficeItemOverviewDto } from '../officeItems/officeItem.mapping';
 import { OfficeItemRepository } from '../officeItems/officeItem.repository';
 import { IOfficeMemberCreator } from '../officeMembers/@types/IOfficeMemberCreator';
@@ -15,6 +14,7 @@ import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
 import { IOfficeCreator } from './@types/IOfficeCreator';
 import { IOfficeService } from './@types/IOfficeService';
 import { IOfficeValidate } from './@types/IOfficeValidate';
+import { IOfficeInvitationCodeGenerator } from './components/officeInvitationCodeGenerator/@types/IOfficeInvitationCodeGenerator';
 import { OfficeRepository } from './office.repository';
 
 export const OfficeService = (

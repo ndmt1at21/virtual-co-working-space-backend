@@ -1,11 +1,11 @@
-import { Pageable } from '@src/@types/Pageable';
 import { CreateItemDto } from './dto/CreateItem.dto';
 import { ItemDto } from './dto/Item.dto';
+import { FindItemOptions } from './FindAllItemsOptions';
 
 export interface IItemService {
-	findAll(pageable: Pageable): Promise<ItemDto[]>;
-	findById(id: number): Promise<ItemDto>;
-	create(item: CreateItemDto): Promise<ItemDto>;
-	updateById(id: number, item: CreateItemDto): Promise<ItemDto>;
-	deleteById(id: number): Promise<void>;
+	findAllItems(options: FindItemOptions): Promise<ItemDto[]>;
+	findItemById(id: number): Promise<ItemDto>;
+	createItem(item: CreateItemDto): Promise<ItemDto>;
+	updateItemById(id: number, item: CreateItemDto): Promise<ItemDto>;
+	deleteItemById(id: number): Promise<void>;
 }

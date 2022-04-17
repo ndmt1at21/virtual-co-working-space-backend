@@ -12,6 +12,7 @@ import { UserStatus } from './@types/UserStatus';
 import { UpdatePasswordDto } from './@types/dto/UpdatePassword.dto';
 import { IPasswordEncoder } from './components/passwordEncoder/@types/IPasswordEncoder';
 import { FindAllUsersOptions } from './@types/filter/FindAllUsersOptions';
+import { PaginationInfo } from '../base/@types/PaginationInfo';
 
 export const UserService = (
 	userRepository: UserRepository,
@@ -68,13 +69,13 @@ export const UserService = (
 
 	const findAllUsers = async (
 		options: FindAllUsersOptions
-	): Promise<UserDto[]> => {
-		const users = await userRepository.findAllUsers(options);
+	): Promise<[UserDto[], PaginationInfo]> => {
+		const [users, pageInfo] = await userRepository.findAllUsers(options);
 		const usersDto = users.map(user =>
 			userCreator.userEntityToUserDto(user)
 		);
 
-		return usersDto;
+		return [usersDto, pageInfo];
 	};
 
 	const updateUserById = async (

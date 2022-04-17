@@ -22,11 +22,13 @@ export const ItemController = (itemService: IItemService) => {
 
 	const getAll = catchAsyncRequestHandler(async (req, res, next) => {
 		const findAllOptions = extractQueryFindAllOptions(req.query);
-		const items = await itemService.findAllItems(findAllOptions);
+		const [items, pagination] = await itemService.findAllItems(
+			findAllOptions
+		);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			data: { items }
+			data: { items, pagination }
 		});
 	});
 

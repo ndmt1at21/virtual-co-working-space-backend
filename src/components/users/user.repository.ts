@@ -4,6 +4,7 @@ import { BaseRepository } from '@src/components/base/BaseRepository';
 import { UserLoginProvider } from '../UserLoginProvider';
 import { FindAllOptions } from '../base/@types/FindAllOptions';
 import { FindAllUsersOptions } from './@types/filter/FindAllUsersOptions';
+import { PaginationInfo } from '../base/@types/PaginationInfo';
 
 @EntityRepository(User)
 export class UserRepository extends BaseRepository<User> {
@@ -56,7 +57,9 @@ export class UserRepository extends BaseRepository<User> {
 		);
 	}
 
-	async findAllUsers(options: FindAllUsersOptions): Promise<User[]> {
+	async findAllUsers(
+		options: FindAllUsersOptions
+	): Promise<[User[], PaginationInfo]> {
 		const optionsWithDbFields =
 			this.mapFindAllItemsOptionsToDatabaseField(options);
 

@@ -1,3 +1,4 @@
+import { PaginationInfo } from '@src/components/base/@types/PaginationInfo';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { CreateUserExternalDto } from './dto/CreateUserExternal.dto';
 import { UpdatePasswordDto } from './dto/UpdatePassword.dto';
@@ -16,7 +17,9 @@ export interface IUserService {
 
 	findUserByEmail: (email: string) => Promise<UserDto>;
 
-	findAllUsers: (options: FindAllUsersOptions) => Promise<UserDto[]>;
+	findAllUsers: (
+		options: FindAllUsersOptions
+	) => Promise<[UserDto[], PaginationInfo]>;
 
 	updateUserById: (id: number, payload: UpdateUserDto) => Promise<UserDto>;
 

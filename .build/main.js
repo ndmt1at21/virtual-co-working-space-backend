@@ -2612,7 +2612,15 @@ class BaseRepository extends typeorm_1.Repository {
                 const { limit = 100, page = 1 } = paginate;
                 query.take(limit).skip((page - 1) * limit);
             }
-            return query.getMany();
+            const [items, totalCount] = yield query.getManyAndCount();
+            return [
+                items,
+                {
+                    count: items.length,
+                    page: (paginate === null || paginate === void 0 ? void 0 : paginate.page) || 1,
+                    totalCount
+                }
+            ];
         });
     }
 }
@@ -3221,10 +3229,10 @@ const ItemController = (itemService) => {
     }));
     const getAll = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const findAllOptions = extractQueryFindAllOptions(req.query);
-        const items = yield itemService.findAllItems(findAllOptions);
+        const [items, pagination] = yield itemService.findAllItems(findAllOptions);
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
             code: httpStatusCode_1.HttpStatusCode.OK,
-            data: { items }
+            data: { items, pagination }
         });
     }));
     const create = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -3501,9 +3509,9 @@ exports.ItemService = void 0;
 const item_mapping_1 = __webpack_require__(5767);
 const ItemService = (itemRepository, itemCreator, itemValidate) => {
     const findAllItems = (options) => __awaiter(void 0, void 0, void 0, function* () {
-        const items = yield itemRepository.findAllItems(options);
+        const [items, pagination] = yield itemRepository.findAllItems(options);
         const itemsDto = items.map(item => (0, item_mapping_1.mapItemToItemDto)(item));
-        return itemsDto;
+        return [itemsDto, pagination];
     });
     const findItemById = (id) => __awaiter(void 0, void 0, void 0, function* () {
         yield itemValidate.checkItemExists(id);
@@ -7399,11 +7407,12 @@ const UserController = (userService) => {
     }));
     const getUsers = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const query = extractQueryFindAllOptions(req.query);
-        const users = yield userService.findAllUsers(query);
+        const [users, pagination] = yield userService.findAllUsers(query);
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
             code: httpStatusCode_1.HttpStatusCode.OK,
             data: {
-                users
+                users,
+                pagination
             }
         });
     }));
@@ -7806,9 +7815,9 @@ const UserService = (userRepository, userValidate, userCreator, passwordEncoder)
         return userCreator.userEntityToUserDto(user);
     });
     const findAllUsers = (options) => __awaiter(void 0, void 0, void 0, function* () {
-        const users = yield userRepository.findAllUsers(options);
+        const [users, pageInfo] = yield userRepository.findAllUsers(options);
         const usersDto = users.map(user => userCreator.userEntityToUserDto(user));
-        return usersDto;
+        return [usersDto, pageInfo];
     });
     const updateUserById = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
         yield userValidate.checkUserExistsById(id);

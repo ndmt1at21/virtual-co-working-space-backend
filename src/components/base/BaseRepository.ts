@@ -1,5 +1,6 @@
 import { ObjectID, Repository } from 'typeorm';
 import { FilterOperationKey, FindAllOptions } from './@types/FindAllOptions';
+import { PaginationInfo } from './@types/PaginationInfo';
 
 type ID = string | number | Date | ObjectID;
 
@@ -8,7 +9,7 @@ export abstract class BaseRepository<T> extends Repository<T> {
 		return this.findOne(id);
 	}
 
-	async findAll(options: FindAllOptions): Promise<T[]> {
+	async findAll(options: FindAllOptions): Promise<[T[], PaginationInfo]> {
 		const { filter, sort, paginate } = options;
 
 		const query = this.createQueryBuilder(this.metadata.tableName);
@@ -103,6 +104,15 @@ export abstract class BaseRepository<T> extends Repository<T> {
 			query.take(limit).skip((page - 1) * limit);
 		}
 
-		return query.getMany();
+		const [items, totalCount] = await query.getManyAndCount();
+
+		return [
+			items,
+			{
+				count: items.length,
+				page: paginate?.page || 1,
+				totalCount
+			}
+		];
 	}
 }

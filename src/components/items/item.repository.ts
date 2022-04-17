@@ -3,6 +3,7 @@ import { Item } from '@src/components/items/item.entity';
 import { BaseRepository } from '../base/BaseRepository';
 import { FindItemOptions } from './@types/FindAllItemsOptions';
 import { FindAllOptions } from '../base/@types/FindAllOptions';
+import { PaginationInfo } from '../base/@types/PaginationInfo';
 
 @EntityRepository(Item)
 export class ItemRepository extends BaseRepository<Item> {
@@ -14,7 +15,9 @@ export class ItemRepository extends BaseRepository<Item> {
 		return count === 1;
 	}
 
-	async findAllItems(options: FindItemOptions): Promise<Item[]> {
+	async findAllItems(
+		options: FindItemOptions
+	): Promise<[Item[], PaginationInfo]> {
 		const optionsWithDbFields =
 			this.mapFindAllItemsOptionsToDatabaseField(options);
 

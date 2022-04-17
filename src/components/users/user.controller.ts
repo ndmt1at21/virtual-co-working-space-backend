@@ -80,12 +80,13 @@ export const UserController = (userService: IUserService) => {
 	const getUsers = catchAsyncRequestHandler(async (req, res, next) => {
 		const query = extractQueryFindAllOptions(req.query);
 
-		const users = await userService.findAllUsers(query);
+		const [users, pagination] = await userService.findAllUsers(query);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
 			data: {
-				users
+				users,
+				pagination
 			}
 		});
 	});

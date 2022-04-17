@@ -1,3 +1,4 @@
+import { PaginationInfo } from '../base/@types/PaginationInfo';
 import { CreateItemDto } from './@types/dto/CreateItem.dto';
 import { ItemDto } from './@types/dto/Item.dto';
 import { UpdateItemDto } from './@types/dto/UpdateItem.dto';
@@ -15,10 +16,10 @@ export const ItemService = (
 ): IItemService => {
 	const findAllItems = async (
 		options: FindItemOptions
-	): Promise<ItemDto[]> => {
-		const items = await itemRepository.findAllItems(options);
+	): Promise<[ItemDto[], PaginationInfo]> => {
+		const [items, pagination] = await itemRepository.findAllItems(options);
 		const itemsDto = items.map(item => mapItemToItemDto(item));
-		return itemsDto;
+		return [itemsDto, pagination];
 	};
 
 	const findItemById = async (id: number): Promise<ItemDto> => {

@@ -1,4 +1,4 @@
-import { Pageable } from '@src/@types/Pageable';
+import { Pageable } from '@src/components/base/@types/FindAllOptions';
 import { CreateOfficeDto } from './dto/CreateOffice.dto';
 import { OfficeDetailDto } from './dto/OfficeDetail.dto';
 import { OfficeOverviewDto } from './dto/OfficeOverview.dto';

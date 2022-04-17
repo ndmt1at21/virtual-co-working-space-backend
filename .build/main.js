@@ -375,6 +375,10 @@ const typeorm_1 = __webpack_require__(5250);
 const cache_1 = __webpack_require__(366);
 const officeMemberRole_entity_1 = __webpack_require__(478);
 const officeInvitation_entity_1 = __webpack_require__(9916);
+const conversation_entity_1 = __webpack_require__(2604);
+const conversationMember_entity_1 = __webpack_require__(8547);
+const message_entity_1 = __webpack_require__(8755);
+const messageStatus_entity_1 = __webpack_require__(5703);
 const refreshToken_entity_1 = __webpack_require__(5161);
 const passwordResetToken_entity_1 = __webpack_require__(6722);
 const ormPostgresOptions = {
@@ -398,7 +402,11 @@ const ormPostgresOptions = {
         officeRole_entity_1.OfficeRole,
         officeMemberTransform_entity_1.OfficeMemberTransform,
         officeMemberRole_entity_1.OfficeMemberRole,
-        officeInvitation_entity_1.OfficeInvitation
+        officeInvitation_entity_1.OfficeInvitation,
+        conversation_entity_1.Conversation,
+        conversationMember_entity_1.ConversationMember,
+        message_entity_1.Message,
+        messageStatus_entity_1.MessageStatus
     ]
 };
 const ormMongoOptions = {
@@ -2504,15 +2512,109 @@ exports.BaseEntity = BaseEntity;
 /***/ }),
 
 /***/ 7325:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BaseRepository = void 0;
 const typeorm_1 = __webpack_require__(5250);
 class BaseRepository extends typeorm_1.Repository {
     findById(id) {
         return this.findOne(id);
+    }
+    findAll(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { filter, sort, paginate } = options;
+            const query = this.createQueryBuilder(this.metadata.tableName);
+            if (filter) {
+                Object.keys(filter).forEach(field => {
+                    const filterValue = filter[field];
+                    if (filterValue === undefined) {
+                        return;
+                    }
+                    Object.keys(filterValue).forEach(opt => {
+                        const operation = opt;
+                        const value = filterValue[operation];
+                        switch (operation) {
+                            case 'eq':
+                                const eq_value = `${field}_eq_value`;
+                                query.andWhere(`${field} = :${eq_value}`, {
+                                    [eq_value]: value
+                                });
+                                break;
+                            case 'ne':
+                                const ne_value = `${field}_ne_value`;
+                                query.andWhere(`${field} != :${ne_value}`, {
+                                    [ne_value]: value
+                                });
+                                break;
+                            case 'lt':
+                                const lt_value = `${field}_lt_value`;
+                                query.andWhere(`${field} < :${lt_value}`, {
+                                    [lt_value]: value
+                                });
+                                break;
+                            case 'lte':
+                                const lte_value = `${field}_lte_value`;
+                                query.andWhere(`${field} <= :${lte_value}`, {
+                                    [lte_value]: value
+                                });
+                                break;
+                            case 'gt':
+                                const gt_value = `${field}_gt_value`;
+                                query.andWhere(`${field} > :${gt_value}`, {
+                                    [gt_value]: value
+                                });
+                                break;
+                            case 'gte':
+                                const gte_value = `${field}_gte_value`;
+                                query.andWhere(`${field} >= :${gte_value}`, {
+                                    [gte_value]: value
+                                });
+                                break;
+                            case 'contains':
+                                const containsValue = `${field}_contains_value`;
+                                query.andWhere(`${field} ILIKE :${containsValue}`, {
+                                    [containsValue]: `%${value}%`
+                                });
+                                break;
+                            case 'startsWith':
+                                const startsWithValue = `${field}_startsWith_value`;
+                                query.andWhere(`${field} ILIKE :${startsWithValue}`, {
+                                    [startsWithValue]: `${value}%`
+                                });
+                                break;
+                            default:
+                                throw new Error(`Unknown filter operation: ${operation}`);
+                        }
+                    });
+                });
+            }
+            if (sort) {
+                Object.keys(sort).forEach(field => {
+                    const order = sort[field];
+                    if (order === undefined) {
+                        return;
+                    }
+                    query.addOrderBy(field, order);
+                });
+            }
+            if (paginate) {
+                const { limit = 100, page = 1 } = paginate;
+                query.take(limit).skip((page - 1) * limit);
+            }
+            console.log(query.getQuery());
+            return query.getMany();
+        });
     }
 }
 exports.BaseRepository = BaseRepository;
@@ -2536,9 +2638,9 @@ class RepositoryQueryBuilder {
         return this;
     }
     withPageable(pageable) {
-        const { page, size } = pageable;
-        this.query.limit(size);
-        this.query.skip(size * (page - 1));
+        const { page = 10, limit = 10 } = pageable;
+        this.query.limit(limit);
+        this.query.skip(limit * (page - 1));
         return this;
     }
     build() {
@@ -2832,6 +2934,101 @@ exports.CloudUploadService = CloudUploadService;
 
 /***/ }),
 
+/***/ 8547:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ConversationMember = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const conversation_entity_1 = __webpack_require__(2604);
+const user_entity_1 = __webpack_require__(4614);
+let ConversationMember = class ConversationMember extends typeorm_1.BaseEntity {
+};
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], ConversationMember.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'conversation_id' }),
+    __metadata("design:type", Number)
+], ConversationMember.prototype, "conversationId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'member_id' }),
+    __metadata("design:type", Number)
+], ConversationMember.prototype, "memberId", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => conversation_entity_1.Conversation),
+    (0, typeorm_1.JoinColumn)({ name: 'conversation_id' }),
+    __metadata("design:type", conversation_entity_1.Conversation)
+], ConversationMember.prototype, "conversation", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
+    (0, typeorm_1.JoinColumn)({ name: 'member_id' }),
+    __metadata("design:type", user_entity_1.User)
+], ConversationMember.prototype, "member", void 0);
+ConversationMember = __decorate([
+    (0, typeorm_1.Entity)({ name: 'conversation_member' })
+], ConversationMember);
+exports.ConversationMember = ConversationMember;
+
+
+/***/ }),
+
+/***/ 2604:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Conversation = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const conversationMember_entity_1 = __webpack_require__(8547);
+const office_entity_1 = __webpack_require__(4843);
+let Conversation = class Conversation extends typeorm_1.BaseEntity {
+};
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], Conversation.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'office_id' }),
+    __metadata("design:type", Number)
+], Conversation.prototype, "officeId", void 0);
+__decorate([
+    (0, typeorm_1.OneToOne)(() => office_entity_1.Office),
+    (0, typeorm_1.JoinColumn)({ name: 'office_id' }),
+    __metadata("design:type", office_entity_1.Office)
+], Conversation.prototype, "office", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => conversationMember_entity_1.ConversationMember, conversationMember => conversationMember.conversation, { cascade: true }),
+    __metadata("design:type", Array)
+], Conversation.prototype, "conversationMembers", void 0);
+Conversation = __decorate([
+    (0, typeorm_1.Entity)({ name: 'conversation' })
+], Conversation);
+exports.Conversation = Conversation;
+
+
+/***/ }),
+
 /***/ 2048:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -3012,32 +3209,76 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ItemController = void 0;
 const httpStatusCode_1 = __webpack_require__(7500);
 const catchAsyncRequestHandler_1 = __webpack_require__(3015);
-const pageParser_1 = __webpack_require__(1624);
+const paginateQueryParser_1 = __webpack_require__(3884);
 const requestValidation_1 = __webpack_require__(5718);
 const CreateItem_dto_1 = __webpack_require__(827);
 const ItemController = (itemService) => {
-    const getAll = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        const pageable = (0, pageParser_1.pageParser)(req.query, {
-            defaultPage: 1,
-            defaultSize: 10
-        });
-        const items = yield itemService.findAll(pageable);
-        res.status(httpStatusCode_1.HttpStatusCode.OK).json(items);
-    }));
     const getById = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        const item = yield itemService.findById(+req.params.id);
-        res.status(httpStatusCode_1.HttpStatusCode.OK).json(item);
+        const item = yield itemService.findItemById(+req.params.id);
+        res.status(httpStatusCode_1.HttpStatusCode.OK).json({
+            code: httpStatusCode_1.HttpStatusCode.OK,
+            data: { item }
+        });
+    }));
+    const getAll = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const findAllOptions = extractQueryFindAllOptions(req.query);
+        const items = yield itemService.findAllItems(findAllOptions);
+        res.status(httpStatusCode_1.HttpStatusCode.OK).json({
+            code: httpStatusCode_1.HttpStatusCode.OK,
+            data: { items }
+        });
     }));
     const create = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        const err = yield (0, requestValidation_1.validateRequestBody)(CreateItem_dto_1.CreateItemDto, req.body);
-        if (err)
-            throw err;
+        const errs = yield (0, requestValidation_1.validateRequestBody)(CreateItem_dto_1.CreateItemDto, req.body);
+        if (errs.length > 0)
+            throw errs;
         const createItemDto = req.body;
-        const item = yield itemService.create(createItemDto);
-        res.status(httpStatusCode_1.HttpStatusCode.CREATED).json(item);
+        const item = yield itemService.createItem(createItemDto);
+        res.status(httpStatusCode_1.HttpStatusCode.CREATED).json({
+            code: httpStatusCode_1.HttpStatusCode.CREATED,
+            data: { item }
+        });
     }));
-    const deleteById = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () { }));
-    const updateById = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () { }));
+    const updateById = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const errs = yield (0, requestValidation_1.validateRequestBody)(CreateItem_dto_1.CreateItemDto, req.body);
+        if (errs.length > 0)
+            throw errs;
+        const updateItemDto = req.body;
+        const item = yield itemService.updateItemById(+req.params.id, updateItemDto);
+        res.status(httpStatusCode_1.HttpStatusCode.OK).json({
+            code: httpStatusCode_1.HttpStatusCode.OK,
+            data: { item }
+        });
+    }));
+    const deleteById = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        yield itemService.deleteItemById(+req.params.id);
+        res.status(httpStatusCode_1.HttpStatusCode.OK).json({
+            code: httpStatusCode_1.HttpStatusCode.OK
+        });
+    }));
+    function extractQueryFindAllOptions(originalQuery) {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        const query = paginateQueryParser_1.PaginateQueryParser.parse(originalQuery, {
+            filter: { includes: ['name', 'path'] }
+        });
+        const filter = {};
+        const sort = {};
+        if (query.filter) {
+            filter.name = query.filter.name;
+            filter.path = query.filter.path;
+        }
+        if (query.sort) {
+            sort.name = (_b = (_a = query.sort) === null || _a === void 0 ? void 0 : _a.name) === null || _b === void 0 ? void 0 : _b.order;
+            sort.path = (_d = (_c = query.sort) === null || _c === void 0 ? void 0 : _c.path) === null || _d === void 0 ? void 0 : _d.order;
+            sort.createdAt = (_f = (_e = query.sort) === null || _e === void 0 ? void 0 : _e.created_at) === null || _f === void 0 ? void 0 : _f.order;
+            sort.updatedAt = (_h = (_g = query.sort) === null || _g === void 0 ? void 0 : _g.updated_at) === null || _h === void 0 ? void 0 : _h.order;
+        }
+        return {
+            filter,
+            sort,
+            pageable: query.pageable
+        };
+    }
     return { getAll, getById, create, deleteById, updateById };
 };
 exports.ItemController = ItemController;
@@ -3046,25 +3287,28 @@ exports.ItemController = ItemController;
 /***/ }),
 
 /***/ 8301:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ItemCreator = void 0;
-const ItemCreator = () => {
-    const mapItemToItemDto = (item) => {
-        const { id, name, modelPath, createdAt } = item;
-        return {
-            id,
-            name,
-            modelPath,
-            createdAt
-        };
-    };
-    const mapItemsToItemsDto = (items) => {
-        return items.map(item => mapItemToItemDto(item));
-    };
-    return { mapItemToItemDto, mapItemsToItemsDto };
+const item_mapping_1 = __webpack_require__(5767);
+const ItemCreator = (itemRepository) => {
+    const createItemDetail = (id) => __awaiter(void 0, void 0, void 0, function* () {
+        const item = yield itemRepository.findById(id);
+        const itemDto = (0, item_mapping_1.mapItemToItemDto)(item);
+        return itemDto;
+    });
+    return { createItemDetail };
 };
 exports.ItemCreator = ItemCreator;
 
@@ -3100,7 +3344,7 @@ __decorate([
     __metadata("design:type", String)
 ], Item.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ unique: true, name: 'model_path' }),
+    (0, typeorm_1.Column)({ name: 'model_path' }),
     __metadata("design:type", String)
 ], Item.prototype, "modelPath", void 0);
 Item = __decorate([
@@ -3129,26 +3373,33 @@ exports.ItemErrorMessages = {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createItemCreator = exports.createItemService = exports.createItemRepository = void 0;
+exports.createItemRepository = exports.createItemCreator = exports.createItemValidate = exports.createItemService = void 0;
 const typeorm_1 = __webpack_require__(5250);
 const item_creator_1 = __webpack_require__(8301);
 const item_repository_1 = __webpack_require__(1074);
 const item_service_1 = __webpack_require__(2926);
+const item_validate_1 = __webpack_require__(1117);
+function createItemService() {
+    const itemRepository = createItemRepository();
+    const itemCreator = createItemCreator();
+    const itemValidate = createItemValidate();
+    return (0, item_service_1.ItemService)(itemRepository, itemCreator, itemValidate);
+}
+exports.createItemService = createItemService;
+function createItemValidate() {
+    const itemRepository = createItemRepository();
+    return (0, item_validate_1.ItemValidate)(itemRepository);
+}
+exports.createItemValidate = createItemValidate;
+function createItemCreator() {
+    const itemRepository = createItemRepository();
+    return (0, item_creator_1.ItemCreator)(itemRepository);
+}
+exports.createItemCreator = createItemCreator;
 function createItemRepository() {
     return (0, typeorm_1.getCustomRepository)(item_repository_1.ItemRepository);
 }
 exports.createItemRepository = createItemRepository;
-function createItemService() {
-    const itemRepository = createItemRepository();
-    const itemCreator = createItemCreator();
-    const service = (0, item_service_1.ItemService)(itemRepository, itemCreator);
-    return service;
-}
-exports.createItemService = createItemService;
-function createItemCreator() {
-    return (0, item_creator_1.ItemCreator)();
-}
-exports.createItemCreator = createItemCreator;
 
 
 /***/ }),
@@ -3178,12 +3429,52 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ItemRepository = void 0;
 const typeorm_1 = __webpack_require__(5250);
 const item_entity_1 = __webpack_require__(1993);
 const BaseRepository_1 = __webpack_require__(7325);
 let ItemRepository = class ItemRepository extends BaseRepository_1.BaseRepository {
+    checkItemExists(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const count = yield this.createQueryBuilder('item')
+                .where('item.id = :id', { id })
+                .getCount();
+            return count === 1;
+        });
+    }
+    findAllItems(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const optionsWithDbFields = this.mapFindAllItemsOptionsToDatabaseField(options);
+            return yield this.findAll(optionsWithDbFields);
+        });
+    }
+    mapFindAllItemsOptionsToDatabaseField(options) {
+        const { filter, pageable, sort } = options;
+        return {
+            filter: {
+                name: filter === null || filter === void 0 ? void 0 : filter.name,
+                model_path: filter === null || filter === void 0 ? void 0 : filter.path,
+                created_at: filter === null || filter === void 0 ? void 0 : filter.createdAt
+            },
+            sort: {
+                name: sort === null || sort === void 0 ? void 0 : sort.name,
+                model_path: sort === null || sort === void 0 ? void 0 : sort.path,
+                created_at: sort === null || sort === void 0 ? void 0 : sort.createdAt,
+                updated_at: sort === null || sort === void 0 ? void 0 : sort.updatedAt
+            },
+            paginate: pageable
+        };
+    }
 };
 ItemRepository = __decorate([
     (0, typeorm_1.EntityRepository)(item_entity_1.Item)
@@ -3208,44 +3499,72 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ItemService = void 0;
+const item_mapping_1 = __webpack_require__(5767);
+const ItemService = (itemRepository, itemCreator, itemValidate) => {
+    const findAllItems = (options) => __awaiter(void 0, void 0, void 0, function* () {
+        const items = yield itemRepository.findAllItems(options);
+        const itemsDto = items.map(item => (0, item_mapping_1.mapItemToItemDto)(item));
+        return itemsDto;
+    });
+    const findItemById = (id) => __awaiter(void 0, void 0, void 0, function* () {
+        yield itemValidate.checkItemExists(id);
+        const itemDto = yield itemCreator.createItemDetail(id);
+        return itemDto;
+    });
+    const createItem = (dto) => __awaiter(void 0, void 0, void 0, function* () {
+        const item = yield itemRepository.save(dto);
+        const itemDto = yield itemCreator.createItemDetail(item.id);
+        return itemDto;
+    });
+    const deleteItemById = (id) => __awaiter(void 0, void 0, void 0, function* () {
+        yield itemValidate.checkItemExists(id);
+        yield itemRepository.softDelete(id);
+    });
+    const updateItemById = (id, item) => __awaiter(void 0, void 0, void 0, function* () {
+        yield itemValidate.checkItemExists(id);
+        yield itemRepository.update(id, item);
+        return itemCreator.createItemDetail(id);
+    });
+    return {
+        findAllItems,
+        findItemById,
+        createItem,
+        deleteItemById,
+        updateItemById
+    };
+};
+exports.ItemService = ItemService;
+
+
+/***/ }),
+
+/***/ 1117:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ItemValidate = void 0;
 const appError_1 = __webpack_require__(2720);
 const item_error_1 = __webpack_require__(5687);
-const ItemService = (itemRepository, itemCreator) => {
-    const findAll = ({ page, size }) => __awaiter(void 0, void 0, void 0, function* () {
-        const items = yield itemRepository
-            .createQueryBuilder()
-            .take(size)
-            .skip((page - 1) * size)
-            .getMany();
-        return itemCreator.mapItemsToItemsDto(items);
-    });
-    const findById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-        const item = yield itemRepository.findOne(id);
+const ItemValidate = (itemRepository) => {
+    const checkItemExists = (id) => __awaiter(void 0, void 0, void 0, function* () {
+        const item = yield itemRepository.checkItemExists(id);
         if (!item) {
             throw new appError_1.NotFoundError(item_error_1.ItemErrorMessages.ITEM_NOT_FOUND);
         }
-        return itemCreator.mapItemToItemDto(item);
     });
-    const create = (dto) => __awaiter(void 0, void 0, void 0, function* () {
-        const item = yield itemRepository.save(dto);
-        return itemCreator.mapItemToItemDto(item);
-    });
-    const deleteById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-        const result = yield itemRepository.softDelete(id);
-        if (!result.affected) {
-            throw new appError_1.NotFoundError(item_error_1.ItemErrorMessages.ITEM_NOT_FOUND);
-        }
-    });
-    const updateById = (id, item) => __awaiter(void 0, void 0, void 0, function* () {
-        const updatedItem = yield itemRepository.save(Object.assign({ id }, item));
-        if (!updatedItem) {
-            throw new appError_1.NotFoundError(item_error_1.ItemErrorMessages.ITEM_NOT_FOUND);
-        }
-        return itemCreator.mapItemToItemDto(updatedItem);
-    });
-    return { findAll, findById, create, deleteById, updateById };
+    return { checkItemExists };
 };
-exports.ItemService = ItemService;
+exports.ItemValidate = ItemValidate;
 
 
 /***/ }),
@@ -3471,6 +3790,96 @@ const MailService = (mailCache, logger) => {
     return { initialize, sendBulkMails, sendMail };
 };
 exports.MailService = MailService;
+
+
+/***/ }),
+
+/***/ 5703:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MessageStatus = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const BaseEntity_1 = __webpack_require__(777);
+let MessageStatus = class MessageStatus extends BaseEntity_1.BaseEntity {
+};
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], MessageStatus.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'receiver_id' }),
+    __metadata("design:type", Number)
+], MessageStatus.prototype, "receiverId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'message_id' }),
+    __metadata("design:type", Number)
+], MessageStatus.prototype, "messageId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], MessageStatus.prototype, "status", void 0);
+MessageStatus = __decorate([
+    (0, typeorm_1.Entity)({ name: 'message_status' })
+], MessageStatus);
+exports.MessageStatus = MessageStatus;
+
+
+/***/ }),
+
+/***/ 8755:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Message = void 0;
+const typeorm_1 = __webpack_require__(5250);
+const BaseEntity_1 = __webpack_require__(777);
+let Message = class Message extends BaseEntity_1.BaseEntity {
+};
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], Message.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'conversation_id' }),
+    __metadata("design:type", Number)
+], Message.prototype, "conversationId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'sender_id' }),
+    __metadata("design:type", Number)
+], Message.prototype, "senderId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'content' }),
+    __metadata("design:type", String)
+], Message.prototype, "content", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Message.prototype, "type", void 0);
+Message = __decorate([
+    (0, typeorm_1.Entity)({ name: 'conversation' })
+], Message);
+exports.Message = Message;
 
 
 /***/ }),
@@ -4236,7 +4645,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OfficeItemController = void 0;
 const httpStatusCode_1 = __webpack_require__(7500);
 const catchAsyncRequestHandler_1 = __webpack_require__(3015);
-const pageParser_1 = __webpack_require__(1624);
 const OfficeItemController = (officeItemService) => {
     const getOfficeItemDetailById = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const id = +req.params.id;
@@ -4247,15 +4655,12 @@ const OfficeItemController = (officeItemService) => {
         });
     }));
     const getOfficeItemsDetail = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        const pageable = (0, pageParser_1.pageParser)(req.query, {
-            defaultPage: 1,
-            defaultSize: 10
+        const [offices, total] = yield officeItemService.findOfficeItemsDetail({
+            page: 10,
+            limit: 10
         });
-        const [offices, total] = yield officeItemService.findOfficeItemsDetail(pageable);
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
             status: 'success',
-            page: pageable.page,
-            limit: pageable.size,
             total,
             offices
         });
@@ -4510,12 +4915,12 @@ let OfficeItemRepository = class OfficeItemRepository extends BaseRepository_1.B
     }
     findOfficeItemsWithItemAndOffice(pageable) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { page, size } = pageable;
+            const { page = 10, limit = 10 } = pageable;
             return this.createQueryBuilder('office_item')
                 .leftJoinAndSelect('office_item.item', 'item')
                 .leftJoinAndSelect('office_item.office', 'office')
-                .skip((page - 1) * size)
-                .limit(size)
+                .skip((page - 1) * limit)
+                .limit(limit)
                 .getMany();
         });
     }
@@ -5047,7 +5452,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OfficeMemberController = void 0;
-const pageParser_1 = __webpack_require__(1624);
 const httpStatusCode_1 = __webpack_require__(7500);
 const catchAsyncRequestHandler_1 = __webpack_require__(3015);
 const OfficeMemberController = (officeMemberService) => {
@@ -5060,15 +5464,12 @@ const OfficeMemberController = (officeMemberService) => {
         });
     }));
     const getOfficeMembersDetail = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        const pageable = (0, pageParser_1.pageParser)(req.query, {
-            defaultPage: 1,
-            defaultSize: 10
+        const [officeMembers, total] = yield officeMemberService.findOfficeMembersDetail({
+            limit: 10,
+            page: 10
         });
-        const [officeMembers, total] = yield officeMemberService.findOfficeMembersDetail(pageable);
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
             status: 'success',
-            page: pageable.page,
-            limit: pageable.size,
             total,
             officeMembers
         });
@@ -6019,7 +6420,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OfficeController = void 0;
-const pageParser_1 = __webpack_require__(1624);
 const httpStatusCode_1 = __webpack_require__(7500);
 const appError_1 = __webpack_require__(2720);
 const catchAsyncRequestHandler_1 = __webpack_require__(3015);
@@ -6072,15 +6472,9 @@ const OfficeController = (officeService) => {
         });
     }));
     const getAllOfficesOverviewCurrentUserIsMember = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        const pageable = (0, pageParser_1.pageParser)(req.query, {
-            defaultPage: 1,
-            defaultSize: 10
-        });
-        const [offices, total] = yield officeService.findAllOfficesOverviewUserIsMemberByUserId(req.user.id, pageable);
+        const [offices, total] = yield officeService.findAllOfficesOverviewUserIsMemberByUserId(req.user.id, { limit: 10, page: 10 });
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
             status: 'success',
-            page: pageable.page,
-            limit: pageable.size,
             total,
             offices
         });
@@ -6207,6 +6601,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Office = void 0;
 const typeorm_1 = __webpack_require__(5250);
 const BaseEntity_1 = __webpack_require__(777);
+const conversation_entity_1 = __webpack_require__(2604);
 const officeItem_entity_1 = __webpack_require__(2965);
 const officeMember_entity_1 = __webpack_require__(5970);
 const user_entity_1 = __webpack_require__(4614);
@@ -6242,6 +6637,11 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], Office.prototype, "officeMembers", void 0);
+__decorate([
+    (0, typeorm_1.OneToOne)(() => conversation_entity_1.Conversation),
+    (0, typeorm_1.JoinColumn)({ name: 'conversation_id' }),
+    __metadata("design:type", conversation_entity_1.Conversation)
+], Office.prototype, "conversation", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
     (0, typeorm_1.JoinColumn)({ name: 'created_by_user_id' }),
@@ -7712,21 +8112,145 @@ exports.catchAsyncSocketMiddleware = catchAsyncSocketMiddleware;
 
 /***/ }),
 
-/***/ 1624:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 3884:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.pageParser = void 0;
-const pageParser = (query, opts) => {
-    const { defaultPage = 1, defaultSize = 10 } = opts;
-    const { page, size } = query;
-    return {
-        page: page || defaultPage,
-        size: size || defaultSize
-    };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.pageParser = pageParser;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PaginateQueryParser = void 0;
+const qs_1 = __importDefault(__webpack_require__(7104));
+const filterOperationKeys = [
+    'eq',
+    'ne',
+    'lt',
+    'lte',
+    'gt',
+    'gte',
+    'contains',
+    'startsWith'
+];
+class PaginateQueryParser {
+    static parse(query, config) {
+        const originalQuery = this.parseOriginalQuery(query);
+        const filter = this.filter(originalQuery, config);
+        const sort = this.sort(originalQuery, config);
+        const pageable = this.paginate(originalQuery, config);
+        return {
+            filter,
+            sort,
+            pageable
+        };
+    }
+    static parseOriginalQuery(query) {
+        const originalQuery = qs_1.default.parse(query, {
+            allowDots: false,
+            comma: true,
+            parseArrays: true,
+            strictNullHandling: true,
+            decoder(value) {
+                if (/^(\d+|\d*\.\d+)$/.test(value)) {
+                    return parseFloat(value);
+                }
+                const keywords = {
+                    true: true,
+                    false: false,
+                    null: null,
+                    undefined: undefined
+                };
+                if (value in keywords) {
+                    return keywords[value];
+                }
+                return value;
+            }
+        });
+        return originalQuery;
+    }
+    static filter(originalQuery, config) {
+        var _a;
+        const includesInFilter = ((_a = config === null || config === void 0 ? void 0 : config.filter) === null || _a === void 0 ? void 0 : _a.includes) || [];
+        const filterObj = {};
+        includesInFilter.forEach(field => {
+            if (originalQuery[field] !== undefined) {
+                filterObj[field] = originalQuery[field];
+            }
+        });
+        Object.keys(filterObj).forEach(field => {
+            const operations = filterObj[field];
+            if (typeof operations === 'string') {
+                filterObj[field] = { eq: operations };
+                return undefined;
+            }
+            if (typeof operations !== 'object') {
+                return undefined;
+            }
+            Object.keys(operations).forEach(operation => {
+                if (!filterOperationKeys.includes(operation)) {
+                    return undefined;
+                }
+                const validOperation = operation;
+                const value = operations[validOperation];
+                if (typeof value === 'boolean') {
+                    delete filterObj[field][validOperation];
+                    if (filterObj[field])
+                        filterObj[field]['eq'] = validOperation;
+                    else
+                        filterObj[field] = { eq: validOperation };
+                }
+                if (!filterOperationKeys.includes(operation)) {
+                    delete filterObj[field][validOperation];
+                    return undefined;
+                }
+            });
+        });
+        Object.keys(filterObj).forEach(field => Object.keys(filterObj[field]).length === 0 &&
+            delete filterObj[field]);
+        return filterObj;
+    }
+    static sort(originalQuery, config) {
+        var _a;
+        const sortByFieldName = ((_a = config === null || config === void 0 ? void 0 : config.sortBy) === null || _a === void 0 ? void 0 : _a.field) || 'sort_by';
+        const originalSorts = typeof originalQuery[sortByFieldName] === 'string'
+            ? [originalQuery[sortByFieldName]]
+            : originalQuery[sortByFieldName];
+        if (!originalSorts) {
+            return {};
+        }
+        if (originalSorts.length === 0) {
+            return {};
+        }
+        const sort = {};
+        originalSorts
+            .filter(field => field.length !== 0)
+            .map(field => {
+            if (field[0] === '-') {
+                const by = field.substring(1);
+                sort[by] = {
+                    order: 'DESC'
+                };
+            }
+            else {
+                sort[field] = {
+                    order: 'ASC'
+                };
+            }
+            return sort;
+        });
+        return sort;
+    }
+    static paginate(originalQuery, config) {
+        var _a, _b, _c;
+        const pageable = {
+            limit: +originalQuery[((_a = config === null || config === void 0 ? void 0 : config.page) === null || _a === void 0 ? void 0 : _a.limitField) || 'limit'],
+            page: +originalQuery[((_b = config === null || config === void 0 ? void 0 : config.page) === null || _b === void 0 ? void 0 : _b.pageField) || 'page'],
+            nextCursor: originalQuery[((_c = config === null || config === void 0 ? void 0 : config.page) === null || _c === void 0 ? void 0 : _c.nextCursorField) || 'next_cursor']
+        };
+        return pageable;
+    }
+}
+exports.PaginateQueryParser = PaginateQueryParser;
 
 
 /***/ }),
@@ -7896,6 +8420,13 @@ module.exports = require("passport-facebook");
 /***/ ((module) => {
 
 module.exports = require("passport-google-oauth2");
+
+/***/ }),
+
+/***/ 7104:
+/***/ ((module) => {
+
+module.exports = require("qs");
 
 /***/ }),
 

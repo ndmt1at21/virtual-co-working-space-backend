@@ -1,4 +1,4 @@
-import { Pageable } from '@src/@types/Pageable';
+import { Pageable } from '@src/components/base/@types/FindAllOptions';
 import { UpdateOfficeMemberTransformDto } from '@src/components/officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
 import { CreateOfficeMemberDto } from './dto/CreateOfficeMember.dto';
 import { OfficeMemberDetailDto } from './dto/OfficeMemberDetail.dto';

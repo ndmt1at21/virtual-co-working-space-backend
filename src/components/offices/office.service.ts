@@ -1,4 +1,4 @@
-import { Pageable } from '@src/@types/Pageable';
+import { Pageable } from '../base/@types/FindAllOptions';
 import { IOfficeInvitationCodeGenerator } from '../officeInvitationCodeGenerator/@types/IOfficeInvitationCodeGenerator';
 import { mapOfficeItemToOfficeItemOverviewDto } from '../officeItems/officeItem.mapping';
 import { OfficeItemRepository } from '../officeItems/officeItem.repository';

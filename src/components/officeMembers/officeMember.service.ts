@@ -8,10 +8,10 @@ import { IOfficeMemberService } from './@types/IOfficeMemberService';
 import { UpdateOfficeMemberTransformDto } from '@components/officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
 import { OfficeMemberErrorMessages } from './officeMember.error';
 import { OfficeMemberOnlineStatus } from './@types/OfficeMemberOnlineStatus';
-import { Pageable } from '@src/@types/Pageable';
 import { mapOfficeMemberToOfficeMemberDetailDto } from './officeMember.mapping';
 import { IOfficeMemberValidate } from './@types/IOfficeMemberValidate';
 import { OfficeMemberTransformRepository } from '@components/officeMemberTransform/officeMemberTransform.repository';
+import { Pageable } from '../base/@types/FindAllOptions';
 
 export const OfficeMemberService = (
 	officeMemberRepository: OfficeMemberRepository,

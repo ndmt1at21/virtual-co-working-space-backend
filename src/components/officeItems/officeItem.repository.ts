@@ -1,8 +1,8 @@
 import { EntityRepository } from 'typeorm';
 import { OfficeItem } from '@src/components/officeItems/officeItem.entity';
 import { BaseRepository } from '../base/BaseRepository';
-import { Pageable } from '@src/@types/Pageable';
 import { OfficeItemTransformDto } from './@types/dto/OfficeItemTransform.dto';
+import { Pageable } from '../base/@types/FindAllOptions';
 
 @EntityRepository(OfficeItem)
 export class OfficeItemRepository extends BaseRepository<OfficeItem> {
@@ -41,13 +41,13 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 	}
 
 	async findOfficeItemsWithItemAndOffice(pageable: Pageable) {
-		const { page, size } = pageable;
+		const { page = 10, limit = 10 } = pageable;
 
 		return this.createQueryBuilder('office_item')
 			.leftJoinAndSelect('office_item.item', 'item')
 			.leftJoinAndSelect('office_item.office', 'office')
-			.skip((page - 1) * size)
-			.limit(size)
+			.skip((page - 1) * limit)
+			.limit(limit)
 			.getMany();
 	}
 

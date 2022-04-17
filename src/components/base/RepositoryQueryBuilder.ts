@@ -1,5 +1,5 @@
-import { Pageable } from '@src/@types/Pageable';
 import { SelectQueryBuilder } from 'typeorm';
+import { Pageable } from './@types/FindAllOptions';
 import { BaseRepository } from './BaseRepository';
 
 export class RepositoryQueryBuilder<T> {
@@ -17,10 +17,10 @@ export class RepositoryQueryBuilder<T> {
 	}
 
 	withPageable(pageable: Pageable): RepositoryQueryBuilder<T> {
-		const { page, size } = pageable;
+		const { page = 10, limit = 10 } = pageable;
 
-		this.query.limit(size);
-		this.query.skip(size * (page - 1));
+		this.query.limit(limit);
+		this.query.skip(limit * (page - 1));
 
 		return this;
 	}

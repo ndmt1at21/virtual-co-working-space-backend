@@ -1,4 +1,3 @@
-import { pageParser } from '@src/utils/pageParser';
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { IllegalArgumentError } from '@src/utils/appError';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
@@ -85,21 +84,14 @@ export const OfficeController = (officeService: IOfficeService) => {
 
 	const getAllOfficesOverviewCurrentUserIsMember = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const pageable = pageParser(req.query, {
-				defaultPage: 1,
-				defaultSize: 10
-			});
-
 			const [offices, total] =
 				await officeService.findAllOfficesOverviewUserIsMemberByUserId(
 					req.user!.id,
-					pageable
+					{ limit: 10, page: 10 }
 				);
 
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
-				page: pageable.page,
-				limit: pageable.size,
 				total,
 				offices
 			});

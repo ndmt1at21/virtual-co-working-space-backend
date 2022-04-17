@@ -1,4 +1,4 @@
-import { Pageable } from '@src/@types/Pageable';
+import { Pageable } from '../base/@types/FindAllOptions';
 import { OfficeItemRepository } from '../officeItems/officeItem.repository';
 import { OfficeMemberRepository } from '../officeMembers/officeMember.repository';
 import { OfficeDetailDto } from './@types/dto/OfficeDetail.dto';

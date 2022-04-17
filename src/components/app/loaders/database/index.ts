@@ -15,6 +15,10 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 import { CacheConnectOption, createCacheConnection } from './cache';
 import { OfficeMemberRole } from '@src/components/officeMemberRole/officeMemberRole.entity';
 import { OfficeInvitation } from '@src/components/officeInvitation/officeInvitation.entity';
+import { Conversation } from '@src/components/conversations/conversation.entity';
+import { ConversationMember } from '@src/components/conversationMembers/conversationMember.entity';
+import { Message } from '@src/components/messages/message.entity';
+import { MessageStatus } from '@src/components/messageStatus/messageStatus.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -37,7 +41,11 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		OfficeRole,
 		OfficeMemberTransform,
 		OfficeMemberRole,
-		OfficeInvitation
+		OfficeInvitation,
+		Conversation,
+		ConversationMember,
+		Message,
+		MessageStatus
 	]
 };
 

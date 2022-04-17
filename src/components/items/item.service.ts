@@ -1,62 +1,57 @@
-import { Pageable } from '@src/@types/Pageable';
-import { NotFoundError } from '@src/utils/appError';
 import { CreateItemDto } from './@types/dto/CreateItem.dto';
 import { ItemDto } from './@types/dto/Item.dto';
 import { UpdateItemDto } from './@types/dto/UpdateItem.dto';
+import { FindItemOptions } from './@types/FindAllItemsOptions';
 import { IItemCreator } from './@types/IItemCreator';
 import { IItemService } from './@types/IItemService';
-import { ItemErrorMessages } from './item.error';
+import { IItemValidate } from './@types/IItemValidate';
+import { mapItemToItemDto } from './item.mapping';
 import { ItemRepository } from './item.repository';
 
 export const ItemService = (
 	itemRepository: ItemRepository,
-	itemCreator: IItemCreator
+	itemCreator: IItemCreator,
+	itemValidate: IItemValidate
 ): IItemService => {
-	const findAll = async ({ page, size }: Pageable): Promise<ItemDto[]> => {
-		const items = await itemRepository
-			.createQueryBuilder()
-			.take(size)
-			.skip((page - 1) * size)
-			.getMany();
-
-		return itemCreator.mapItemsToItemsDto(items);
+	const findAllItems = async (
+		options: FindItemOptions
+	): Promise<ItemDto[]> => {
+		const items = await itemRepository.findAllItems(options);
+		const itemsDto = items.map(item => mapItemToItemDto(item));
+		return itemsDto;
 	};
 
-	const findById = async (id: number): Promise<ItemDto> => {
-		const item = await itemRepository.findOne(id);
-
-		if (!item) {
-			throw new NotFoundError(ItemErrorMessages.ITEM_NOT_FOUND);
-		}
-
-		return itemCreator.mapItemToItemDto(item);
+	const findItemById = async (id: number): Promise<ItemDto> => {
+		await itemValidate.checkItemExists(id);
+		const itemDto = await itemCreator.createItemDetail(id);
+		return itemDto;
 	};
 
-	const create = async (dto: CreateItemDto): Promise<ItemDto> => {
+	const createItem = async (dto: CreateItemDto): Promise<ItemDto> => {
 		const item = await itemRepository.save(dto);
-		return itemCreator.mapItemToItemDto(item);
+		const itemDto = await itemCreator.createItemDetail(item.id);
+		return itemDto;
 	};
 
-	const deleteById = async (id: number): Promise<void> => {
-		const result = await itemRepository.softDelete(id);
-
-		if (!result.affected) {
-			throw new NotFoundError(ItemErrorMessages.ITEM_NOT_FOUND);
-		}
+	const deleteItemById = async (id: number): Promise<void> => {
+		await itemValidate.checkItemExists(id);
+		await itemRepository.softDelete(id);
 	};
 
-	const updateById = async (
+	const updateItemById = async (
 		id: number,
 		item: UpdateItemDto
 	): Promise<ItemDto> => {
-		const updatedItem = await itemRepository.save({ id, ...item });
-
-		if (!updatedItem) {
-			throw new NotFoundError(ItemErrorMessages.ITEM_NOT_FOUND);
-		}
-
-		return itemCreator.mapItemToItemDto(updatedItem);
+		await itemValidate.checkItemExists(id);
+		await itemRepository.update(id, item);
+		return itemCreator.createItemDetail(id);
 	};
 
-	return { findAll, findById, create, deleteById, updateById };
+	return {
+		findAllItems,
+		findItemById,
+		createItem,
+		deleteItemById,
+		updateItemById
+	};
 };

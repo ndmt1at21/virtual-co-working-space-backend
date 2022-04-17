@@ -2,6 +2,8 @@ import { EntityRepository } from 'typeorm';
 import { User } from './user.entity';
 import { BaseRepository } from '@src/components/base/BaseRepository';
 import { UserLoginProvider } from '../UserLoginProvider';
+import { FindAllOptions } from '../base/@types/FindAllOptions';
+import { FindAllUsersOptions } from './@types/filter/FindAllUsersOptions';
 
 @EntityRepository(User)
 export class UserRepository extends BaseRepository<User> {
@@ -52,5 +54,40 @@ export class UserRepository extends BaseRepository<User> {
 				password
 			}
 		);
+	}
+
+	async findAllUsers(options: FindAllUsersOptions): Promise<User[]> {
+		const optionsWithDbFields =
+			this.mapFindAllItemsOptionsToDatabaseField(options);
+
+		return await this.findAll(optionsWithDbFields);
+	}
+
+	mapFindAllItemsOptionsToDatabaseField(
+		options: FindAllUsersOptions
+	): FindAllOptions {
+		const { filter, pageable, sort } = options;
+
+		return {
+			filter: {
+				name: filter?.name,
+				email: filter?.email,
+				phone: filter?.phone,
+				provider: filter?.provider,
+				type: filter?.type,
+				status: filter?.status,
+				blocked: filter?.blocked
+			},
+			sort: {
+				name: sort?.name,
+				email: sort?.email,
+				phone: sort?.phone,
+				provider: sort?.provider,
+				type: sort?.type,
+				status: sort?.status,
+				created_at: sort?.createdAt
+			},
+			paginate: pageable
+		};
 	}
 }

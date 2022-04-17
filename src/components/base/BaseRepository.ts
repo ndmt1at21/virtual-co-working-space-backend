@@ -103,8 +103,6 @@ export abstract class BaseRepository<T> extends Repository<T> {
 			query.take(limit).skip((page - 1) * limit);
 		}
 
-		console.log(query.getQuery());
-
 		return query.getMany();
 	}
 }

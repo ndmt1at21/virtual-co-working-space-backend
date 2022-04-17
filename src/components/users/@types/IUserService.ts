@@ -3,6 +3,7 @@ import { CreateUserExternalDto } from './dto/CreateUserExternal.dto';
 import { UpdatePasswordDto } from './dto/UpdatePassword.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { UserDto } from './dto/User.dto';
+import { FindAllUsersOptions } from './filter/FindAllUsersOptions';
 
 export interface IUserService {
 	createLocalUser: (payload: CreateUserDto) => Promise<UserDto>;
@@ -14,6 +15,8 @@ export interface IUserService {
 	findUserById: (id: number) => Promise<UserDto>;
 
 	findUserByEmail: (email: string) => Promise<UserDto>;
+
+	findAllUsers: (options: FindAllUsersOptions) => Promise<UserDto[]>;
 
 	updateUserById: (id: number, payload: UpdateUserDto) => Promise<UserDto>;
 

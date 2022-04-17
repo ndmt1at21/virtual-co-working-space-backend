@@ -207,9 +207,12 @@ export class PaginateQueryParser {
 		originalQuery: { [key: string]: any },
 		config?: PaginateQueryParserConfig
 	) {
+		const limit = +originalQuery[config?.page?.limitField || 'limit'];
+		const page = +originalQuery[config?.page?.pageField || 'page'];
+
 		const pageable: Pageable = {
-			limit: +originalQuery[config?.page?.limitField || 'limit'],
-			page: +originalQuery[config?.page?.pageField || 'page'],
+			limit: isNaN(limit) ? undefined : limit,
+			page: isNaN(page) ? undefined : page,
 			nextCursor:
 				originalQuery[config?.page?.nextCursorField || 'next_cursor']
 		};

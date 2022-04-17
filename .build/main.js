@@ -2612,7 +2612,6 @@ class BaseRepository extends typeorm_1.Repository {
                 const { limit = 100, page = 1 } = paginate;
                 query.take(limit).skip((page - 1) * limit);
             }
-            console.log(query.getQuery());
             return query.getMany();
         });
     }
@@ -6423,6 +6422,7 @@ exports.OfficeController = void 0;
 const httpStatusCode_1 = __webpack_require__(7500);
 const appError_1 = __webpack_require__(2720);
 const catchAsyncRequestHandler_1 = __webpack_require__(3015);
+const paginateQueryParser_1 = __webpack_require__(3884);
 const requestValidation_1 = __webpack_require__(5718);
 const CreateOffice_dto_1 = __webpack_require__(973);
 const UpdateOffice_dto_1 = __webpack_require__(7299);
@@ -6432,6 +6432,7 @@ const OfficeController = (officeService) => {
         const office = yield officeService.findOfficeDetailById(id);
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
             status: 'success',
+            code: httpStatusCode_1.HttpStatusCode.OK,
             office
         });
     }));
@@ -6445,6 +6446,7 @@ const OfficeController = (officeService) => {
         const office = yield officeService.updateOfficeById(id, updateOfficeDto);
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
             status: 'success',
+            code: httpStatusCode_1.HttpStatusCode.OK,
             office
         });
     }));
@@ -6452,7 +6454,8 @@ const OfficeController = (officeService) => {
         const id = +req.params.id;
         yield officeService.deleteOfficeById(id);
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
-            status: 'success'
+            status: 'success',
+            code: httpStatusCode_1.HttpStatusCode.OK
         });
     }));
     const getOfficeItemsById = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -6475,9 +6478,13 @@ const OfficeController = (officeService) => {
         const [offices, total] = yield officeService.findAllOfficesOverviewUserIsMemberByUserId(req.user.id, { limit: 10, page: 10 });
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
             status: 'success',
+            code: httpStatusCode_1.HttpStatusCode.OK,
             total,
             offices
         });
+    }));
+    const getAllOffices = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const query = extractQueryFindAllOptions(req.query);
     }));
     const createOffice = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const errors = yield (0, requestValidation_1.validateRequestBody)(CreateOffice_dto_1.CreateOfficeDto, req.body);
@@ -6487,9 +6494,39 @@ const OfficeController = (officeService) => {
         const office = yield officeService.createOffice(req.user.id, createOfficeDto);
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
             status: 'success',
+            code: httpStatusCode_1.HttpStatusCode.OK,
             office
         });
     }));
+    function extractQueryFindAllOptions(originalQuery) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
+        const query = paginateQueryParser_1.PaginateQueryParser.parse(originalQuery, {
+            filter: { includes: ['name', 'path'] }
+        });
+        const filter = {};
+        const sort = {};
+        if (query.filter) {
+            filter.name = (_a = query.filter) === null || _a === void 0 ? void 0 : _a.name;
+            filter.invitationCode = (_b = query.filter) === null || _b === void 0 ? void 0 : _b.invitation_code;
+            filter.createdBy = (_c = query.filter) === null || _c === void 0 ? void 0 : _c.created_by;
+            filter.officeItem = (_d = query.filter) === null || _d === void 0 ? void 0 : _d.office_item;
+            filter.officeMember = (_e = query.filter) === null || _e === void 0 ? void 0 : _e.office_member;
+            filter.createdAt = (_f = query.filter) === null || _f === void 0 ? void 0 : _f.created_at;
+        }
+        if (query.sort) {
+            sort.name = (_g = query.sort) === null || _g === void 0 ? void 0 : _g.name.order;
+            sort.invitationCode = (_j = (_h = query.sort) === null || _h === void 0 ? void 0 : _h.invitation_code) === null || _j === void 0 ? void 0 : _j.order;
+            sort.createdBy = (_l = (_k = query.sort) === null || _k === void 0 ? void 0 : _k.created_by) === null || _l === void 0 ? void 0 : _l.order;
+            sort.officeItem = (_o = (_m = query.sort) === null || _m === void 0 ? void 0 : _m.office_item) === null || _o === void 0 ? void 0 : _o.order;
+            sort.officeMember = (_q = (_p = query.sort) === null || _p === void 0 ? void 0 : _p.office_member) === null || _q === void 0 ? void 0 : _q.order;
+            sort.createdAt = (_s = (_r = query.sort) === null || _r === void 0 ? void 0 : _r.created_at) === null || _s === void 0 ? void 0 : _s.order;
+        }
+        return {
+            filter,
+            sort,
+            pageable: query.pageable
+        };
+    }
     return {
         getOfficeDetailById,
         updateOfficeById,
@@ -6818,6 +6855,28 @@ let OfficeRepository = class OfficeRepository extends BaseRepository_1.BaseRepos
                 .getCount();
             return count === 1;
         });
+    }
+    mapFindAllItemsOptionsToDatabaseField(options) {
+        const { filter, pageable, sort } = options;
+        return {
+            filter: {
+                name: filter === null || filter === void 0 ? void 0 : filter.name,
+                invitation_code: filter === null || filter === void 0 ? void 0 : filter.invitationCode,
+                created_by_user_id: filter === null || filter === void 0 ? void 0 : filter.createdBy,
+                office_item: filter === null || filter === void 0 ? void 0 : filter.officeItem,
+                office_member: filter === null || filter === void 0 ? void 0 : filter.officeMember,
+                created_at: filter === null || filter === void 0 ? void 0 : filter.createdAt
+            },
+            sort: {
+                name: sort === null || sort === void 0 ? void 0 : sort.name,
+                invitation_code: sort === null || sort === void 0 ? void 0 : sort.invitationCode,
+                created_by_user_id: sort === null || sort === void 0 ? void 0 : sort.createdBy,
+                office_item: sort === null || sort === void 0 ? void 0 : sort.officeItem,
+                office_member: sort === null || sort === void 0 ? void 0 : sort.officeMember,
+                created_at: sort === null || sort === void 0 ? void 0 : sort.createdAt
+            },
+            paginate: pageable
+        };
     }
 };
 OfficeRepository = __decorate([
@@ -7285,6 +7344,7 @@ exports.UserController = void 0;
 const httpStatusCode_1 = __webpack_require__(7500);
 const appError_1 = __webpack_require__(2720);
 const catchAsyncRequestHandler_1 = __webpack_require__(3015);
+const paginateQueryParser_1 = __webpack_require__(3884);
 const requestValidation_1 = __webpack_require__(5718);
 const CreateUser_dto_1 = __webpack_require__(8927);
 const UpdateUser_dto_1 = __webpack_require__(4036);
@@ -7333,10 +7393,63 @@ const UserController = (userService) => {
         const userId = +req.params.id;
         yield userService.deleteUserById(userId);
         res.status(httpStatusCode_1.HttpStatusCode.OK).json({
+            code: httpStatusCode_1.HttpStatusCode.OK,
             message: 'User deleted successfully'
         });
     }));
-    const getUsers = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () { }));
+    const getUsers = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const query = extractQueryFindAllOptions(req.query);
+        const users = yield userService.findAllUsers(query);
+        res.status(httpStatusCode_1.HttpStatusCode.OK).json({
+            code: httpStatusCode_1.HttpStatusCode.OK,
+            data: {
+                users
+            }
+        });
+    }));
+    function extractQueryFindAllOptions(originalQuery) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
+        const query = paginateQueryParser_1.PaginateQueryParser.parse(originalQuery, {
+            filter: {
+                includes: [
+                    'name',
+                    'email',
+                    'phone',
+                    'provider',
+                    'blocked',
+                    'status',
+                    'type'
+                ]
+            }
+        });
+        const options = {};
+        if (query.filter) {
+            options.filter = {
+                name: (_a = query.filter) === null || _a === void 0 ? void 0 : _a.name,
+                email: (_b = query.filter) === null || _b === void 0 ? void 0 : _b.email,
+                phone: (_c = query.filter) === null || _c === void 0 ? void 0 : _c.phone,
+                provider: (_d = query.filter) === null || _d === void 0 ? void 0 : _d.provider,
+                blocked: (_e = query.filter) === null || _e === void 0 ? void 0 : _e.blocked,
+                status: (_f = query.filter) === null || _f === void 0 ? void 0 : _f.status,
+                type: (_g = query.filter) === null || _g === void 0 ? void 0 : _g.type
+            };
+        }
+        if (query.sort) {
+            options.sort = {
+                name: (_j = (_h = query.sort) === null || _h === void 0 ? void 0 : _h.name) === null || _j === void 0 ? void 0 : _j.order,
+                email: (_l = (_k = query.sort) === null || _k === void 0 ? void 0 : _k.email) === null || _l === void 0 ? void 0 : _l.order,
+                phone: (_o = (_m = query.sort) === null || _m === void 0 ? void 0 : _m.phone) === null || _o === void 0 ? void 0 : _o.order,
+                provider: (_q = (_p = query.sort) === null || _p === void 0 ? void 0 : _p.provider) === null || _q === void 0 ? void 0 : _q.order,
+                status: (_s = (_r = query.sort) === null || _r === void 0 ? void 0 : _r.status) === null || _s === void 0 ? void 0 : _s.order,
+                type: (_u = (_t = query.sort) === null || _t === void 0 ? void 0 : _t.type) === null || _u === void 0 ? void 0 : _u.order,
+                createdAt: ((_w = (_v = query.sort) === null || _v === void 0 ? void 0 : _v.created_at) === null || _w === void 0 ? void 0 : _w.order) || 'DESC'
+            };
+        }
+        if (query.pageable) {
+            options.pageable = query.pageable;
+        }
+        return options;
+    }
     return {
         createUser,
         getProfile,
@@ -7608,6 +7721,36 @@ let UserRepository = class UserRepository extends BaseRepository_1.BaseRepositor
             });
         });
     }
+    findAllUsers(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const optionsWithDbFields = this.mapFindAllItemsOptionsToDatabaseField(options);
+            return yield this.findAll(optionsWithDbFields);
+        });
+    }
+    mapFindAllItemsOptionsToDatabaseField(options) {
+        const { filter, pageable, sort } = options;
+        return {
+            filter: {
+                name: filter === null || filter === void 0 ? void 0 : filter.name,
+                email: filter === null || filter === void 0 ? void 0 : filter.email,
+                phone: filter === null || filter === void 0 ? void 0 : filter.phone,
+                provider: filter === null || filter === void 0 ? void 0 : filter.provider,
+                type: filter === null || filter === void 0 ? void 0 : filter.type,
+                status: filter === null || filter === void 0 ? void 0 : filter.status,
+                blocked: filter === null || filter === void 0 ? void 0 : filter.blocked
+            },
+            sort: {
+                name: sort === null || sort === void 0 ? void 0 : sort.name,
+                email: sort === null || sort === void 0 ? void 0 : sort.email,
+                phone: sort === null || sort === void 0 ? void 0 : sort.phone,
+                provider: sort === null || sort === void 0 ? void 0 : sort.provider,
+                type: sort === null || sort === void 0 ? void 0 : sort.type,
+                status: sort === null || sort === void 0 ? void 0 : sort.status,
+                created_at: sort === null || sort === void 0 ? void 0 : sort.createdAt
+            },
+            paginate: pageable
+        };
+    }
 };
 UserRepository = __decorate([
     (0, typeorm_1.EntityRepository)(user_entity_1.User)
@@ -7662,6 +7805,11 @@ const UserService = (userRepository, userValidate, userCreator, passwordEncoder)
         const user = yield userRepository.findUserByEmail(email);
         return userCreator.userEntityToUserDto(user);
     });
+    const findAllUsers = (options) => __awaiter(void 0, void 0, void 0, function* () {
+        const users = yield userRepository.findAllUsers(options);
+        const usersDto = users.map(user => userCreator.userEntityToUserDto(user));
+        return usersDto;
+    });
     const updateUserById = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
         yield userValidate.checkUserExistsById(id);
         const user = yield userRepository.findById(id);
@@ -7697,6 +7845,7 @@ const UserService = (userRepository, userValidate, userCreator, passwordEncoder)
         findOrCreateUserByExternal,
         findUserById,
         findUserByEmail,
+        findAllUsers,
         updateUserById,
         updatePasswordById,
         deleteUserById,
@@ -8242,9 +8391,11 @@ class PaginateQueryParser {
     }
     static paginate(originalQuery, config) {
         var _a, _b, _c;
+        const limit = +originalQuery[((_a = config === null || config === void 0 ? void 0 : config.page) === null || _a === void 0 ? void 0 : _a.limitField) || 'limit'];
+        const page = +originalQuery[((_b = config === null || config === void 0 ? void 0 : config.page) === null || _b === void 0 ? void 0 : _b.pageField) || 'page'];
         const pageable = {
-            limit: +originalQuery[((_a = config === null || config === void 0 ? void 0 : config.page) === null || _a === void 0 ? void 0 : _a.limitField) || 'limit'],
-            page: +originalQuery[((_b = config === null || config === void 0 ? void 0 : config.page) === null || _b === void 0 ? void 0 : _b.pageField) || 'page'],
+            limit: isNaN(limit) ? undefined : limit,
+            page: isNaN(page) ? undefined : page,
             nextCursor: originalQuery[((_c = config === null || config === void 0 ? void 0 : config.page) === null || _c === void 0 ? void 0 : _c.nextCursorField) || 'next_cursor']
         };
         return pageable;

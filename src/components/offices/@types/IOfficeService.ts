@@ -1,9 +1,11 @@
 import { Pageable } from '@src/components/base/@types/FindAllOptions';
+import { PaginationInfo } from '@src/components/base/@types/PaginationInfo';
 import { CreateOfficeDto } from './dto/CreateOffice.dto';
 import { OfficeDetailDto } from './dto/OfficeDetail.dto';
 import { OfficeOverviewDto } from './dto/OfficeOverview.dto';
 import { OfficeWithItemsDto } from './dto/OfficeWithItems.dto';
 import { OfficeWithMembersDto } from './dto/OfficeWithMembers.dto';
+import { FindAllOfficesOptions } from './filter/FindAllOfficesOptions';
 
 export interface IOfficeService {
 	createOffice(
@@ -17,7 +19,9 @@ export interface IOfficeService {
 
 	findOfficeDetailById(id: number): Promise<OfficeDetailDto>;
 
-	findAllOfficesOverview(pageable: Pageable): Promise<OfficeOverviewDto[]>;
+	findAllOfficesOverview(
+		options: FindAllOfficesOptions
+	): Promise<[OfficeOverviewDto[], PaginationInfo]>;
 
 	findAllOfficesOverviewUserIsMemberByUserId(
 		userId: number,

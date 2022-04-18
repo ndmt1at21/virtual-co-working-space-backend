@@ -1,4 +1,5 @@
 import { Pageable } from '../base/@types/FindAllOptions';
+import { PaginationInfo } from '../base/@types/PaginationInfo';
 import { mapOfficeItemToOfficeItemOverviewDto } from '../officeItems/officeItem.mapping';
 import { OfficeItemRepository } from '../officeItems/officeItem.repository';
 import { IOfficeMemberCreator } from '../officeMembers/@types/IOfficeMemberCreator';
@@ -11,6 +12,7 @@ import { OfficeOverviewDto } from './@types/dto/OfficeOverview.dto';
 import { OfficeWithItemsDto } from './@types/dto/OfficeWithItems.dto';
 import { OfficeWithMembersDto } from './@types/dto/OfficeWithMembers.dto';
 import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
+import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
 import { IOfficeCreator } from './@types/IOfficeCreator';
 import { IOfficeService } from './@types/IOfficeService';
 import { IOfficeValidate } from './@types/IOfficeValidate';
@@ -88,9 +90,9 @@ export const OfficeService = (
 	};
 
 	const findAllOfficesOverview = async (
-		pageable: Pageable
-	): Promise<OfficeOverviewDto[]> => {
-		return await officeCreator.createOfficesOverview(pageable);
+		options: FindAllOfficesOptions
+	): Promise<[OfficeOverviewDto[], PaginationInfo]> => {
+		return await officeCreator.createOfficesOverview(options);
 	};
 
 	const findAllOfficesOverviewUserIsMemberByUserId = async (
@@ -100,7 +102,6 @@ export const OfficeService = (
 		const officeMembers = await officeMemberRepository
 			.queryBuilder()
 			.findByMemberId(userId)
-			.withPageable(pageable)
 			.build()
 			.getMany();
 

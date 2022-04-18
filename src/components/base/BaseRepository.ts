@@ -1,4 +1,4 @@
-import { ObjectID, Repository } from 'typeorm';
+import { ObjectID, Repository, SelectQueryBuilder } from 'typeorm';
 import { FilterOperationKey, FindAllOptions } from './@types/FindAllOptions';
 import { PaginationInfo } from './@types/PaginationInfo';
 
@@ -10,6 +10,20 @@ export abstract class BaseRepository<T> extends Repository<T> {
 	}
 
 	async findAll(options: FindAllOptions): Promise<[T[], PaginationInfo]> {
+		const query = this.createFindAllQueryBuilder(options);
+		const [items, totalCount] = await query.getManyAndCount();
+
+		return [
+			items,
+			{
+				count: items.length,
+				page: options.paginate?.page || 1,
+				totalCount
+			}
+		];
+	}
+
+	createFindAllQueryBuilder(options: FindAllOptions): SelectQueryBuilder<T> {
 		const { filter, sort, paginate } = options;
 
 		const query = this.createQueryBuilder(this.metadata.tableName);
@@ -78,6 +92,12 @@ export abstract class BaseRepository<T> extends Repository<T> {
 								}
 							);
 							break;
+						case 'in':
+							const in_value = `${field}_in_value`;
+							query.andWhere(`${field} IN (:${in_value})`, {
+								[in_value]: value
+							});
+							break;
 						default:
 							throw new Error(
 								`Unknown filter operation: ${operation}`
@@ -104,15 +124,6 @@ export abstract class BaseRepository<T> extends Repository<T> {
 			query.take(limit).skip((page - 1) * limit);
 		}
 
-		const [items, totalCount] = await query.getManyAndCount();
-
-		return [
-			items,
-			{
-				count: items.length,
-				page: paginate?.page || 1,
-				totalCount
-			}
-		];
+		return query;
 	}
 }

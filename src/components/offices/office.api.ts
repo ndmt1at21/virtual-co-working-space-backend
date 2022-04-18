@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { createAuthMiddleware } from '../auth/auth.factory';
+import { UserRoleType } from '../users/@types/UserRoleType';
 import { createOfficeController } from './office.factory';
 
 export const OfficeRouter = () => {
 	const officeController = createOfficeController();
-	const { protect } = createAuthMiddleware();
+	const { protect, restrictTo } = createAuthMiddleware();
 
 	const router = Router();
 
@@ -15,6 +16,10 @@ export const OfficeRouter = () => {
 	router.route('/:id/items').get(officeController.getOfficeItemsById);
 
 	router
+		.route('/in-offices')
+		.get(officeController.getAllOfficesOverviewCurrentUserIsMember);
+
+	router
 		.route('/:id')
 		.get(officeController.getOfficeDetailById)
 		.delete(officeController.deleteOfficeById)
@@ -22,7 +27,7 @@ export const OfficeRouter = () => {
 
 	router
 		.route('/')
-		.get(officeController.getAllOfficesOverviewCurrentUserIsMember)
+		.get(restrictTo([UserRoleType.ADMIN]), officeController.getAllOffices)
 		.post(officeController.createOffice)
 		.patch(officeController.updateOfficeById);
 

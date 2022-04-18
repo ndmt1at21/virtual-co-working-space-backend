@@ -110,6 +110,16 @@ export const OfficeController = (officeService: IOfficeService) => {
 
 	const getAllOffices = catchAsyncRequestHandler(async (req, res, next) => {
 		const query = extractQueryFindAllOptions(req.query);
+		const [offices, pagination] =
+			await officeService.findAllOfficesOverview(query);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: {
+				offices,
+				pagination
+			}
+		});
 	});
 
 	const createOffice = catchAsyncRequestHandler(async (req, res, next) => {
@@ -134,44 +144,61 @@ export const OfficeController = (officeService: IOfficeService) => {
 		originalQuery: any
 	): FindAllOfficesOptions {
 		const query = PaginateQueryParser.parse(originalQuery, {
-			filter: { includes: ['name', 'path'] }
+			filter: {
+				includes: [
+					'name',
+					'invitation_code',
+					'created_by',
+					'office_item',
+					'office_member',
+					'created_at'
+				]
+			}
 		});
 
-		const filter: FindAllOfficesFilter = {};
-		const sort: FindAllOfficesSort = {};
+		const options: FindAllOfficesOptions = {};
 
 		if (query.filter) {
-			filter.name = query.filter?.name;
-			filter.invitationCode = query.filter?.invitation_code;
-			filter.createdBy = query.filter?.created_by;
-			filter.officeItem = query.filter?.office_item;
-			filter.officeMember = query.filter?.office_member;
-			filter.createdAt = query.filter?.created_at;
+			const queryFilter = query.filter;
+
+			options.filter = {
+				name: queryFilter?.name,
+				invitationCode: queryFilter?.invitation_code,
+				createdBy: queryFilter?.created_by,
+				officeItem: queryFilter?.office_item,
+				officeMember: queryFilter?.office_member,
+				createdAt: queryFilter?.created_at
+			};
 		}
 
 		if (query.sort) {
-			sort.name = query.sort?.name.order;
-			sort.invitationCode = query.sort?.invitation_code?.order;
-			sort.createdBy = query.sort?.created_by?.order;
-			sort.officeItem = query.sort?.office_item?.order;
-			sort.officeMember = query.sort?.office_member?.order;
-			sort.createdAt = query.sort?.created_at?.order;
+			const querySort = query.sort;
+
+			options.sort = {
+				name: querySort?.name?.order,
+				invitationCode: querySort?.invitation_code?.order,
+				createdBy: querySort?.created_by?.order,
+				officeItem: querySort?.office_item?.order,
+				officeMember: querySort?.office_member?.order,
+				createdAt: querySort?.created_at?.order
+			};
 		}
 
-		return {
-			filter,
-			sort,
-			pageable: query.pageable
-		};
+		if (query.pageable) {
+			options.pageable = query.pageable;
+		}
+
+		return options;
 	}
 
 	return {
 		getOfficeDetailById,
-		updateOfficeById,
-		deleteOfficeById,
 		getOfficeItemsById,
 		getOfficeMembersById,
 		getAllOfficesOverviewCurrentUserIsMember,
+		getAllOffices,
+		updateOfficeById,
+		deleteOfficeById,
 		createOffice
 	};
 };

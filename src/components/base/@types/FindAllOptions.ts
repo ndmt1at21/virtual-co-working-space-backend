@@ -8,7 +8,8 @@ export type FilterOperationKey =
 	| 'gt'
 	| 'gte'
 	| 'contains'
-	| 'startsWith';
+	| 'startsWith'
+	| 'in';
 
 export type FilterValue = {
 	[key in FilterOperationKey]?: any;

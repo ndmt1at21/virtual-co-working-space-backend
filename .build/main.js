@@ -2532,96 +2532,107 @@ class BaseRepository extends typeorm_1.Repository {
         return this.findOne(id);
     }
     findAll(options) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const { filter, sort, paginate } = options;
-            const query = this.createQueryBuilder(this.metadata.tableName);
-            if (filter) {
-                Object.keys(filter).forEach(field => {
-                    const filterValue = filter[field];
-                    if (filterValue === undefined) {
-                        return;
-                    }
-                    Object.keys(filterValue).forEach(opt => {
-                        const operation = opt;
-                        const value = filterValue[operation];
-                        switch (operation) {
-                            case 'eq':
-                                const eq_value = `${field}_eq_value`;
-                                query.andWhere(`${field} = :${eq_value}`, {
-                                    [eq_value]: value
-                                });
-                                break;
-                            case 'ne':
-                                const ne_value = `${field}_ne_value`;
-                                query.andWhere(`${field} != :${ne_value}`, {
-                                    [ne_value]: value
-                                });
-                                break;
-                            case 'lt':
-                                const lt_value = `${field}_lt_value`;
-                                query.andWhere(`${field} < :${lt_value}`, {
-                                    [lt_value]: value
-                                });
-                                break;
-                            case 'lte':
-                                const lte_value = `${field}_lte_value`;
-                                query.andWhere(`${field} <= :${lte_value}`, {
-                                    [lte_value]: value
-                                });
-                                break;
-                            case 'gt':
-                                const gt_value = `${field}_gt_value`;
-                                query.andWhere(`${field} > :${gt_value}`, {
-                                    [gt_value]: value
-                                });
-                                break;
-                            case 'gte':
-                                const gte_value = `${field}_gte_value`;
-                                query.andWhere(`${field} >= :${gte_value}`, {
-                                    [gte_value]: value
-                                });
-                                break;
-                            case 'contains':
-                                const containsValue = `${field}_contains_value`;
-                                query.andWhere(`${field} ILIKE :${containsValue}`, {
-                                    [containsValue]: `%${value}%`
-                                });
-                                break;
-                            case 'startsWith':
-                                const startsWithValue = `${field}_startsWith_value`;
-                                query.andWhere(`${field} ILIKE :${startsWithValue}`, {
-                                    [startsWithValue]: `${value}%`
-                                });
-                                break;
-                            default:
-                                throw new Error(`Unknown filter operation: ${operation}`);
-                        }
-                    });
-                });
-            }
-            if (sort) {
-                Object.keys(sort).forEach(field => {
-                    const order = sort[field];
-                    if (order === undefined) {
-                        return;
-                    }
-                    query.addOrderBy(field, order);
-                });
-            }
-            if (paginate) {
-                const { limit = 100, page = 1 } = paginate;
-                query.take(limit).skip((page - 1) * limit);
-            }
+            const query = this.createFindAllQueryBuilder(options);
             const [items, totalCount] = yield query.getManyAndCount();
             return [
                 items,
                 {
                     count: items.length,
-                    page: (paginate === null || paginate === void 0 ? void 0 : paginate.page) || 1,
+                    page: ((_a = options.paginate) === null || _a === void 0 ? void 0 : _a.page) || 1,
                     totalCount
                 }
             ];
         });
+    }
+    createFindAllQueryBuilder(options) {
+        const { filter, sort, paginate } = options;
+        const query = this.createQueryBuilder(this.metadata.tableName);
+        if (filter) {
+            Object.keys(filter).forEach(field => {
+                const filterValue = filter[field];
+                if (filterValue === undefined) {
+                    return;
+                }
+                Object.keys(filterValue).forEach(opt => {
+                    const operation = opt;
+                    const value = filterValue[operation];
+                    switch (operation) {
+                        case 'eq':
+                            const eq_value = `${field}_eq_value`;
+                            query.andWhere(`${field} = :${eq_value}`, {
+                                [eq_value]: value
+                            });
+                            break;
+                        case 'ne':
+                            const ne_value = `${field}_ne_value`;
+                            query.andWhere(`${field} != :${ne_value}`, {
+                                [ne_value]: value
+                            });
+                            break;
+                        case 'lt':
+                            const lt_value = `${field}_lt_value`;
+                            query.andWhere(`${field} < :${lt_value}`, {
+                                [lt_value]: value
+                            });
+                            break;
+                        case 'lte':
+                            const lte_value = `${field}_lte_value`;
+                            query.andWhere(`${field} <= :${lte_value}`, {
+                                [lte_value]: value
+                            });
+                            break;
+                        case 'gt':
+                            const gt_value = `${field}_gt_value`;
+                            query.andWhere(`${field} > :${gt_value}`, {
+                                [gt_value]: value
+                            });
+                            break;
+                        case 'gte':
+                            const gte_value = `${field}_gte_value`;
+                            query.andWhere(`${field} >= :${gte_value}`, {
+                                [gte_value]: value
+                            });
+                            break;
+                        case 'contains':
+                            const containsValue = `${field}_contains_value`;
+                            query.andWhere(`${field} ILIKE :${containsValue}`, {
+                                [containsValue]: `%${value}%`
+                            });
+                            break;
+                        case 'startsWith':
+                            const startsWithValue = `${field}_startsWith_value`;
+                            query.andWhere(`${field} ILIKE :${startsWithValue}`, {
+                                [startsWithValue]: `${value}%`
+                            });
+                            break;
+                        case 'in':
+                            const in_value = `${field}_in_value`;
+                            query.andWhere(`${field} IN (:${in_value})`, {
+                                [in_value]: value
+                            });
+                            break;
+                        default:
+                            throw new Error(`Unknown filter operation: ${operation}`);
+                    }
+                });
+            });
+        }
+        if (sort) {
+            Object.keys(sort).forEach(field => {
+                const order = sort[field];
+                if (order === undefined) {
+                    return;
+                }
+                query.addOrderBy(field, order);
+            });
+        }
+        if (paginate) {
+            const { limit = 100, page = 1 } = paginate;
+            query.take(limit).skip((page - 1) * limit);
+        }
+        return query;
     }
 }
 exports.BaseRepository = BaseRepository;
@@ -2638,16 +2649,11 @@ exports.RepositoryQueryBuilder = void 0;
 class RepositoryQueryBuilder {
     constructor(repository, tableAlias) {
         this.query = repository.createQueryBuilder(tableAlias);
-        this.tableAlias = tableAlias;
+        this.repository = repository;
+        this.tableAlias = repository.metadata.tableName;
     }
     findById(id) {
         this.query.where(`${this.tableAlias}.id = :id`, { id });
-        return this;
-    }
-    withPageable(pageable) {
-        const { page = 10, limit = 10 } = pageable;
-        this.query.limit(limit);
-        this.query.skip(limit * (page - 1));
         return this;
     }
     build() {
@@ -5904,10 +5910,6 @@ class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder_1.Reposi
             .leftJoinAndSelect('office_member_role.officeRole', 'office_role');
         return this;
     }
-    withPageable(pageable) {
-        super.withPageable(pageable);
-        return this;
-    }
     build() {
         return this.query;
     }
@@ -5965,7 +5967,6 @@ const OfficeMemberService = (officeMemberRepository, officeMemberTransformReposi
             .withOfficeHasCreator()
             .withRoles()
             .withTransform()
-            .withPageable(pageable)
             .build()
             .getMany();
         const total = yield officeMemberRepository.count();
@@ -6387,14 +6388,18 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OfficeRouter = void 0;
 const express_1 = __webpack_require__(6860);
 const auth_factory_1 = __webpack_require__(6901);
+const UserRoleType_1 = __webpack_require__(7927);
 const office_factory_1 = __webpack_require__(4903);
 const OfficeRouter = () => {
     const officeController = (0, office_factory_1.createOfficeController)();
-    const { protect } = (0, auth_factory_1.createAuthMiddleware)();
+    const { protect, restrictTo } = (0, auth_factory_1.createAuthMiddleware)();
     const router = (0, express_1.Router)();
     router.use(protect);
     router.route('/:id/members').get(officeController.getOfficeMembersById);
     router.route('/:id/items').get(officeController.getOfficeItemsById);
+    router
+        .route('/in-offices')
+        .get(officeController.getAllOfficesOverviewCurrentUserIsMember);
     router
         .route('/:id')
         .get(officeController.getOfficeDetailById)
@@ -6402,7 +6407,7 @@ const OfficeRouter = () => {
         .patch(officeController.updateOfficeById);
     router
         .route('/')
-        .get(officeController.getAllOfficesOverviewCurrentUserIsMember)
+        .get(restrictTo([UserRoleType_1.UserRoleType.ADMIN]), officeController.getAllOfficesOverviewCurrentUserIsMember)
         .post(officeController.createOffice)
         .patch(officeController.updateOfficeById);
     return router;
@@ -6493,6 +6498,14 @@ const OfficeController = (officeService) => {
     }));
     const getAllOffices = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const query = extractQueryFindAllOptions(req.query);
+        const [offices, pagination] = yield officeService.findAllOfficesOverview(query);
+        res.status(httpStatusCode_1.HttpStatusCode.OK).json({
+            code: httpStatusCode_1.HttpStatusCode.OK,
+            data: {
+                offices,
+                pagination
+            }
+        });
     }));
     const createOffice = (0, catchAsyncRequestHandler_1.catchAsyncRequestHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const errors = yield (0, requestValidation_1.validateRequestBody)(CreateOffice_dto_1.CreateOfficeDto, req.body);
@@ -6507,41 +6520,55 @@ const OfficeController = (officeService) => {
         });
     }));
     function extractQueryFindAllOptions(originalQuery) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
+        var _a, _b, _c, _d, _e;
         const query = paginateQueryParser_1.PaginateQueryParser.parse(originalQuery, {
-            filter: { includes: ['name', 'path'] }
+            filter: {
+                includes: [
+                    'name',
+                    'invitation_code',
+                    'created_by',
+                    'office_item',
+                    'office_member',
+                    'created_at'
+                ]
+            }
         });
-        const filter = {};
-        const sort = {};
+        const options = {};
         if (query.filter) {
-            filter.name = (_a = query.filter) === null || _a === void 0 ? void 0 : _a.name;
-            filter.invitationCode = (_b = query.filter) === null || _b === void 0 ? void 0 : _b.invitation_code;
-            filter.createdBy = (_c = query.filter) === null || _c === void 0 ? void 0 : _c.created_by;
-            filter.officeItem = (_d = query.filter) === null || _d === void 0 ? void 0 : _d.office_item;
-            filter.officeMember = (_e = query.filter) === null || _e === void 0 ? void 0 : _e.office_member;
-            filter.createdAt = (_f = query.filter) === null || _f === void 0 ? void 0 : _f.created_at;
+            const queryFilter = query.filter;
+            options.filter = {
+                name: queryFilter === null || queryFilter === void 0 ? void 0 : queryFilter.name,
+                invitationCode: queryFilter === null || queryFilter === void 0 ? void 0 : queryFilter.invitation_code,
+                createdBy: queryFilter === null || queryFilter === void 0 ? void 0 : queryFilter.created_by,
+                officeItem: queryFilter === null || queryFilter === void 0 ? void 0 : queryFilter.office_item,
+                officeMember: queryFilter === null || queryFilter === void 0 ? void 0 : queryFilter.office_member,
+                createdAt: queryFilter === null || queryFilter === void 0 ? void 0 : queryFilter.created_at
+            };
         }
         if (query.sort) {
-            sort.name = (_g = query.sort) === null || _g === void 0 ? void 0 : _g.name.order;
-            sort.invitationCode = (_j = (_h = query.sort) === null || _h === void 0 ? void 0 : _h.invitation_code) === null || _j === void 0 ? void 0 : _j.order;
-            sort.createdBy = (_l = (_k = query.sort) === null || _k === void 0 ? void 0 : _k.created_by) === null || _l === void 0 ? void 0 : _l.order;
-            sort.officeItem = (_o = (_m = query.sort) === null || _m === void 0 ? void 0 : _m.office_item) === null || _o === void 0 ? void 0 : _o.order;
-            sort.officeMember = (_q = (_p = query.sort) === null || _p === void 0 ? void 0 : _p.office_member) === null || _q === void 0 ? void 0 : _q.order;
-            sort.createdAt = (_s = (_r = query.sort) === null || _r === void 0 ? void 0 : _r.created_at) === null || _s === void 0 ? void 0 : _s.order;
+            const querySort = query.sort;
+            options.sort = {
+                name: querySort === null || querySort === void 0 ? void 0 : querySort.name.order,
+                invitationCode: (_a = querySort === null || querySort === void 0 ? void 0 : querySort.invitation_code) === null || _a === void 0 ? void 0 : _a.order,
+                createdBy: (_b = querySort === null || querySort === void 0 ? void 0 : querySort.created_by) === null || _b === void 0 ? void 0 : _b.order,
+                officeItem: (_c = querySort === null || querySort === void 0 ? void 0 : querySort.office_item) === null || _c === void 0 ? void 0 : _c.order,
+                officeMember: (_d = querySort === null || querySort === void 0 ? void 0 : querySort.office_member) === null || _d === void 0 ? void 0 : _d.order,
+                createdAt: (_e = querySort === null || querySort === void 0 ? void 0 : querySort.created_at) === null || _e === void 0 ? void 0 : _e.order
+            };
         }
-        return {
-            filter,
-            sort,
-            pageable: query.pageable
-        };
+        if (query.pageable) {
+            options.pageable = query.pageable;
+        }
+        return options;
     }
     return {
         getOfficeDetailById,
-        updateOfficeById,
-        deleteOfficeById,
         getOfficeItemsById,
         getOfficeMembersById,
         getAllOfficesOverviewCurrentUserIsMember,
+        getAllOffices,
+        updateOfficeById,
+        deleteOfficeById,
         createOffice
     };
 };
@@ -6608,14 +6635,23 @@ const OfficeCreator = (officeRepository, officeMemberRepository, officeItemRepos
             .getMany();
         return offices.map(office => (0, office_mapping_1.mapOfficeToOfficeOverviewDto)(office));
     });
-    const createOfficesOverview = (pageable) => __awaiter(void 0, void 0, void 0, function* () {
-        const offices = yield officeRepository
+    const createOfficesOverview = (options) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        const [offices, totalCount] = yield officeRepository
             .queryBuilder()
+            .findAllOffices(options)
             .withCreator()
-            .withPageable(pageable)
             .build()
-            .getMany();
-        return offices.map(office => (0, office_mapping_1.mapOfficeToOfficeOverviewDto)(office));
+            .getManyAndCount();
+        const officesOverviewDto = offices.map(office => (0, office_mapping_1.mapOfficeToOfficeOverviewDto)(office));
+        return [
+            officesOverviewDto,
+            {
+                count: offices.length,
+                page: ((_a = options.pageable) === null || _a === void 0 ? void 0 : _a.page) || 1,
+                totalCount
+            }
+        ];
     });
     return {
         createOfficeOverviewById,
@@ -6864,28 +6900,6 @@ let OfficeRepository = class OfficeRepository extends BaseRepository_1.BaseRepos
             return count === 1;
         });
     }
-    mapFindAllItemsOptionsToDatabaseField(options) {
-        const { filter, pageable, sort } = options;
-        return {
-            filter: {
-                name: filter === null || filter === void 0 ? void 0 : filter.name,
-                invitation_code: filter === null || filter === void 0 ? void 0 : filter.invitationCode,
-                created_by_user_id: filter === null || filter === void 0 ? void 0 : filter.createdBy,
-                office_item: filter === null || filter === void 0 ? void 0 : filter.officeItem,
-                office_member: filter === null || filter === void 0 ? void 0 : filter.officeMember,
-                created_at: filter === null || filter === void 0 ? void 0 : filter.createdAt
-            },
-            sort: {
-                name: sort === null || sort === void 0 ? void 0 : sort.name,
-                invitation_code: sort === null || sort === void 0 ? void 0 : sort.invitationCode,
-                created_by_user_id: sort === null || sort === void 0 ? void 0 : sort.createdBy,
-                office_item: sort === null || sort === void 0 ? void 0 : sort.officeItem,
-                office_member: sort === null || sort === void 0 ? void 0 : sort.officeMember,
-                created_at: sort === null || sort === void 0 ? void 0 : sort.createdAt
-            },
-            paginate: pageable
-        };
-    }
 };
 OfficeRepository = __decorate([
     (0, typeorm_1.EntityRepository)(office_entity_1.Office)
@@ -6904,7 +6918,7 @@ exports.OfficeRepositoryQueryBuilder = void 0;
 const RepositoryQueryBuilder_1 = __webpack_require__(9456);
 class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder_1.RepositoryQueryBuilder {
     constructor(repository) {
-        super(repository, 'office');
+        super(repository);
     }
     findById(id) {
         super.findById(id);
@@ -6926,13 +6940,37 @@ class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder_1.RepositoryQu
         });
         return this;
     }
+    findAllOffices(options) {
+        const optionsWithDbField = this.mapFindAllItemsOptionsToDatabaseField(options);
+        this.query =
+            this.repository.createFindAllQueryBuilder(optionsWithDbField);
+        return this;
+    }
     withCreator() {
         this.query.leftJoinAndSelect('office.createdBy', 'user');
         return this;
     }
-    withPageable(pageable) {
-        super.withPageable(pageable);
-        return this;
+    mapFindAllItemsOptionsToDatabaseField(options) {
+        const { filter, pageable, sort } = options;
+        return {
+            filter: {
+                name: filter === null || filter === void 0 ? void 0 : filter.name,
+                invitation_code: filter === null || filter === void 0 ? void 0 : filter.invitationCode,
+                created_by_user_id: filter === null || filter === void 0 ? void 0 : filter.createdBy,
+                office_item: filter === null || filter === void 0 ? void 0 : filter.officeItem,
+                office_member: filter === null || filter === void 0 ? void 0 : filter.officeMember,
+                created_at: filter === null || filter === void 0 ? void 0 : filter.createdAt
+            },
+            sort: {
+                name: sort === null || sort === void 0 ? void 0 : sort.name,
+                invitation_code: sort === null || sort === void 0 ? void 0 : sort.invitationCode,
+                created_by_user_id: sort === null || sort === void 0 ? void 0 : sort.createdBy,
+                office_item: sort === null || sort === void 0 ? void 0 : sort.officeItem,
+                office_member: sort === null || sort === void 0 ? void 0 : sort.officeMember,
+                created_at: sort === null || sort === void 0 ? void 0 : sort.createdAt
+            },
+            paginate: pageable
+        };
     }
 }
 exports.OfficeRepositoryQueryBuilder = OfficeRepositoryQueryBuilder;
@@ -6993,14 +7031,13 @@ const OfficeService = (officeRepository, officeItemRepository, officeMemberRepos
         const officeDetail = yield officeCreator.createOfficeDetailById(id);
         return officeDetail;
     });
-    const findAllOfficesOverview = (pageable) => __awaiter(void 0, void 0, void 0, function* () {
-        return yield officeCreator.createOfficesOverview(pageable);
+    const findAllOfficesOverview = (options) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield officeCreator.createOfficesOverview(options);
     });
     const findAllOfficesOverviewUserIsMemberByUserId = (userId, pageable) => __awaiter(void 0, void 0, void 0, function* () {
         const officeMembers = yield officeMemberRepository
             .queryBuilder()
             .findByMemberId(userId)
-            .withPageable(pageable)
             .build()
             .getMany();
         const totalOfficeMembers = yield officeMemberRepository

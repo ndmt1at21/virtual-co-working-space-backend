@@ -1,12 +1,11 @@
 import { SelectQueryBuilder } from 'typeorm';
-import { Pageable } from '../base/@types/FindAllOptions';
 import { RepositoryQueryBuilder } from '../base/RepositoryQueryBuilder';
 import { OfficeMember } from './officeMember.entity';
 import { OfficeMemberRepository } from './officeMember.repository';
 
 export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<OfficeMember> {
 	constructor(repository: OfficeMemberRepository) {
-		super(repository, 'office_member');
+		super(repository);
 	}
 
 	findById(id: number): OfficeMemberRepositoryQueryBuilder {
@@ -70,11 +69,6 @@ export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<O
 		this.query
 			.leftJoinAndSelect('office_member.roles', 'office_member_role')
 			.leftJoinAndSelect('office_member_role.officeRole', 'office_role');
-		return this;
-	}
-
-	withPageable(pageable: Pageable): OfficeMemberRepositoryQueryBuilder {
-		super.withPageable(pageable);
 		return this;
 	}
 

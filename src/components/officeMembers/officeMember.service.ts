@@ -70,7 +70,6 @@ export const OfficeMemberService = (
 			.withOfficeHasCreator()
 			.withRoles()
 			.withTransform()
-			.withPageable(pageable)
 			.build()
 			.getMany();
 

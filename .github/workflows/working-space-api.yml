@@ -23,5 +23,6 @@ jobs:
                   node-version: ${{matrix.node-version}}
 
             - run: npm ci
+            - run: npm test
             - run: npm run build:prod
             - run: pm2 startOrRestart ecosystem.config.js

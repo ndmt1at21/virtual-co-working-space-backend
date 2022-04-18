@@ -8,7 +8,7 @@ on:
 
 jobs:
     Working-Space-API-Actions:
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
 
         strategy:
             matrix:

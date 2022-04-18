@@ -10,29 +10,18 @@ jobs:
     Working-Space-API-Actions:
         runs-on: ubuntu-latest
 
-        strategy:
-            matrix:
-                node-version: [14.x]
+    strategy:
+        matrix:
+            node-version: [14.x]
 
         steps:
+            - uses: actions/checkout@v2
+
             - name: Use Node.js ${{matrix.node-version}}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{matrix.node-version}}
 
-            - name: Deploy node server
-              uses: appleboy/ssh-action@master
-              with:
-                  host: ${{ secrets.SSH_HOST }}
-                  username: ${{ secrets.SSH_USERNAME }}
-                  key: ${{ secrets.SSH_KEY }}
-                  port: ${{ secrets.SSH_PORT }}
-                  passphrase: ${{ secrets.SSH_PASSPHRASE }}
-                  script: |
-                      cd ~/virtual-working-space-backend/virtual-co-working-space-backend
-                      git pull origin main
-
-                      sudo npm ci
-                      sudo npm run build
-                      sudo npm test
-                      sudo pm2 startOrRestart ecosystem.config.js --env production
+            - run: npm ci
+            - run: npm run build:prod
+            - run: pm2 startOrRestart ecosystem.config.js

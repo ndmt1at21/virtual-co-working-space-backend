@@ -1,5 +1,7 @@
 import { SelectQueryBuilder } from 'typeorm';
+import { FindAllOptions } from '../base/@types/FindAllOptions';
 import { RepositoryQueryBuilder } from '../base/RepositoryQueryBuilder';
+import { FindAllOfficeMembersOptions } from './@types/filter/FindAllOfficeMembersOptions';
 import { OfficeMember } from './officeMember.entity';
 import { OfficeMemberRepository } from './officeMember.repository';
 
@@ -14,12 +16,14 @@ export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<O
 	}
 
 	findByOfficeId(officeId: number): OfficeMemberRepositoryQueryBuilder {
-		this.query.where('office_member.office_id = :officeId', { officeId });
+		this.query.where(`${this.tableAlias}.office_id = :officeId`, {
+			officeId
+		});
 		return this;
 	}
 
 	findByMemberId(memberId: number): OfficeMemberRepositoryQueryBuilder {
-		this.query.where('office_member.member_id = :memberId', {
+		this.query.where(`${this.tableAlias}.member_id = :memberId`, {
 			memberId
 		});
 		return this;
@@ -30,8 +34,8 @@ export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<O
 		officeId: number
 	): OfficeMemberRepositoryQueryBuilder {
 		this.query
-			.where('office_member.member_id = :memberId', { memberId })
-			.andWhere('office_member.office_id = :officeId', { officeId });
+			.where(`${this.tableAlias}.member_id = :memberId`, { memberId })
+			.andWhere(`${this.tableAlias}.office_id = :officeId`, { officeId });
 		return this;
 	}
 
@@ -41,25 +45,25 @@ export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<O
 	}
 
 	withMember(): OfficeMemberRepositoryQueryBuilder {
-		this.query.leftJoinAndSelect('office_member.member', 'user');
+		this.query.leftJoinAndSelect(`${this.tableAlias}.member`, 'user');
 		return this;
 	}
 
 	withOffice(): OfficeMemberRepositoryQueryBuilder {
-		this.query.leftJoinAndSelect('office_member.office', 'office');
+		this.query.leftJoinAndSelect(`${this.tableAlias}.office`, 'office');
 		return this;
 	}
 
 	withOfficeHasCreator(): OfficeMemberRepositoryQueryBuilder {
 		this.query
-			.leftJoinAndSelect('office_member.office', 'office')
+			.leftJoinAndSelect(`${this.tableAlias}.office`, 'office')
 			.leftJoinAndSelect('office.createdBy', 'created_user');
 		return this;
 	}
 
 	withTransform(): OfficeMemberRepositoryQueryBuilder {
 		this.query.leftJoinAndSelect(
-			'office_member.transform',
+			`${this.tableAlias}.transform`,
 			'office_member_transform'
 		);
 		return this;
@@ -67,12 +71,35 @@ export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<O
 
 	withRoles(): OfficeMemberRepositoryQueryBuilder {
 		this.query
-			.leftJoinAndSelect('office_member.roles', 'office_member_role')
+			.leftJoinAndSelect(`${this.tableAlias}.roles`, 'office_member_role')
 			.leftJoinAndSelect('office_member_role.officeRole', 'office_role');
 		return this;
 	}
 
 	build(): SelectQueryBuilder<OfficeMember> {
 		return this.query;
+	}
+
+	private mapFindAllItemsOptionsToDatabaseField(
+		options: FindAllOfficeMembersOptions
+	): FindAllOptions {
+		const { filter, pageable, sort } = options;
+		const alias = this.tableAlias;
+
+		return {
+			filter: {
+				[`${alias}.member_id`]: filter?.memberId,
+				[`${alias}.office_id`]: filter?.officeId,
+				[`${alias}.online_status`]: filter?.onlineStatus,
+				[`${alias}.role`]: filter?.role
+			},
+			sort: {
+				[`${alias}.member_id`]: sort?.memberId,
+				[`${alias}.office_id`]: sort?.officeId,
+				[`${alias}.online_status`]: sort?.onlineStatus,
+				[`${alias}.role`]: sort?.role
+			},
+			paginate: pageable
+		};
 	}
 }

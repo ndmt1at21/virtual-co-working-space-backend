@@ -22,6 +22,10 @@ jobs:
               with:
                   node-version: ${{matrix.node-version}}
 
+            - name: Create .env files
+              shell: bash
+              run: cp ../.env .env
+
             - run: npm ci
             - run: npm run build:prod
             - run: pm2 startOrRestart ecosystem.config.js

@@ -11,9 +11,7 @@ import {
 	mainRoutes
 } from './loaders/main';
 import { createMessageQueues } from './loaders/queue';
-import { socketEventHandlers, socketMiddleware } from './loaders/socket';
-
-import io from 'socket.io';
+import { socketEventHandlers } from './loaders/socket';
 import config from '@src/config';
 
 export const mainAppLoaders = async (

@@ -6,6 +6,7 @@ import { Application } from 'express';
 import { appConfig } from '@src/config/app';
 import { ILogger } from '@components/logger/@types/ILogger';
 import { rateLimiting } from '../../middleware/rateLimit';
+import config from '@src/config';
 
 export const mainMiddleware = (app: Application, logger: ILogger) => {
 	const isProduction = appConfig.NODE_ENV === 'production';
@@ -26,7 +27,7 @@ export const mainMiddleware = (app: Application, logger: ILogger) => {
 
 	app.use(
 		cors({
-			origin: ['http://localhost:3000', 'https://vispace.tech'],
+			origin: config.app.CORS_ORIGIN,
 			credentials: true,
 			exposedHeaders: [
 				'x-total-count',

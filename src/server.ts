@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import http from 'http';
 import express from 'express';
-import globalManager from './global';
 import { appConfig } from '@src/config/app';
 import { serverLogger } from '@components/logger';
 import {

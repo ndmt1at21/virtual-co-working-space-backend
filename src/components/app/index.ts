@@ -14,6 +14,7 @@ import { createMessageQueues } from './loaders/queue';
 import { socketEventHandlers, socketMiddleware } from './loaders/socket';
 
 import io from 'socket.io';
+import config from '@src/config';
 
 export const mainAppLoaders = async (
 	app: Application,
@@ -69,7 +70,7 @@ export const socketServerLoader = (
 ): SocketServer => {
 	const socketServer = new SocketServer(server, {
 		cors: {
-			origin: ['http://localhost:3000', 'https://vispace.tech']
+			origin: config.app.CORS_ORIGIN
 		},
 		transports: ['polling', 'websocket'],
 		path: '/socket.io'

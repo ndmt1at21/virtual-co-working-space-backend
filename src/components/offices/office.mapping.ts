@@ -16,14 +16,24 @@ type OfficeDetailMappingData = {
 export const mapOfficeToOfficeOverviewDto = (
 	office: Office
 ): OfficeOverviewDto => {
-	const { id, createdAt, invitationCode, name, createdBy } = office;
+	const {
+		id,
+		createdAt,
+		invitationCode,
+		name,
+		createdBy,
+		numberOfItems,
+		numberOfMembers
+	} = office;
 
 	return {
 		id,
 		name,
 		invitationCode,
 		createdBy: mapUserToUserOverviewDto(createdBy),
-		createdAt
+		createdAt,
+		numberOfItems,
+		numberOfMembers
 	};
 };
 

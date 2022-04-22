@@ -1,8 +1,9 @@
-import { EntityRepository } from 'typeorm';
+import { DeepPartial, EntityRepository, getManager } from 'typeorm';
 import { OfficeItem } from '@src/components/officeItems/officeItem.entity';
 import { BaseRepository } from '../base/BaseRepository';
 import { OfficeItemTransformDto } from './@types/dto/OfficeItemTransform.dto';
 import { Pageable } from '../base/@types/FindAllOptions';
+import { Office } from '../offices/office.entity';
 
 @EntityRepository(OfficeItem)
 export class OfficeItemRepository extends BaseRepository<OfficeItem> {
@@ -12,6 +13,27 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 			.getCount();
 
 		return count === 1;
+	}
+
+	async saveOfficeItem(entity: DeepPartial<OfficeItem>): Promise<OfficeItem> {
+		let createdOfficeItem: OfficeItem;
+
+		getManager().transaction(async transactionManager => {
+			const officeItem = transactionManager.create(OfficeItem, entity);
+
+			createdOfficeItem = await transactionManager.save<OfficeItem>(
+				officeItem
+			);
+
+			await transactionManager.increment(
+				Office,
+				{ id: entity.officeId! },
+				'numberOfItems',
+				1
+			);
+		});
+
+		return createdOfficeItem!;
 	}
 
 	async updateOfficeItemTransformById(

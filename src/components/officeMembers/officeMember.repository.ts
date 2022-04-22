@@ -1,13 +1,39 @@
-import { EntityRepository } from 'typeorm';
+import { DeepPartial, EntityRepository, getManager } from 'typeorm';
 import { OfficeMember } from '@src/components/officeMembers/officeMember.entity';
 import { BaseRepository } from '../base/BaseRepository';
 import { OfficeMemberOnlineStatus } from './@types/OfficeMemberOnlineStatus';
 import { OfficeMemberRepositoryQueryBuilder } from './officeMember.repositoryBuilder';
+import { Office } from '../offices/office.entity';
 
 @EntityRepository(OfficeMember)
 export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 	queryBuilder(): OfficeMemberRepositoryQueryBuilder {
 		return new OfficeMemberRepositoryQueryBuilder(this);
+	}
+
+	async saveOfficeMember(
+		entity: DeepPartial<OfficeMember>
+	): Promise<OfficeMember> {
+		let createdOfficeMember: OfficeMember;
+
+		getManager().transaction(async transactionEntityManager => {
+			const officeMember = this.create(entity);
+
+			createdOfficeMember =
+				await transactionEntityManager.save<OfficeMember>(officeMember);
+
+			const updateResult = await transactionEntityManager.increment(
+				Office,
+				{ id: entity.officeId! },
+				'numberOfMembers',
+				1
+			);
+
+			console.log(updateResult);
+		});
+
+		// TODO: can throw an error ?
+		return createdOfficeMember!;
 	}
 
 	async existsOfficeMemberById(id: number): Promise<boolean> {

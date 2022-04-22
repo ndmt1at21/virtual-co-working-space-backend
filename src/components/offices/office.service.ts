@@ -49,7 +49,8 @@ export const OfficeService = (
 			invitationCode,
 			createdByUserId: createdUserId,
 			name: createOfficeDto.name,
-			officeMembers: [officeMember]
+			officeMembers: [officeMember],
+			numberOfMembers: 1
 		});
 
 		const officeDto = await officeCreator.createOfficeOverviewById(

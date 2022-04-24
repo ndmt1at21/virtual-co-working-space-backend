@@ -34,14 +34,14 @@ export const UserRouter = (): Router => {
 
 	router
 		.route('/:id')
-		.all(authMiddleware.restrictTo([UserRoleType.ADMIN]))
+		// .all(authMiddleware.restrictTo([UserRoleType.ADMIN]))
 		.get(userController.getUserById)
 		.patch(userController.updateUser)
 		.delete(userController.deleteUser);
 
 	router
 		.route('/')
-		.all(authMiddleware.restrictTo([UserRoleType.ADMIN]))
+		// .all(authMiddleware.restrictTo([UserRoleType.ADMIN]))
 		.post(userController.createUser)
 		.get(userController.getUsers);
 

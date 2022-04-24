@@ -17,6 +17,7 @@ export class RefreshToken extends BaseEntity {
 	id: number;
 
 	@Column()
+	@Index()
 	token: string;
 
 	@Column({ name: 'user_id' })

@@ -1,17 +1,12 @@
-import {
-	Column,
-	Entity,
-	JoinColumn,
-	OneToMany,
-	OneToOne,
-	PrimaryGeneratedColumn
-} from 'typeorm';
+import { Column, Entity, ObjectID, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '@components/base/BaseEntity';
+import { MessageReader } from './@types/MessageReader';
+import { MessageStatus } from './@types/MessageStatus';
 
 @Entity({ name: 'conversation' })
 export class Message extends BaseEntity {
 	@PrimaryGeneratedColumn()
-	id: number;
+	id: ObjectID;
 
 	@Column({ name: 'conversation_id' })
 	conversationId: number;
@@ -21,6 +16,12 @@ export class Message extends BaseEntity {
 
 	@Column({ name: 'content' })
 	content: string;
+
+	@Column()
+	readers: MessageReader[];
+
+	@Column()
+	messageStatus: MessageStatus;
 
 	@Column()
 	type: number;

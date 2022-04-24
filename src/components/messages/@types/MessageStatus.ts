@@ -1,6 +1,7 @@
 export enum MessageStatus {
 	SENT = 'sent',
 	RECEIVED = 'received',
-	READ = 'read',
-	FAILED = 'failed'
+	FAILED = 'failed',
+	REVOKE = 'revoke',
+	SELF_DELETE = 'self_delete'
 }

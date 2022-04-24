@@ -7,6 +7,7 @@ import { UnauthorizedError } from '@src/utils/appError';
 import { AuthTokenErrorMessages } from './authToken.error';
 import { IAuthTokenService } from './@types/IAuthTokenService';
 import { IAuthTokenValidate } from './@types/IAuthTokenValidate';
+import { CredentialsDto } from '../auth/@types/dto/Credentials.dto';
 
 export const AuthTokenService = (
 	refreshTokenRepository: RefreshTokenRepository,
@@ -89,14 +90,11 @@ export const AuthTokenService = (
 	};
 
 	const validateRefreshToken = async (
-		userId: number,
 		refreshToken: string
 	): Promise<boolean> => {
-		const refreshTokenEntity =
-			await refreshTokenRepository.findByTokenAndUserId(
-				userId,
-				refreshToken
-			);
+		const refreshTokenEntity = await refreshTokenRepository.findByToken(
+			refreshToken
+		);
 
 		authTokenValidate.checkRefreshTokenExists(refreshTokenEntity);
 		authTokenValidate.checkRefreshTokenActive(refreshTokenEntity!);
@@ -106,10 +104,29 @@ export const AuthTokenService = (
 	};
 
 	const validateRefreshTokenCanRenewAccessToken = async (
-		userId: number,
 		refreshToken: string
 	): Promise<boolean> => {
-		return await validateRefreshToken(userId, refreshToken);
+		return await validateRefreshToken(refreshToken);
+	};
+
+	const renewCredentialByRefreshToken = async (
+		refreshToken: string
+	): Promise<CredentialsDto> => {
+		await validateRefreshTokenCanRenewAccessToken(refreshToken);
+		await refreshTokenRepository.blockByToken(refreshToken);
+
+		const refreshTokenEntity = await refreshTokenRepository.findByToken(
+			refreshToken
+		);
+
+		const newCredential = await createAccessTokenAndRefreshToken(
+			refreshTokenEntity!.userId
+		);
+
+		return {
+			accessToken: newCredential[0],
+			refreshToken: newCredential[1]
+		};
 	};
 
 	return {
@@ -121,6 +138,7 @@ export const AuthTokenService = (
 		validateAccessToken,
 		validateRefreshToken,
 		validateRefreshTokenCanRenewAccessToken,
+		renewCredentialByRefreshToken,
 		getUserIdFromAccessToken
 	};
 };

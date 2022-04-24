@@ -18,6 +18,9 @@ export class Conversation extends BaseEntity {
 	@Column({ name: 'office_id' })
 	officeId: number;
 
+	@Column({ name: 'number_of_unread_messages', default: 0 })
+	numberOfUnreadMessages: number;
+
 	@OneToOne(() => Office)
 	@JoinColumn({ name: 'office_id' })
 	office: Office;

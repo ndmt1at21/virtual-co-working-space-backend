@@ -1,6 +1,6 @@
 import { EntityRepository } from 'typeorm';
-import { BaseMongoRepository } from '../base/BaseMongoEntity';
+import { BaseRepository } from '../base/BaseRepository';
 import { Message } from './message.entity';
 
 @EntityRepository(Message)
-export class MessageRepository extends BaseMongoRepository<Message> {}
+export class MessageRepository extends BaseRepository<Message> {}

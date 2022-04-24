@@ -24,7 +24,7 @@ export function createUserService() {
 }
 
 export function createUserCreator() {
-	return UserCreator();
+	return UserCreator(createUserRepository());
 }
 
 export function createUserValidate() {

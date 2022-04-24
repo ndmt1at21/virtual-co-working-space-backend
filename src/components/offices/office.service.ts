@@ -13,6 +13,7 @@ import { OfficeWithItemsDto } from './@types/dto/OfficeWithItems.dto';
 import { OfficeWithMembersDto } from './@types/dto/OfficeWithMembers.dto';
 import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
 import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
+import { FindAllUserOfficesOptions } from './@types/filter/FindAllUserOfficesOptions';
 import { IOfficeCreator } from './@types/IOfficeCreator';
 import { IOfficeService } from './@types/IOfficeService';
 import { IOfficeValidate } from './@types/IOfficeValidate';
@@ -99,7 +100,7 @@ export const OfficeService = (
 
 	const findAllOfficesOverviewUserIsMemberByUserId = async (
 		userId: number,
-		pageable: Pageable
+		options: FindAllUserOfficesOptions
 	): Promise<[OfficeOverviewDto[], number]> => {
 		const officeMembers = await officeMemberRepository
 			.queryBuilder()

@@ -4,6 +4,7 @@ import { OfficeMemberRepository } from '../officeMembers/officeMember.repository
 import { OfficeDetailDto } from './@types/dto/OfficeDetail.dto';
 import { OfficeOverviewDto } from './@types/dto/OfficeOverview.dto';
 import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
+import { FindAllUserOfficesOptions } from './@types/filter/FindAllUserOfficesOptions';
 import { IOfficeCreator } from './@types/IOfficeCreator';
 import {
 	mapOfficeToOfficeDetailDto,
@@ -74,6 +75,30 @@ export const OfficeCreator = (
 
 	const createOfficesOverview = async (
 		options: FindAllOfficesOptions
+	): Promise<[OfficeOverviewDto[], PaginationInfo]> => {
+		const [offices, totalCount] = await officeRepository
+			.queryBuilder()
+			.findAllOffices(options)
+			.withCreator()
+			.build()
+			.getManyAndCount();
+
+		const officesOverviewDto = offices.map(office =>
+			mapOfficeToOfficeOverviewDto(office)
+		);
+
+		return [
+			officesOverviewDto,
+			{
+				count: offices.length,
+				page: options.pageable?.page || 1,
+				totalCount
+			}
+		];
+	};
+
+	const createOfficesOverviewUserIsMember = async (
+		options: FindAllUserOfficesOptions
 	): Promise<[OfficeOverviewDto[], PaginationInfo]> => {
 		const [offices, totalCount] = await officeRepository
 			.queryBuilder()

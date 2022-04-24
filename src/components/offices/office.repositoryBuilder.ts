@@ -64,16 +64,16 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 				[`${alias}.name`]: filter?.name,
 				[`${alias}.invitation_code`]: filter?.invitationCode,
 				[`${alias}.created_by_user_id`]: filter?.createdBy,
-				[`${alias}.office_item`]: filter?.officeItem,
-				[`${alias}.office_member`]: filter?.officeMember,
+				[`${alias}.number_of_items`]: filter?.officeItem,
+				[`${alias}.number_of_members`]: filter?.officeMember,
 				[`${alias}.created_at`]: filter?.createdAt
 			},
 			sort: {
 				[`${alias}.name`]: sort?.name,
 				[`${alias}.invitationCode`]: sort?.invitationCode,
 				[`${alias}.createdByUserId`]: sort?.createdBy,
-				[`${alias}.officeItem`]: sort?.officeItem,
-				[`${alias}.officeMember`]: sort?.officeMember,
+				[`${alias}.numberOfItems`]: sort?.officeItem,
+				[`${alias}.numberOfMembers`]: sort?.officeMember,
 				[`${alias}.createdAt`]: sort?.createdAt
 			},
 			paginate: pageable

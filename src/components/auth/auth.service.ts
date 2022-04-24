@@ -60,20 +60,12 @@ export const AuthService = (
 	};
 
 	const refreshAccessToken = async (
-		userId: number,
 		refreshToken: string
 	): Promise<CredentialsDto> => {
-		await authTokenService.validateRefreshTokenCanRenewAccessToken(
-			userId,
-			refreshToken
-		);
+		const newCredential =
+			await authTokenService.renewCredentialByRefreshToken(refreshToken);
 
-		await authTokenService.blockRefreshToken(refreshToken);
-
-		const [accessToken, newRefreshToken] =
-			await authTokenService.createAccessTokenAndRefreshToken(userId);
-
-		return { accessToken, refreshToken: newRefreshToken };
+		return newCredential;
 	};
 
 	const logout = async (refreshToken: string): Promise<void> => {

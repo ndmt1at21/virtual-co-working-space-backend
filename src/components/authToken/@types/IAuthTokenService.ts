@@ -1,3 +1,5 @@
+import { CredentialsDto } from '@src/components/auth/@types/dto/Credentials.dto';
+
 export interface IAuthTokenService {
 	createAccessTokenAndRefreshToken: (
 		userId: number
@@ -15,13 +17,13 @@ export interface IAuthTokenService {
 
 	validateAccessToken: (token: string) => Promise<boolean>;
 
-	validateRefreshToken: (
-		userId: number,
+	validateRefreshToken: (refreshToken: string) => Promise<boolean>;
+
+	validateRefreshTokenCanRenewAccessToken: (
 		refreshToken: string
 	) => Promise<boolean>;
 
-	validateRefreshTokenCanRenewAccessToken: (
-		userId: number,
+	renewCredentialByRefreshToken: (
 		refreshToken: string
-	) => Promise<boolean>;
+	) => Promise<CredentialsDto>;
 }

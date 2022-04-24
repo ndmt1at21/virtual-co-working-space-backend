@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsUrl } from 'class-validator';
+import { IsUrl, Length } from 'class-validator';
 
 export class UpdateItemDto {
 	@Expose()

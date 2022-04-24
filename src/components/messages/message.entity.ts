@@ -1,7 +1,15 @@
-import { Column, Entity, ObjectID, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	Entity,
+	Index,
+	ObjectID,
+	PrimaryGeneratedColumn
+} from 'typeorm';
 import { BaseEntity } from '@components/base/BaseEntity';
 import { MessageReader } from './@types/MessageReader';
 import { MessageStatus } from './@types/MessageStatus';
+import { MessageType } from '@src/@types/MessageType';
+import { MessageReaction } from './@types/MessageReaction';
 
 @Entity({ name: 'conversation' })
 export class Message extends BaseEntity {
@@ -12,17 +20,25 @@ export class Message extends BaseEntity {
 	conversationId: number;
 
 	@Column({ name: 'sender_id' })
+	@Index()
 	senderId: number;
 
-	@Column({ name: 'content' })
+	@Column({ name: 'content', length: 20000 })
 	content: string;
+
+	@Column()
+	reactions: MessageReaction[];
 
 	@Column()
 	readers: MessageReader[];
 
-	@Column()
-	messageStatus: MessageStatus;
+	@Column({
+		type: 'enum',
+		enum: MessageStatus,
+		default: MessageStatus.SENT
+	})
+	status: MessageStatus;
 
-	@Column()
-	type: number;
+	@Column({ type: 'enum', enum: MessageType, default: MessageType.TEXT })
+	type: MessageType;
 }

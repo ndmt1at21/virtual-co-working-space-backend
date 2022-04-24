@@ -19,6 +19,20 @@ export const UserRouter = (): Router => {
 		.patch(userController.updateProfile);
 
 	router
+		.route('/:id/block')
+		.patch(
+			authMiddleware.restrictTo([UserRoleType.ADMIN]),
+			userController.blockUser
+		);
+
+	router
+		.route('/:id/unblock')
+		.patch(
+			authMiddleware.restrictTo([UserRoleType.ADMIN]),
+			userController.unblockUser
+		);
+
+	router
 		.route('/:id')
 		.all(authMiddleware.restrictTo([UserRoleType.ADMIN]))
 		.get(userController.getUserById)

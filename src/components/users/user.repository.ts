@@ -5,6 +5,7 @@ import { UserLoginProvider } from '../UserLoginProvider';
 import { FindAllOptions } from '../base/@types/FindAllOptions';
 import { FindAllUsersOptions } from './@types/filter/FindAllUsersOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
+import { UserStatusType } from 'aws-sdk/clients/cognitoidentityserviceprovider';
 
 @EntityRepository(User)
 export class UserRepository extends BaseRepository<User> {

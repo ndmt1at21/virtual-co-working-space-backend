@@ -7,6 +7,8 @@ import { CreateUserDto } from './@types/dto/CreateUser.dto';
 import { UpdateUserDto } from './@types/dto/UpdateUser.dto';
 import { FindAllUsersOptions } from './@types/filter/FindAllUsersOptions';
 import { IUserService } from './@types/IUserService';
+import { UserStatus } from './@types/UserStatus';
+import { UserErrorMessage } from './user.error';
 
 export const UserController = (userService: IUserService) => {
 	const createUser = catchAsyncRequestHandler(async (req, res, next) => {
@@ -66,6 +68,53 @@ export const UserController = (userService: IUserService) => {
 		);
 
 		res.status(HttpStatusCode.OK).json(updatedUser);
+	});
+
+	const blockUser = catchAsyncRequestHandler(async (req, res, next) => {
+		const userId = +req.params.id;
+
+		if (userId === req.user!.id) {
+			throw new IllegalArgumentError(
+				UserErrorMessage.USER_CANNOT_BLOCK_SELF
+			);
+		}
+
+		const id = await userService.updateUserBlockStatus(
+			userId,
+			UserStatus.BLOCKED
+		);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			message: 'User blocked successfully',
+			data: {
+				id
+			}
+		});
+	});
+
+	const unblockUser = catchAsyncRequestHandler(async (req, res, next) => {
+		const userId = +req.params.id;
+
+		if (userId === req.user!.id) {
+			throw new IllegalArgumentError(
+				UserErrorMessage.USER_CANNOT_UNBLOCK_SELF
+			);
+		}
+
+		// TODO: If user status before blocking is inactive??? -> move confirm status to another column
+		const id = await userService.updateUserBlockStatus(
+			userId,
+			UserStatus.ACTIVE
+		);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			message: 'User unblocked successfully',
+			data: {
+				id
+			}
+		});
 	});
 
 	const deleteUser = catchAsyncRequestHandler(async (req, res, next) => {
@@ -147,6 +196,8 @@ export const UserController = (userService: IUserService) => {
 		updateProfile,
 		getUserById,
 		updateUser,
+		blockUser,
+		unblockUser,
 		deleteUser,
 		getUsers
 	};

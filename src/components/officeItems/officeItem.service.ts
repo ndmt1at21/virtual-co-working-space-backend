@@ -19,7 +19,10 @@ export const OfficeItemService = (
 	const createOfficeItem = async (
 		createOfficeItemDto: CreateOfficeItemDto
 	): Promise<OfficeItemOverviewDto> => {
-		const officeItem = await officeItemRepository.save(createOfficeItemDto);
+		const officeItem = await officeItemRepository.saveOfficeItem(
+			createOfficeItemDto
+		);
+
 		return mapOfficeItemToOfficeItemOverviewDto(officeItem);
 	};
 

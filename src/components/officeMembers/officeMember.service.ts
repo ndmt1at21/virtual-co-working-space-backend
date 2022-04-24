@@ -12,10 +12,12 @@ import { mapOfficeMemberToOfficeMemberDetailDto } from './officeMember.mapping';
 import { IOfficeMemberValidate } from './@types/IOfficeMemberValidate';
 import { OfficeMemberTransformRepository } from '@components/officeMemberTransform/officeMemberTransform.repository';
 import { Pageable } from '../base/@types/FindAllOptions';
+import { getManager } from 'typeorm';
+import { OfficeMember } from './officeMember.entity';
+import { Office } from '../offices/office.entity';
 
 export const OfficeMemberService = (
 	officeMemberRepository: OfficeMemberRepository,
-	officeMemberTransformRepository: OfficeMemberTransformRepository,
 	officeMemberCreator: IOfficeMemberCreator,
 	officeMemberValidate: IOfficeMemberValidate
 ): IOfficeMemberService => {
@@ -26,14 +28,14 @@ export const OfficeMemberService = (
 
 		await officeMemberValidate.checkUniqueUserInOffice(memberId, officeId);
 
-		const createdOfficeMember = await officeMemberRepository.save({
+		const createdMember = await officeMemberRepository.saveOfficeMember({
 			memberId,
 			officeId,
 			transform: {}
 		});
 
 		return await officeMemberCreator.createOfficeMemberOverviewById(
-			createdOfficeMember.id
+			createdMember.id
 		);
 	};
 

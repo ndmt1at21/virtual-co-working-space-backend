@@ -36,14 +36,11 @@ export function createOfficeMemberSocketService(io: Server, socket: Socket) {
 
 export function createOfficeMemberService() {
 	const officeMemberRepository = createOfficeMemberRepository();
-	const officeMemberTransformRepository =
-		createOfficeMemberTransformRepository();
 	const officeMemberCreator = createOfficeMemberCreator();
 	const officeMemberValidate = createOfficeMemberValidate();
 
 	return OfficeMemberService(
 		officeMemberRepository,
-		officeMemberTransformRepository,
 		officeMemberCreator,
 		officeMemberValidate
 	);

@@ -20,8 +20,8 @@ export const mainMiddleware = (app: Application, logger: ILogger) => {
 
 	app.use(
 		helmet({
-			contentSecurityPolicy: isProduction,
-			crossOriginEmbedderPolicy: isProduction
+			contentSecurityPolicy: false,
+			crossOriginEmbedderPolicy: false
 		})
 	);
 

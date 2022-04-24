@@ -17,12 +17,6 @@ export interface IAuthTokenService {
 
 	validateAccessToken: (token: string) => Promise<boolean>;
 
-	validateRefreshToken: (refreshToken: string) => Promise<boolean>;
-
-	validateRefreshTokenCanRenewAccessToken: (
-		refreshToken: string
-	) => Promise<boolean>;
-
 	renewCredentialByRefreshToken: (
 		refreshToken: string
 	) => Promise<CredentialsDto>;

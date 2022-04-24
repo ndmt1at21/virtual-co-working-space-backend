@@ -7,7 +7,7 @@ import { UnauthorizedError } from '@src/utils/appError';
 import { AuthTokenErrorMessages } from './authToken.error';
 import { IAuthTokenService } from './@types/IAuthTokenService';
 import { IAuthTokenValidate } from './@types/IAuthTokenValidate';
-import { CredentialsDto } from '../auth/@types/dto/Credentials.dto';
+import { CredentialsDto } from '../../@types/dto/Credentials.dto';
 
 export const AuthTokenService = (
 	refreshTokenRepository: RefreshTokenRepository,
@@ -136,8 +136,6 @@ export const AuthTokenService = (
 		blockRefreshToken,
 		deleteRefreshToken,
 		validateAccessToken,
-		validateRefreshToken,
-		validateRefreshTokenCanRenewAccessToken,
 		renewCredentialByRefreshToken,
 		getUserIdFromAccessToken
 	};

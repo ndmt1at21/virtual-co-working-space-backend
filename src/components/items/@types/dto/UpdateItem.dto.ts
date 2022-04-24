@@ -3,9 +3,10 @@ import { IsUrl } from 'class-validator';
 
 export class UpdateItemDto {
 	@Expose()
+	@Length(1, 255)
 	name?: string;
 
-	@IsUrl()
 	@Expose()
+	@IsUrl()
 	modelPath?: string;
 }

@@ -14,8 +14,8 @@ export const OfficeMemberController = (
 				await officeMemberService.findOfficeMemberDetailById(id);
 
 			res.status(HttpStatusCode.OK).json({
-				status: 'success',
-				officeMember
+				code: HttpStatusCode.OK,
+				data: { officeMember }
 			});
 		}
 	);
@@ -29,9 +29,11 @@ export const OfficeMemberController = (
 				});
 
 			res.status(HttpStatusCode.OK).json({
-				status: 'success',
-				total,
-				officeMembers
+				code: HttpStatusCode.OK,
+				data: {
+					total,
+					officeMembers
+				}
 			});
 		}
 	);
@@ -43,7 +45,7 @@ export const OfficeMemberController = (
 			await officeMemberService.deleteOfficeMemberById(id);
 
 			res.status(HttpStatusCode.OK).json({
-				status: 'success'
+				code: HttpStatusCode.OK
 			});
 		}
 	);
@@ -57,8 +59,8 @@ export const OfficeMemberController = (
 			);
 
 			res.status(HttpStatusCode.OK).json({
-				status: 'success',
-				officeMember
+				code: HttpStatusCode.OK,
+				data: { officeMember }
 			});
 		}
 	);

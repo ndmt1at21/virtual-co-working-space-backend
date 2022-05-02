@@ -22,7 +22,7 @@ export const AuthTokenService = (
 	const createAccessToken = (userId: number): string => {
 		return jwt.sign({ userId }, config.auth.JWT_SECRET, {
 			issuer: config.auth.JWT_ISSUER,
-			expiresIn: Date.now() + config.auth.JWT_ACCESS_TOKEN_EXPIRES_TIME,
+			expiresIn: config.auth.JWT_ACCESS_TOKEN_EXPIRES_TIME,
 			algorithm: 'HS256'
 		});
 	};
@@ -66,23 +66,22 @@ export const AuthTokenService = (
 		try {
 			jwtPayload = (await util.promisify(jwt.verify)(
 				token,
-				config.auth.JWT_SECRET
+				config.auth.JWT_SECRET,
+				// @ts-ignore
+				{ issuer: config.auth.JWT_ISSUER }
 			)) as jwt.JwtPayload;
 		} catch (err) {
+			console.log(err);
+			if (err instanceof jwt.TokenExpiredError) {
+				if (err.name === 'TokenExpiredError') {
+					throw new UnauthorizedError(
+						AuthTokenErrorMessages.ACCESS_TOKEN_EXPIRED
+					);
+				}
+			}
+
 			throw new UnauthorizedError(
 				AuthTokenErrorMessages.INVALID_ACCESS_TOKEN
-			);
-		}
-
-		if (jwtPayload.iss !== config.auth.JWT_ISSUER) {
-			throw new UnauthorizedError(
-				AuthTokenErrorMessages.INVALID_ACCESS_TOKEN
-			);
-		}
-
-		if (!jwtPayload.exp || jwtPayload.exp < Date.now()) {
-			throw new UnauthorizedError(
-				AuthTokenErrorMessages.ACCESS_TOKEN_EXPIRED
 			);
 		}
 

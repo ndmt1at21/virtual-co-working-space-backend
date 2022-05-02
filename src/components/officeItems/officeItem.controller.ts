@@ -11,8 +11,8 @@ export const OfficeItemController = (officeItemService: IOfficeItemService) => {
 				await officeItemService.findOfficeItemDetailById(id);
 
 			res.status(HttpStatusCode.OK).json({
-				status: 'success',
-				officeItem: officeItemDto
+				code: HttpStatusCode.OK,
+				data: { officeItem: officeItemDto }
 			});
 		}
 	);
@@ -26,9 +26,8 @@ export const OfficeItemController = (officeItemService: IOfficeItemService) => {
 				});
 
 			res.status(HttpStatusCode.OK).json({
-				status: 'success',
-				total,
-				offices
+				code: HttpStatusCode.OK,
+				data: { total, offices }
 			});
 		}
 	);
@@ -40,7 +39,7 @@ export const OfficeItemController = (officeItemService: IOfficeItemService) => {
 			await officeItemService.deleteOfficeItem(id);
 
 			res.status(HttpStatusCode.OK).json({
-				status: 'success'
+				code: HttpStatusCode.OK
 			});
 		}
 	);
@@ -50,7 +49,7 @@ export const OfficeItemController = (officeItemService: IOfficeItemService) => {
 			const id = +req.params.id;
 
 			res.status(HttpStatusCode.OK).json({
-				status: 'success'
+				code: HttpStatusCode.OK
 			});
 		}
 	);

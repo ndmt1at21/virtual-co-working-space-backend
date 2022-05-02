@@ -20,16 +20,20 @@ export const UserController = (userService: IUserService) => {
 		const createUserDto = req.body as CreateUserDto;
 		const user = await userService.createLocalUser(createUserDto);
 
-		res.status(HttpStatusCode.CREATED).json({
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			message: 'User created successfully',
-			user
+			data: { user }
 		});
 	});
 
 	const getProfile = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = req.user!.id;
 		const user = await userService.findUserById(userId);
-		res.status(HttpStatusCode.OK).json(user);
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { user }
+		});
 	});
 
 	const updateProfile = catchAsyncRequestHandler(async (req, res, next) => {
@@ -45,13 +49,19 @@ export const UserController = (userService: IUserService) => {
 			updateUserDto
 		);
 
-		res.status(HttpStatusCode.OK).json(updatedUser);
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { user: updatedUser }
+		});
 	});
 
 	const getUserById = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = +req.params.id;
 		const user = await userService.findUserById(userId);
-		res.status(HttpStatusCode.OK).json(user);
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { user }
+		});
 	});
 
 	const updateUser = catchAsyncRequestHandler(async (req, res, next) => {
@@ -67,7 +77,10 @@ export const UserController = (userService: IUserService) => {
 			updateUserDto
 		);
 
-		res.status(HttpStatusCode.OK).json(updatedUser);
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { user: updatedUser }
+		});
 	});
 
 	const blockUser = catchAsyncRequestHandler(async (req, res, next) => {

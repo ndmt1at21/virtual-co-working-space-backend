@@ -20,6 +20,7 @@ export const CloudUploadController = (cloudService: ICloudUploadService) => {
 		});
 
 		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			data: { url }
 		});
 	});
@@ -36,6 +37,7 @@ export const CloudUploadController = (cloudService: ICloudUploadService) => {
 		});
 
 		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			data: { url }
 		});
 	});
@@ -52,6 +54,7 @@ export const CloudUploadController = (cloudService: ICloudUploadService) => {
 		});
 
 		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			data: { url }
 		});
 	});

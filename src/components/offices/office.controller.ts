@@ -25,7 +25,7 @@ export const OfficeController = (
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
 				code: HttpStatusCode.OK,
-				office
+				data: { office }
 			});
 		}
 	);
@@ -58,7 +58,7 @@ export const OfficeController = (
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
 				code: HttpStatusCode.OK,
-				office
+				data: { office }
 			});
 		}
 	);
@@ -90,7 +90,7 @@ export const OfficeController = (
 
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
-				data: items
+				data: { items }
 			});
 		}
 	);
@@ -106,7 +106,7 @@ export const OfficeController = (
 
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
-				data: members
+				data: { members }
 			});
 		}
 	);
@@ -128,8 +128,7 @@ export const OfficeController = (
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
 				code: HttpStatusCode.OK,
-				total,
-				offices
+				data: { total, offices }
 			});
 		}
 	);
@@ -162,7 +161,7 @@ export const OfficeController = (
 		res.status(HttpStatusCode.OK).json({
 			status: 'success',
 			code: HttpStatusCode.OK,
-			office
+			data: { office }
 		});
 	});
 

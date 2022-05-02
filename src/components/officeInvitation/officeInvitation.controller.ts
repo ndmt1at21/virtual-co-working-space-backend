@@ -38,7 +38,8 @@ export const OfficeInvitationController = (
 				clientUrl
 			);
 
-			res.status(HttpStatusCode.CREATED).json({
+			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
 				message: 'Invitation has been sent'
 			});
 		}
@@ -54,7 +55,10 @@ export const OfficeInvitationController = (
 					token
 				);
 
-			res.status(HttpStatusCode.OK).json({ data: { invitation } });
+			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
+				data: { invitation }
+			});
 		}
 	);
 
@@ -68,7 +72,10 @@ export const OfficeInvitationController = (
 					officeInviteCode
 				);
 
-			res.status(HttpStatusCode.OK).json({ data: { invitation } });
+			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
+				data: { invitation }
+			});
 		}
 	);
 
@@ -81,7 +88,10 @@ export const OfficeInvitationController = (
 				token
 			);
 
-			res.status(HttpStatusCode.OK).json({ message: 'Joined' });
+			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
+				message: 'Joined'
+			});
 		}
 	);
 
@@ -94,7 +104,10 @@ export const OfficeInvitationController = (
 				officeInviteCode
 			);
 
-			res.status(HttpStatusCode.OK).json({ message: 'Joined' });
+			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
+				message: 'Joined'
+			});
 		}
 	);
 

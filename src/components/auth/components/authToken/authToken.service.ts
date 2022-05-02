@@ -71,7 +71,6 @@ export const AuthTokenService = (
 				{ issuer: config.auth.JWT_ISSUER }
 			)) as jwt.JwtPayload;
 		} catch (err) {
-			console.log(err);
 			if (err instanceof jwt.TokenExpiredError) {
 				if (err.name === 'TokenExpiredError') {
 					throw new UnauthorizedError(
@@ -112,19 +111,18 @@ export const AuthTokenService = (
 		refreshToken: string
 	): Promise<CredentialsDto> => {
 		await validateRefreshTokenCanRenewAccessToken(refreshToken);
-		await refreshTokenRepository.blockByToken(refreshToken);
 
 		const refreshTokenEntity = await refreshTokenRepository.findByToken(
 			refreshToken
 		);
 
-		const newCredential = await createAccessTokenAndRefreshToken(
+		const newAccessToken = await createAccessToken(
 			refreshTokenEntity!.userId
 		);
 
 		return {
-			accessToken: newCredential[0],
-			refreshToken: newCredential[1]
+			accessToken: newAccessToken,
+			refreshToken: refreshToken
 		};
 	};
 

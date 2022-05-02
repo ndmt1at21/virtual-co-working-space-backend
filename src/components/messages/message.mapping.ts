@@ -1,8 +1,6 @@
-import { groupBy } from '@src/utils/groupBy';
 import { mapUserToUserOverviewDto } from '../users/user.mapping';
 import { MessageDto } from './@types/dto/MessageDto';
 import { mapMessageReaderToMessageReaderDto } from './components/messageReader/messageReader.mapping';
-import { mapUserMessageStatusToUserMessageStatusDto } from './components/userMessageStatus/userMessageStatus.mapping';
 import { Message } from './message.entity';
 
 export const mapMessageToMessageDto = (message: Message): MessageDto => {
@@ -13,17 +11,14 @@ export const mapMessageToMessageDto = (message: Message): MessageDto => {
 		content,
 		createdAt,
 		type,
-		userMessageStatuses,
+		readers,
 		status
 	} = message;
 
 	const senderDto = mapUserToUserOverviewDto(sender);
 
-	const userMessageStatusesGrouped = groupBy(
-		userMessageStatuses.map(ums =>
-			mapUserMessageStatusToUserMessageStatusDto(ums)
-		),
-		userMessageStatus => userMessageStatus.status
+	const readersDto = readers.map(reader =>
+		mapMessageReaderToMessageReaderDto(reader)
 	);
 
 	return {
@@ -33,7 +28,7 @@ export const mapMessageToMessageDto = (message: Message): MessageDto => {
 		type,
 		sentAt: createdAt,
 		sender: senderDto,
-		readers: userMessageStatusesGrouped.readers,
+		readers: readersDto,
 		reactions: [],
 		status
 	};

@@ -14,5 +14,16 @@ export class MessageReaderRepository extends BaseRepository<MessageReader> {
 		const messageReaders = messageIds.map(messageId =>
 			this.create({ messageId, readerId: readBy })
 		);
+
+		this.manager.transaction(async entityManager => {
+			await entityManager.save(messageReaders);
+			await entityManager.update(
+				ConversationMember,
+				{ conversationId },
+				{
+					lastReadMessageId
+				}
+			);
+		});
 	}
 }

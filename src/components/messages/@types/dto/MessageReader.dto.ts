@@ -1,6 +1,6 @@
 import { UserOverviewDto } from '@src/components/users/@types/dto/UserOverviewDto';
 
 export type MessageReaderDto = {
-	userId: number;
+	reader: UserOverviewDto;
 	readAt: Date;
 };

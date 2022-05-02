@@ -6,10 +6,9 @@ export const MessageCreator = (
 	messageRepository: MessageRepository,
 	userCreator: IUserCreator
 ) => {
-	const createMessageDto = async (id: string | ObjectID) => {
+	const createMessageDto = async (id: number) => {
 		const message = await messageRepository.findById(id);
 		const sender = await userCreator.createUserDtoById(message!.senderId);
-		const readers = await userRepository.findByIds(message!.readers);
 	};
 
 	return {

@@ -1,15 +1,15 @@
 import {
-	BaseEntity,
 	Column,
 	Entity,
 	JoinColumn,
 	ManyToOne,
-	OneToMany,
 	OneToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { Conversation } from '@src/components/conversations/conversation.entity';
 import { User } from '@components/users/user.entity';
+import { BaseEntity } from '../base/BaseEntity';
+import { Message } from '../messages/message.entity';
 
 @Entity({ name: 'conversation_member' })
 export class ConversationMember extends BaseEntity {
@@ -21,6 +21,15 @@ export class ConversationMember extends BaseEntity {
 
 	@Column({ name: 'member_id' })
 	memberId: number;
+
+	@Column({ name: 'last_read_message_id', nullable: true })
+	lastReadMessageId?: number;
+
+	@Column({ name: 'number_of_unread_messages', default: 0 })
+	numberOfUnreadMessages: number;
+
+	@OneToOne(type => Message, message => message.id)
+	lastReadMessage: Message;
 
 	@ManyToOne(() => Conversation)
 	@JoinColumn({ name: 'conversation_id' })

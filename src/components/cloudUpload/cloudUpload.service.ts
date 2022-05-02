@@ -73,6 +73,7 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 		logger.info('Create new bucket contains file of models');
 		const s3 = new AWS.S3();
 
+		await configBucketPolicy(s3);
 		await configBucketCors(s3);
 		await s3.createBucket({
 			Bucket: config.cloud.MODEL_AWS_BUCKET_NAME
@@ -98,6 +99,24 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 				}
 			})
 			.promise();
+	}
+
+	async function configBucketPolicy(s3: AWS.S3): Promise<void> {
+		const bucketPolicy = {
+			Version: '2012-10-17',
+			Statement: {
+				Sid: 'PublicS3AccessPolicy',
+				Effect: 'Allow',
+				Principle: '*',
+				Action: ['s3:GetObject'],
+				Resource: [`arn:aws:s3:::${config.cloud.MODEL_AWS_BUCKET_NAME}`]
+			}
+		};
+
+		s3.putBucketPolicy({
+			Bucket: config.cloud.MODEL_AWS_BUCKET_NAME,
+			Policy: JSON.stringify(bucketPolicy)
+		});
 	}
 
 	return { initialize, uploadMedia, uploadLargeFile };

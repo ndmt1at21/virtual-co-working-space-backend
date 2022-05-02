@@ -1,59 +1,40 @@
-import { ObjectID } from 'typeorm';
-import { UserOverviewDto } from '../users/@types/dto/UserOverviewDto';
+import { groupBy } from '@src/utils/groupBy';
+import { mapUserToUserOverviewDto } from '../users/user.mapping';
 import { MessageDto } from './@types/dto/MessageDto';
-import { MessageReactionDto } from './@types/dto/MessageReaction.dto';
-import { MessageReaderDto } from './@types/dto/MessageReader.dto';
+import { mapMessageReaderToMessageReaderDto } from './components/messageReader/messageReader.mapping';
+import { mapUserMessageStatusToUserMessageStatusDto } from './components/userMessageStatus/userMessageStatus.mapping';
 import { Message } from './message.entity';
 
-export class MessageDtoBuilder {
-	id: ObjectID;
-	conversationId: number;
-	sender: UserOverviewDto;
-	content: string;
-	reactions: MessageReactionDto[];
-	readers: MessageReaderDto[];
-	status: string;
-	type: string;
-	createdAt: Date;
+export const mapMessageToMessageDto = (message: Message): MessageDto => {
+	const {
+		id,
+		conversationId,
+		sender,
+		content,
+		createdAt,
+		type,
+		userMessageStatuses,
+		status
+	} = message;
 
-	constructor() {}
+	const senderDto = mapUserToUserOverviewDto(sender);
 
-	public setMessage(message: Message): MessageDtoBuilder {
-		this.id = message.id;
-		this.conversationId = message.conversationId;
-		this.content = message.content;
-		this.status = message.status;
-		this.type = message.type;
-		this.createdAt = message.createdAt;
-		return this;
-	}
+	const userMessageStatusesGrouped = groupBy(
+		userMessageStatuses.map(ums =>
+			mapUserMessageStatusToUserMessageStatusDto(ums)
+		),
+		userMessageStatus => userMessageStatus.status
+	);
 
-	public setSender(user: UserOverviewDto): MessageDtoBuilder {
-		this.sender = user;
-		return this;
-	}
-
-	public setReactionsDto(reactions: MessageReactionDto[]): MessageDtoBuilder {
-		this.reactions = reactions;
-		return this;
-	}
-
-	public setReadersDto(readers: MessageReaderDto[]): MessageDtoBuilder {
-		this.readers = readers;
-		return this;
-	}
-
-	public build(): MessageDto {
-		return {
-			id: this.id.toString(),
-			conversationId: this.conversationId,
-			sender: this.sender,
-			content: this.content,
-			reactions: this.reactions,
-			readers: this.readers,
-			status: this.status,
-			type: this.type,
-			createdAt: this.createdAt
-		};
-	}
-}
+	return {
+		id,
+		conversationId,
+		content,
+		type,
+		sentAt: createdAt,
+		sender: senderDto,
+		readers: userMessageStatusesGrouped.readers,
+		reactions: [],
+		status
+	};
+};

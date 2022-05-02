@@ -3,13 +3,13 @@ import { MessageReactionDto } from './MessageReaction.dto';
 import { MessageReaderDto } from './MessageReader.dto';
 
 export type MessageDto = {
-	id: string;
+	id: number;
 	conversationId: number;
 	sender: UserOverviewDto;
-	content: string;
-	reactions: MessageReactionDto[];
-	readers: MessageReaderDto[];
+	content?: string;
+	type?: string;
+	readers?: MessageReaderDto[];
+	reactions?: MessageReactionDto[];
 	status: string;
-	type: string;
-	createdAt: Date;
+	sentAt: Date;
 };

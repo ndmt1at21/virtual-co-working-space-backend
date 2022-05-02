@@ -14,6 +14,7 @@ import generator from '@src/components/offices/components/officeInvitationCodeGe
 import { OfficeSocketHandler } from './office.socketHandler';
 import { Server, Socket } from 'socket.io';
 import { officeLogger } from '../logger';
+import { createConversationRepository } from '../conversations/conversation.factory';
 
 export function createOfficeController() {
 	return OfficeController(createOfficeService(), officeLogger);
@@ -32,8 +33,9 @@ export function createOfficeService() {
 	const officeMemberCreator = createOfficeMemberCreator();
 	const officeValidate = createOfficeValidate();
 	const generator = createOfficeGenerator();
+	const conversationRepository = createConversationRepository();
 
-	return OfficeService(
+	return OfficeService({
 		officeRepository,
 		officeItemRepository,
 		officeMemberRepository,
@@ -41,8 +43,9 @@ export function createOfficeService() {
 		officeCreator,
 		officeMemberCreator,
 		officeValidate,
-		generator
-	);
+		officeInvitationCodeGenerator: generator,
+		conversationRepository
+	});
 }
 
 export function createOfficeGenerator() {

@@ -1,11 +1,8 @@
 import { Pageable } from '../base/@types/FindAllOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
+import { ConversationType } from '../conversations/@types/ConversationType';
 import { mapOfficeItemToOfficeItemOverviewDto } from '../officeItems/officeItem.mapping';
-import { OfficeItemRepository } from '../officeItems/officeItem.repository';
-import { IOfficeMemberCreator } from '../officeMembers/@types/IOfficeMemberCreator';
-import { OfficeMemberRepository } from '../officeMembers/officeMember.repository';
 import { OfficeRoleType } from '../officeRoles/@types/OfficeRoleType';
-import { OfficeRoleRepository } from '../officeRoles/officeRole.repository';
 import { CreateOfficeDto } from './@types/dto/CreateOffice.dto';
 import { OfficeDetailDto } from './@types/dto/OfficeDetail.dto';
 import { OfficeOverviewDto } from './@types/dto/OfficeOverview.dto';
@@ -13,22 +10,20 @@ import { OfficeWithItemsDto } from './@types/dto/OfficeWithItems.dto';
 import { OfficeWithMembersDto } from './@types/dto/OfficeWithMembers.dto';
 import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
 import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
-import { IOfficeCreator } from './@types/IOfficeCreator';
 import { IOfficeService } from './@types/IOfficeService';
-import { IOfficeValidate } from './@types/IOfficeValidate';
-import { IOfficeInvitationCodeGenerator } from './components/officeInvitationCodeGenerator/@types/IOfficeInvitationCodeGenerator';
-import { OfficeRepository } from './office.repository';
+import { OfficeServiceParams } from './@types/OfficeServiceParams';
 
-export const OfficeService = (
-	officeRepository: OfficeRepository,
-	officeItemRepository: OfficeItemRepository,
-	officeMemberRepository: OfficeMemberRepository,
-	officeRoleRepository: OfficeRoleRepository,
-	officeCreator: IOfficeCreator,
-	officeMemberCreator: IOfficeMemberCreator,
-	officeValidate: IOfficeValidate,
-	officeInvitationCodeGenerator: IOfficeInvitationCodeGenerator
-): IOfficeService => {
+export const OfficeService = ({
+	officeRepository,
+	officeItemRepository,
+	officeMemberRepository,
+	officeRoleRepository,
+	officeCreator,
+	officeMemberCreator,
+	officeValidate,
+	officeInvitationCodeGenerator,
+	conversationRepository
+}: OfficeServiceParams): IOfficeService => {
 	const createOffice = async (
 		createdUserId: number,
 		createOfficeDto: CreateOfficeDto
@@ -45,11 +40,17 @@ export const OfficeService = (
 			transform: {}
 		});
 
+		const conversation = conversationRepository.create({
+			type: ConversationType.ALL,
+			conversationMembers: [{ memberId: createdUserId }]
+		});
+
 		const office = await officeRepository.save({
 			invitationCode,
 			createdByUserId: createdUserId,
 			name: createOfficeDto.name,
 			officeMembers: [officeMember],
+			conversations: [conversation],
 			numberOfMembers: 1
 		});
 

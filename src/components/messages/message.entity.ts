@@ -10,10 +10,9 @@ import { BaseEntity } from '@components/base/BaseEntity';
 import { MessageType } from '@src/@types/MessageType';
 import { User } from '../users/user.entity';
 import { MessageReaction } from './components/messageReactions/messageReaction.entity';
-import { MessageReader } from './components/messageReader/messageReader.entity';
-import { MessageReceiver } from './components/messageReceiver/messageReceiver.entity';
-import { UserMessageDeleted } from './components/userMessageDeleted/userMessageDeleted.entity';
 import { MessageStatus } from './@types/MessageStatus';
+import { UserMessageStatus } from './components/userMessageStatus/userMessageStatus.entity';
+import { UserMessageStatusType } from './@types/UserMessageStatusType';
 
 @Entity({ name: 'message' })
 export class Message extends BaseEntity {
@@ -33,11 +32,8 @@ export class Message extends BaseEntity {
 	@Column({ type: 'enum', enum: MessageType, default: MessageType.TEXT })
 	type: MessageType;
 
-	@Column({ name: 'is_sent', default: false })
+	@Column({ name: 'is_sent', default: true })
 	isSent: boolean;
-
-	@Column({ name: 'sent_at', nullable: true })
-	sentAt: Date;
 
 	@Column({ name: 'has_receiver', default: false })
 	hasReceiver: boolean;
@@ -54,20 +50,11 @@ export class Message extends BaseEntity {
 	@OneToMany(type => MessageReaction, reaction => reaction.messageId)
 	reactions: MessageReaction[];
 
-	@OneToMany(type => MessageReader, messageReader => messageReader.messageId)
-	readers: MessageReader[];
-
 	@OneToMany(
-		type => MessageReceiver,
-		messageReceiver => messageReceiver.messageId
+		type => UserMessageStatus,
+		userMessageStatus => userMessageStatus.messageId
 	)
-	receivers: MessageReceiver[];
-
-	@OneToMany(
-		type => UserMessageDeleted,
-		userMessageDeleted => userMessageDeleted.messageId
-	)
-	deletedMessageOfUsers: UserMessageDeleted[];
+	userMessageStatuses: UserMessageStatus[];
 
 	public get status(): MessageStatus {
 		if (this.isRevoked) return 'revoked';
@@ -77,5 +64,19 @@ export class Message extends BaseEntity {
 		if (this.isSent) return 'sent';
 
 		return 'failed';
+	}
+
+	public get readers(): UserMessageStatus[] {
+		return this.userMessageStatuses.filter(
+			userMessageStatus =>
+				userMessageStatus.status === UserMessageStatusType.READ
+		);
+	}
+
+	public get receivers(): UserMessageStatus[] {
+		return this.userMessageStatuses.filter(
+			userMessageStatus =>
+				userMessageStatus.status === UserMessageStatusType.RECEIVED
+		);
 	}
 }

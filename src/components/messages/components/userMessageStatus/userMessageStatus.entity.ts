@@ -18,7 +18,7 @@ export class UserMessageStatus extends BaseEntity {
 	@PrimaryColumn({ name: 'message_id' })
 	messageId: number;
 
-	@PrimaryColumn({ name: 'reader_id' })
+	@PrimaryColumn({ name: 'user_id' })
 	userId: number;
 
 	@Column()

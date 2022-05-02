@@ -4,6 +4,7 @@ import {
 	RecentMessagePageable,
 	RecentMessagePaginationInfo
 } from './@types/RecentMessagePaginate';
+import { UserMessageStatusType } from './@types/UserMessageStatusType';
 import { Message } from './message.entity';
 
 @EntityRepository(Message)
@@ -53,12 +54,14 @@ export class MessageRepository extends BaseRepository<Message> {
 			.limit(limit)
 			.addOrderBy('message.createdAt', 'DESC')
 			.leftJoinAndSelect('message.sender', 'user')
-			.leftJoinAndSelect('message.readers', 'message_reader')
 			.leftJoinAndSelect(
-				'message.deletedMessageOfUsers',
-				'user_deleted_message',
-				'user_deleted_message.user_id != :userId',
-				{ userId }
+				'message.userMessageStatuses',
+				'user_message_status',
+				'user_message_status.user_id = :userId AND user_message_status.status != :deletedStatus',
+				{
+					userId,
+					deletedStatus: UserMessageStatusType.DELETED
+				}
 			)
 			.getManyAndCount();
 

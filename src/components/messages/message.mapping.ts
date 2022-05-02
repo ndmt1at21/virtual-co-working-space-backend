@@ -1,6 +1,6 @@
 import { mapUserToUserOverviewDto } from '../users/user.mapping';
 import { MessageDto } from './@types/dto/MessageDto';
-import { mapMessageReaderToMessageReaderDto } from './components/messageReader/messageReader.mapping';
+import { mapUserMessageStatusToUserMessageReaderStatusDto } from './components/userMessageStatus/userMessageStatus.mapping';
 import { Message } from './message.entity';
 
 export const mapMessageToMessageDto = (message: Message): MessageDto => {
@@ -18,7 +18,7 @@ export const mapMessageToMessageDto = (message: Message): MessageDto => {
 	const senderDto = mapUserToUserOverviewDto(sender);
 
 	const readersDto = readers.map(reader =>
-		mapMessageReaderToMessageReaderDto(reader)
+		mapUserMessageStatusToUserMessageReaderStatusDto(reader)
 	);
 
 	return {

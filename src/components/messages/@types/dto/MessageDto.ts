@@ -1,6 +1,6 @@
 import { UserOverviewDto } from '@src/components/users/@types/dto/UserOverviewDto';
+import { UserMessageReadStatusDto } from '../../components/userMessageStatus/@types/UserMessageStatus.dto';
 import { MessageReactionDto } from './MessageReaction.dto';
-import { MessageReaderDto } from './MessageReader.dto';
 
 export type MessageDto = {
 	id: number;
@@ -8,7 +8,7 @@ export type MessageDto = {
 	sender: UserOverviewDto;
 	content?: string;
 	type?: string;
-	readers?: MessageReaderDto[];
+	readers?: UserMessageReadStatusDto[];
 	reactions?: MessageReactionDto[];
 	status: string;
 	sentAt: Date;

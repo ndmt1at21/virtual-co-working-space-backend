@@ -5,18 +5,12 @@ import { MessageDto } from './@types/dto/MessageDto';
 import { MessageQuery } from './@types/filter/MessageQuery';
 import { IMessageService } from './@types/IMessageService';
 import { MessageServiceParams } from './@types/MessageServiceParams';
-import {
-	RecentMessagePageable,
-	RecentMessagePaginationInfo
-} from './@types/RecentMessagePaginate';
+import { UserMessageStatusType } from './@types/UserMessageStatusType';
 import { MessageErrorMessages } from './message.error';
-import { mapMessageToMessageDto } from './message.mapping';
 
 export const MessageService = ({
 	messageRepository,
-	messageReaderRepository,
-	messageReceiverRepository,
-	userMessageDeletedRepository
+	userMessageStatusRepository
 }: MessageServiceParams): IMessageService => {
 	const createMessage = async (
 		createMessageDto: CreateMessageDto
@@ -50,9 +44,10 @@ export const MessageService = ({
 		messageId: number,
 		userId: number
 	): Promise<void> => {
-		await userMessageDeletedRepository.save({
+		await userMessageStatusRepository.save({
 			messageId,
-			userId
+			userId,
+			status: UserMessageStatusType.DELETED
 		});
 	};
 
@@ -60,14 +55,22 @@ export const MessageService = ({
 		messageId: number,
 		readerId: number
 	): Promise<void> => {
-		await messageReaderRepository.save({ messageId, readerId });
+		await userMessageStatusRepository.save({
+			messageId,
+			readerId,
+			status: UserMessageStatusType.READ
+		});
 	};
 
 	const addMessageReceiver = async (
 		messageId: number,
 		receiverId: number
 	): Promise<void> => {
-		await messageReceiverRepository.save({ messageId, receiverId });
+		await userMessageStatusRepository.save({
+			messageId,
+			receiverId,
+			status: UserMessageStatusType.RECEIVED
+		});
 	};
 
 	const addMessageReaction = async (
@@ -77,12 +80,10 @@ export const MessageService = ({
 	): Promise<void> => {};
 
 	return {
-		createMessage,
-		findRecentMessagesByConversationIdAndUserId,
-		revokeMessageByMessageIdAndSenderId,
-		deleteMessageSelfSide,
-		addMessageReader,
-		addMessageReceiver,
-		addMessageReaction
+		// createMessage,
+		// deleteMessageSelfSide,
+		// addMessageReader,
+		// addMessageReceiver,
+		// addMessageReaction
 	};
 };

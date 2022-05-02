@@ -1,9 +1,19 @@
-import { UserMessageStatusDto } from './@types/UserMessageStatus.dto';
+import {
+	UserMessageReadStatusDto,
+	UserMessageReceivedStatusDto
+} from './@types/UserMessageStatus.dto';
 import { UserMessageStatus } from './userMessageStatus.entity';
 
-export const mapUserMessageStatusToUserMessageStatusDto = (
+export const mapUserMessageStatusToUserMessageReaderStatusDto = (
 	userMessageStatus: UserMessageStatus
-): UserMessageStatusDto => {
+): UserMessageReadStatusDto => {
 	const { id, userId, messageId, status, createdAt } = userMessageStatus;
-	return { id, userId, messageId, status, createdAt };
+	return { id, readerId: userId, messageId, readAt: createdAt };
+};
+
+export const mapUserMessageStatusToUserMessageReceivedStatusDto = (
+	userMessageStatus: UserMessageStatus
+): UserMessageReceivedStatusDto => {
+	const { id, userId, messageId, status, createdAt } = userMessageStatus;
+	return { id, receiverId: userId, messageId, receivedAt: createdAt };
 };

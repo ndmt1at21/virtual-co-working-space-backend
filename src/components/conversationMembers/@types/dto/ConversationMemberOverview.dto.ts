@@ -1,8 +1,7 @@
 import { UserOverviewDto } from '@src/components/users/@types/dto/UserOverviewDto';
 
-export type ConversationMemberDto = {
+export type ConversationMemberOverviewDto = {
 	id: number;
-	conversationId: number;
-	member: UserOverviewDto;
+	user: UserOverviewDto;
 	joinedAt: Date;
 };

@@ -1,5 +1,7 @@
-import { EntityRepository } from 'typeorm';
+import { DeepPartial, EntityRepository } from 'typeorm';
 import { BaseRepository } from '../base/BaseRepository';
+import { ConversationMember } from '../conversationMembers/conversationMember.entity';
+import { Conversation } from '../conversations/conversation.entity';
 import {
 	RecentMessagePageable,
 	RecentMessagePaginationInfo
@@ -9,6 +11,39 @@ import { Message } from './message.entity';
 
 @EntityRepository(Message)
 export class MessageRepository extends BaseRepository<Message> {
+	async createMessage(entity: DeepPartial<Message>): Promise<Message> {
+		let createdMessage: Message;
+
+		const message = this.create({
+			...entity,
+			userMessageStatuses: [
+				{
+					userId: entity.senderId,
+					status: UserMessageStatusType.READ
+				}
+			]
+		});
+
+		this.manager.transaction(async entityManager => {
+			createdMessage = await entityManager.save<Message>(message);
+
+			await entityManager.increment(
+				ConversationMember,
+				{ conversationId: message.conversationId! },
+				'numberOfUnreadMessages',
+				1
+			);
+
+			await entityManager.update(
+				Conversation,
+				{ id: entity.conversationId },
+				{ latestMessageId: createdMessage.id }
+			);
+		});
+
+		return createdMessage!;
+	}
+
 	async findByMessageIdAndSenderId(
 		messageId: number,
 		creatorId: number
@@ -25,15 +60,15 @@ export class MessageRepository extends BaseRepository<Message> {
 
 	async findRecentMessageIdsByConversationId(
 		conversationId: number,
-		fromMessageId: number
+		count: number
 	) {
 		return await this.createQueryBuilder('message')
 			.select('message.id')
 			.where('message.conversation_id = :conversationId', {
 				conversationId
 			})
-			.andWhere('message.id > :messageId', { messageId: fromMessageId })
 			.addOrderBy('message.createdAt', 'DESC')
+			.limit(count)
 			.getMany();
 	}
 

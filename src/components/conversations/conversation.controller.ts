@@ -1,27 +1,36 @@
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
+import { generateResponseData } from '@src/utils/generateResponseData';
+import { IConversationMemberService } from '../conversationMembers/@types/IConversationMemberService';
 import { RecentMessagePageable } from '../messages/@types/RecentMessagePaginate';
 import { IConversationService } from './@types/IConversationService';
 
 export const ConversationController = (
 	conversationService: IConversationService
+	conversationMemberService: IConversationMemberService
 ) => {
-	const getConversationById = catchAsyncRequestHandler(
+	const getConversationsOfUser = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = +req.params.id;
-			const conversation = await conversationService.findConversationById(
-				id
-			);
+			const conversationId = +req.params.id;
+			const userId = req.user!.id;
 
-			res.status(HttpStatusCode.OK).json({
+			const conversation =
+				await conversationService.findConversationOfUserByConversationIdAndUserId(
+					conversationId,
+					userId
+				);
+
+			const resData = generateResponseData({
 				code: HttpStatusCode.OK,
-				data: {}
+				data: { ...conversation }
 			});
+
+			res.status(HttpStatusCode.OK).json(resData);
 		}
 	);
 
-	const findRecentMessagesByConversationIdAndUserId =
-		catchAsyncRequestHandler(async (req, res, next) => {
+	const getRecentMessagesByConversationIdAndUserId = catchAsyncRequestHandler(
+		async (req, res, next) => {
 			const conversationId = +req.params.id;
 			const userId = req.user!.id;
 			const { limit, nextCursor } = req.query as RecentMessagePageable;
@@ -33,11 +42,17 @@ export const ConversationController = (
 					{ limit, nextCursor }
 				);
 
-			res.status(HttpStatusCode.OK).json({
+			const resData = generateResponseData({
 				code: HttpStatusCode.OK,
 				data: { ...recentMessages }
 			});
-		});
 
-	return { findRecentMessagesByConversationIdAndUserId };
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
+
+	return {
+		getRecentMessagesByConversationIdAndUserId,
+		getConversationOfUser
+	};
 };

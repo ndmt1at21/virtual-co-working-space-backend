@@ -22,14 +22,11 @@ export class ConversationMember extends BaseEntity {
 	@Column({ name: 'member_id' })
 	memberId: number;
 
-	@Column({ name: 'last_read_message_id', nullable: true })
-	lastReadMessageId?: number;
-
 	@Column({ name: 'number_of_unread_messages', default: 0 })
 	numberOfUnreadMessages: number;
 
-	@OneToOne(type => Message, message => message.id)
-	lastReadMessage: Message;
+	@Column({ name: 'is_typing', default: false })
+	isTyping: boolean;
 
 	@ManyToOne(() => Conversation)
 	@JoinColumn({ name: 'conversation_id' })

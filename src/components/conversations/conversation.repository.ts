@@ -14,4 +14,21 @@ export class ConversationRepository extends BaseRepository<Conversation> {
 			.leftJoinAndSelect('conversation.members', 'user')
 			.getOne();
 	}
+
+	async findConversationByOfficeId(
+		officeId: number
+	): Promise<Conversation[]> {
+		return await this.createQueryBuilder('conversation')
+			.where('conversation.office_id = :officeId', {
+				officeId
+			})
+			.leftJoinAndSelect(
+				'conversation.conversation_members',
+				'conversation_member'
+			)
+			.leftJoinAndSelect('conversation.latest_message', 'message')
+			.getMany();
+	}
+
+	async findConversationsByUserId(userId: number) {}
 }

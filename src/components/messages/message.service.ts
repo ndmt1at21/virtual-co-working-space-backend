@@ -1,12 +1,11 @@
-import { NotFoundError } from '@src/utils/appError';
-import { PaginationInfo } from '../base/@types/PaginationInfo';
+import { IllegalArgumentError, NotFoundError } from '@src/utils/appError';
 import { CreateMessageDto } from './@types/dto/CreateMessage.dto';
 import { MessageDto } from './@types/dto/MessageDto';
-import { MessageQuery } from './@types/filter/MessageQuery';
 import { IMessageService } from './@types/IMessageService';
 import { MessageServiceParams } from './@types/MessageServiceParams';
 import { UserMessageStatusType } from './@types/UserMessageStatusType';
 import { MessageErrorMessages } from './message.error';
+import { mapMessageToMessageDto } from './message.mapping';
 
 export const MessageService = ({
 	messageRepository,
@@ -15,8 +14,11 @@ export const MessageService = ({
 	const createMessage = async (
 		createMessageDto: CreateMessageDto
 	): Promise<MessageDto> => {
-		const createdMessage = await messageRepository.save(createMessageDto);
-		return createdMessage;
+		const createdMessage = await messageRepository.createMessage(
+			createMessageDto
+		);
+
+		return mapMessageToMessageDto(createdMessage);
 	};
 
 	const revokeMessageByMessageIdAndSenderId = async (
@@ -28,8 +30,15 @@ export const MessageService = ({
 			senderId
 		);
 
-		if (!message)
+		if (!message) {
 			throw new NotFoundError(MessageErrorMessages.MESSAGE_NOT_FOUND);
+		}
+
+		if (message.isRevoked) {
+			throw new IllegalArgumentError(
+				MessageErrorMessages.MESSAGE_ALREADY_REVOKED
+			);
+		}
 
 		await messageRepository.save({
 			...message,
@@ -44,21 +53,23 @@ export const MessageService = ({
 		messageId: number,
 		userId: number
 	): Promise<void> => {
+		const userMessageStatus =
+			await userMessageStatusRepository.findByMessageIdAndUserIdAndStatus(
+				messageId,
+				userId,
+				UserMessageStatusType.DELETED
+			);
+
+		if (userMessageStatus) {
+			throw new NotFoundError(
+				MessageErrorMessages.MESSAGE_ALREADY_SELF_SIDE_DELETED
+			);
+		}
+
 		await userMessageStatusRepository.save({
 			messageId,
 			userId,
 			status: UserMessageStatusType.DELETED
-		});
-	};
-
-	const addMessageReader = async (
-		messageId: number,
-		readerId: number
-	): Promise<void> => {
-		await userMessageStatusRepository.save({
-			messageId,
-			readerId,
-			status: UserMessageStatusType.READ
 		});
 	};
 
@@ -80,10 +91,10 @@ export const MessageService = ({
 	): Promise<void> => {};
 
 	return {
-		// createMessage,
-		// deleteMessageSelfSide,
-		// addMessageReader,
-		// addMessageReceiver,
-		// addMessageReaction
+		addMessageReaction,
+		addMessageReceiver,
+		createMessage,
+		deleteMessageSelfSide,
+		revokeMessageByMessageIdAndSenderId
 	};
 };

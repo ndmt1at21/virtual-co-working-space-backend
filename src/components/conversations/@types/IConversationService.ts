@@ -1,5 +1,5 @@
 import { RecentMessagePageable } from '@src/components/messages/@types/RecentMessagePaginate';
-import { ConversationOfUserDto } from './dto/ConversationOfUser.dto';
+import { ConversationDetailDto } from './dto/ConversationDetail.dto';
 import { RecentMessagesDto } from './dto/RecentMessages.dto';
 
 export interface IConversationService {
@@ -9,8 +9,13 @@ export interface IConversationService {
 		pageable: RecentMessagePageable
 	): Promise<RecentMessagesDto>;
 
-	findConversationOfUserByConversationIdAndUserId(
+	findConversationDetailByConversationIdAndUserId(
 		conversationId: number,
 		memberId: number
-	): Promise<ConversationOfUserDto>;
+	): Promise<ConversationDetailDto>;
+
+	markAsReadByConversationIdAndUserId(
+		conversationId: number,
+		userId: number
+	): Promise<void>;
 }

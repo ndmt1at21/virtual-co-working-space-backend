@@ -1,31 +1,42 @@
-import { ConversationMember } from '../conversationMembers/conversationMember.entity';
-import { mapConversationMemberToConversationMemberDto } from '../conversationMembers/conversationMember.mapping';
-import { ConversationOfUserDto } from './@types/dto/ConversationOfUser.dto';
+import { mapConversationMemberToConversationMemberOverviewDto } from '../conversationMembers/conversationMember.mapping';
+import { mapMessageToMessageDto } from '../messages/message.mapping';
+import { ConversationDetailDto } from './@types/dto/ConversationDetail.dto';
+import { ConversationOverviewDto } from './@types/dto/ConversationOverview.dto';
 import { Conversation } from './conversation.entity';
 
 export const mapConversationToConversationOverviewDto = (
 	conversation: Conversation
-) => {
-	const { id, officeId, type } = conversation;
-	return { id, officeId, type };
+): ConversationOverviewDto => {
+	const { id, officeId, name, type, latestMessage } = conversation;
+
+	return {
+		id,
+		officeId,
+		name,
+		type,
+		latestMessage: latestMessage
+			? mapMessageToMessageDto(latestMessage)
+			: undefined
+	};
 };
 
-export const mapConversationToConversationOfUserDto = (
-	conversation: Conversation,
-	conversationMember: ConversationMember
-): ConversationOfUserDto => {
-	const { id, officeId, type, conversationMembers } = conversation;
-	const { numberOfUnreadMessages } = conversationMember;
+export const mapConversationToConversationDetailDto = (
+	conversation: Conversation
+): ConversationDetailDto => {
+	const { id, officeId, name, description, type, conversationMembers } =
+		conversation;
 
 	const membersDto = conversationMembers.map(cm =>
-		mapConversationMemberToConversationMemberDto(cm)
+		mapConversationMemberToConversationMemberOverviewDto(cm)
 	);
 
 	return {
 		id,
 		officeId,
+		name,
+		description,
 		type,
-		unreadMessages: numberOfUnreadMessages,
-		conversationMembers: membersDto
+		conversationMembers: membersDto,
+		creator: {}
 	};
 };

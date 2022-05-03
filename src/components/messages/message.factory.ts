@@ -1,4 +1,5 @@
 import { getCustomRepository } from 'typeorm';
+import { createUserMessageStatusRepository } from './components/userMessageStatus/userMessageStatus.factory';
 import { MessageController } from './message.controller';
 import { MessageRepository } from './message.repository';
 import { MessageService } from './message.service';
@@ -10,12 +11,11 @@ export function createMessageController() {
 
 export function createMessageService() {
 	const messageRepository = createMessageRepository();
+	const userMessageStatusRepository = createUserMessageStatusRepository();
 
 	return MessageService({
 		messageRepository,
-		messageReaderRepository,
-		messageReceiverRepository,
-		userMessageDeletedRepository
+		userMessageStatusRepository
 	});
 }
 

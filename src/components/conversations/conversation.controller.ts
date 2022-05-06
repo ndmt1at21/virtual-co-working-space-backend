@@ -1,28 +1,65 @@
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { generateResponseData } from '@src/utils/generateResponseData';
-import { IConversationMemberService } from '../conversationMembers/@types/IConversationMemberService';
 import { RecentMessagePageable } from '../messages/@types/RecentMessagePaginate';
 import { IConversationService } from './@types/IConversationService';
 
 export const ConversationController = (
 	conversationService: IConversationService
-	conversationMemberService: IConversationMemberService
 ) => {
-	const getConversationsOfUser = catchAsyncRequestHandler(
+	const createConversation = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			const officeId = req.body.officeId;
+			const userId = req.user!.id;
+
+			const conversation = await conversationService.createConversation({
+				creatorId: userId,
+				officeId
+			});
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: { conversation }
+			});
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
+
+	const getConversationDetailOfUser = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const conversationId = +req.params.id;
 			const userId = req.user!.id;
 
 			const conversation =
-				await conversationService.findConversationOfUserByConversationIdAndUserId(
+				await conversationService.findConversationDetailByConversationIdAndUserId(
 					conversationId,
 					userId
 				);
 
 			const resData = generateResponseData({
 				code: HttpStatusCode.OK,
-				data: { ...conversation }
+				data: { conversation }
+			});
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
+
+	const getConversationsOfUserInOffice = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			const officeId = +req.params.officeId;
+			const userId = req.user!.id;
+
+			const conversations =
+				await conversationService.findConversationsOverviewsOfUserInOffice(
+					userId,
+					1
+				);
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: { userId, conversations }
 			});
 
 			res.status(HttpStatusCode.OK).json(resData);
@@ -44,7 +81,7 @@ export const ConversationController = (
 
 			const resData = generateResponseData({
 				code: HttpStatusCode.OK,
-				data: { ...recentMessages }
+				data: { messages: recentMessages }
 			});
 
 			res.status(HttpStatusCode.OK).json(resData);
@@ -52,7 +89,9 @@ export const ConversationController = (
 	);
 
 	return {
+		createConversation,
 		getRecentMessagesByConversationIdAndUserId,
-		getConversationOfUser
+		getConversationDetailOfUser,
+		getConversationsOfUserInOffice
 	};
 };

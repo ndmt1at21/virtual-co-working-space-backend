@@ -28,11 +28,11 @@ export class ConversationMember extends BaseEntity {
 	@Column({ name: 'is_typing', default: false })
 	isTyping: boolean;
 
-	@ManyToOne(() => Conversation)
+	@ManyToOne(() => Conversation, conversation => conversation.id)
 	@JoinColumn({ name: 'conversation_id' })
 	conversation: Conversation;
 
-	@ManyToOne(() => User)
+	@ManyToOne(() => User, user => user.id)
 	@JoinColumn({ name: 'member_id' })
 	member: User;
 }

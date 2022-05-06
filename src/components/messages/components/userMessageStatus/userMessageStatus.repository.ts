@@ -10,13 +10,34 @@ export class UserMessageStatusRepository extends BaseRepository<UserMessageStatu
 		userId: number,
 		status: UserMessageStatusType
 	): Promise<UserMessageStatus | undefined> {
-		return await this.createQueryBuilder('user_message_status')
+		const query = this.createQueryBuilder('user_message_status')
 			.where('user_message_status.message_id = :messageId', { messageId })
 			.andWhere('user_message_status.user_id = :userId', {
 				userId
-			})
-			.andWhere('user_message_status.status = :status', { status })
-			.getOne();
+			});
+
+		if (status === UserMessageStatusType.DELETED) {
+			query.andWhere(
+				'user_message_status.is_self_deleted = :isSelfDeleted',
+				{ isSelfDeleted: true }
+			);
+		}
+
+		if (status === UserMessageStatusType.RECEIVED) {
+			query.andWhere(
+				'user_message_status.is_self_deleted = :isReceived',
+				{ isReceived: true }
+			);
+		}
+
+		if (status === UserMessageStatusType.READ) {
+			query.andWhere(
+				'user_message_status.is_self_deleted = :isReceived',
+				{ isRead: true }
+			);
+		}
+
+		return await query.getOne();
 	}
 
 	async deleteMessageSelfSide(
@@ -26,7 +47,8 @@ export class UserMessageStatusRepository extends BaseRepository<UserMessageStatu
 		return await this.save({
 			messageId,
 			userId,
-			status: UserMessageStatusType.DELETED
+			isSelfDeleted: true,
+			selfDeletedAt: new Date()
 		});
 	}
 
@@ -37,7 +59,8 @@ export class UserMessageStatusRepository extends BaseRepository<UserMessageStatu
 		return await this.save({
 			messageId,
 			userId: readerId,
-			status: UserMessageStatusType.READ
+			isRead: true,
+			readAt: new Date()
 		});
 	}
 
@@ -48,7 +71,8 @@ export class UserMessageStatusRepository extends BaseRepository<UserMessageStatu
 		return await this.save({
 			messageId,
 			receiverId,
-			status: UserMessageStatusType.RECEIVED
+			isReceived: true,
+			receivedAt: new Date()
 		});
 	}
 }

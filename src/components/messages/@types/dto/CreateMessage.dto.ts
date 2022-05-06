@@ -14,14 +14,4 @@ export class CreateMessageDto {
 	@MaxLength(20000)
 	@Expose()
 	content: string;
-
-	@IsDefined()
-	@IsIn([
-		MessageType.TEXT,
-		MessageType.IMAGE,
-		MessageType.VIDEO,
-		MessageType.STICKER
-	])
-	@Expose()
-	type: MessageType;
 }

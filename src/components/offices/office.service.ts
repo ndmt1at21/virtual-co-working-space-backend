@@ -42,6 +42,7 @@ export const OfficeService = ({
 
 		const conversation = conversationRepository.create({
 			type: ConversationType.OFFICE_LEVEL,
+			creatorId: createdUserId,
 			conversationMembers: [{ memberId: createdUserId }]
 		});
 

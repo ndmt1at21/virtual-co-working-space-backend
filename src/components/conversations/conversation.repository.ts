@@ -11,7 +11,12 @@ export class ConversationRepository extends BaseRepository<Conversation> {
 			.where('conversation.id = :id', {
 				id
 			})
-			.leftJoinAndSelect('conversation.members', 'user')
+			.leftJoinAndSelect('conversation.creator', 'user1')
+			.leftJoinAndSelect(
+				'conversation.conversationMembers',
+				'conversation_member'
+			)
+			.leftJoinAndSelect('conversation_member.member', 'user2')
 			.getOne();
 	}
 
@@ -23,10 +28,10 @@ export class ConversationRepository extends BaseRepository<Conversation> {
 				officeId
 			})
 			.leftJoinAndSelect(
-				'conversation.conversation_members',
+				'conversation.conversationMembers',
 				'conversation_member'
 			)
-			.leftJoinAndSelect('conversation.latest_message', 'message')
+			.leftJoinAndSelect('conversation.latestMessage', 'message')
 			.getMany();
 	}
 

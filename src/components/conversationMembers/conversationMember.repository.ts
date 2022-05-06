@@ -23,10 +23,10 @@ export class ConversationMemberRepository extends BaseRepository<ConversationMem
 		const [conversationMembers, count] = await this.createQueryBuilder(
 			'conversation_member'
 		)
-			.where('conversation_member.user_id = :userId', {
+			.where('conversation_member.member_id = :userId', {
 				userId
 			})
-			.leftJoinAndSelect('conversation_member.member', 'user')
+			.leftJoinAndSelect('conversation_member.member', 'user_1')
 			.leftJoinAndSelect(
 				'conversation_member.conversation',
 				'conversation',
@@ -34,6 +34,8 @@ export class ConversationMemberRepository extends BaseRepository<ConversationMem
 				{ officeId }
 			)
 			.leftJoinAndSelect('conversation.latestMessage', 'message')
+			.leftJoinAndSelect('message.sender', 'user_2')
+			.orderBy('conversation.updated_at', 'DESC')
 			.getManyAndCount();
 
 		return [conversationMembers, count];

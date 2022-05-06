@@ -1,8 +1,11 @@
 import { CreateMessageDto } from './dto/CreateMessage.dto';
 import { MessageDto } from './dto/MessageDto';
+import { MessageOverviewDto } from './dto/MessageOverview.dto';
 
 export interface IMessageService {
-	createMessage(createMessageDto: CreateMessageDto): Promise<MessageDto>;
+	createMessage(
+		createMessageDto: CreateMessageDto
+	): Promise<MessageOverviewDto>;
 
 	revokeMessageByMessageIdAndSenderId(
 		messageId: number,

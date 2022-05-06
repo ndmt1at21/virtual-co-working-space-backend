@@ -1,5 +1,6 @@
 import { mapUserToUserOverviewDto } from '../users/user.mapping';
 import { MessageDto } from './@types/dto/MessageDto';
+import { MessageOverviewDto } from './@types/dto/MessageOverview.dto';
 import { mapUserMessageStatusToUserMessageReaderStatusDto } from './components/userMessageStatus/userMessageStatus.mapping';
 import { Message } from './message.entity';
 
@@ -31,5 +32,22 @@ export const mapMessageToMessageDto = (message: Message): MessageDto => {
 		readers: readersDto,
 		reactions: [],
 		status
+	};
+};
+
+export const mapMessageToMessageOverviewDto = (
+	message: Message
+): MessageOverviewDto => {
+	const { id, conversationId, senderId, content, createdAt, type, status } =
+		message;
+
+	return {
+		id,
+		conversationId,
+		senderId,
+		content,
+		type,
+		status,
+		sentAt: createdAt
 	};
 };

@@ -18,6 +18,8 @@ import { ConversationMember } from '@src/components/conversationMembers/conversa
 import { Message } from '@src/components/messages/message.entity';
 import { RefreshToken } from '@src/components/auth/components/refreshToken/refreshToken.entity';
 import { PasswordResetToken } from '@src/components/auth/components/passwordResetToken/passwordResetToken.entity';
+import { UserMessageStatus } from '@src/components/messages/components/userMessageStatus/userMessageStatus.entity';
+import { MessageReaction } from '@src/components/messages/components/messageReactions/messageReaction.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -42,7 +44,10 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		OfficeMemberRole,
 		OfficeInvitation,
 		Conversation,
-		ConversationMember
+		ConversationMember,
+		UserMessageStatus,
+		MessageReaction,
+		Message
 	]
 };
 

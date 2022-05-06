@@ -1,4 +1,5 @@
 import { getCustomRepository } from 'typeorm';
+import { createConversationService } from '../conversations/conversation.factory';
 import { createUserMessageStatusRepository } from './components/userMessageStatus/userMessageStatus.factory';
 import { MessageController } from './message.controller';
 import { MessageRepository } from './message.repository';
@@ -6,7 +7,8 @@ import { MessageService } from './message.service';
 
 export function createMessageController() {
 	const officeService = createMessageService();
-	return MessageController(officeService);
+	const conversationService = createConversationService();
+	return MessageController(officeService, conversationService);
 }
 
 export function createMessageService() {

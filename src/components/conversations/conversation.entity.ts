@@ -1,5 +1,4 @@
 import {
-	BaseEntity,
 	Column,
 	Entity,
 	JoinColumn,
@@ -8,6 +7,7 @@ import {
 	OneToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
+import { BaseEntity } from '../base/BaseEntity';
 import { ConversationMember } from '../conversationMembers/conversationMember.entity';
 import { Message } from '../messages/message.entity';
 import { Office } from '../offices/office.entity';
@@ -52,9 +52,11 @@ export class Conversation extends BaseEntity {
 	)
 	conversationMembers: ConversationMember[];
 
-	@OneToOne(type => Message, message => message.id)
+	@OneToOne(type => Message)
+	@JoinColumn({ name: 'latest_message_id' })
 	latestMessage?: Message;
 
-	@ManyToOne(type => User, user => user.id)
-	creator?: Message;
+	@ManyToOne(type => User)
+	@JoinColumn({ name: 'creator_id' })
+	creator: User;
 }

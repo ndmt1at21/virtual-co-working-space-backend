@@ -1,11 +1,11 @@
 import { IllegalArgumentError, NotFoundError } from '@src/utils/appError';
 import { CreateMessageDto } from './@types/dto/CreateMessage.dto';
-import { MessageDto } from './@types/dto/MessageDto';
+import { MessageOverviewDto } from './@types/dto/MessageOverview.dto';
 import { IMessageService } from './@types/IMessageService';
 import { MessageServiceParams } from './@types/MessageServiceParams';
 import { UserMessageStatusType } from './@types/UserMessageStatusType';
 import { MessageErrorMessages } from './message.error';
-import { mapMessageToMessageDto } from './message.mapping';
+import { mapMessageToMessageOverviewDto } from './message.mapping';
 
 export const MessageService = ({
 	messageRepository,
@@ -13,12 +13,12 @@ export const MessageService = ({
 }: MessageServiceParams): IMessageService => {
 	const createMessage = async (
 		createMessageDto: CreateMessageDto
-	): Promise<MessageDto> => {
+	): Promise<MessageOverviewDto> => {
 		const createdMessage = await messageRepository.createMessage(
 			createMessageDto
 		);
 
-		return mapMessageToMessageDto(createdMessage);
+		return mapMessageToMessageOverviewDto(createdMessage);
 	};
 
 	const revokeMessageByMessageIdAndSenderId = async (
@@ -69,7 +69,8 @@ export const MessageService = ({
 		await userMessageStatusRepository.save({
 			messageId,
 			userId,
-			status: UserMessageStatusType.DELETED
+			isSelfDeleted: true,
+			selfDeletedAt: new Date()
 		});
 	};
 
@@ -79,8 +80,9 @@ export const MessageService = ({
 	): Promise<void> => {
 		await userMessageStatusRepository.save({
 			messageId,
-			receiverId,
-			status: UserMessageStatusType.RECEIVED
+			userId: receiverId,
+			isReceived: true,
+			receivedAt: new Date()
 		});
 	};
 

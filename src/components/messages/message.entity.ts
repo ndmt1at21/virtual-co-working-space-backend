@@ -1,7 +1,7 @@
 import {
 	Column,
 	Entity,
-	Index,
+	JoinColumn,
 	ManyToOne,
 	OneToMany,
 	PrimaryGeneratedColumn
@@ -12,7 +12,7 @@ import { User } from '../users/user.entity';
 import { MessageReaction } from './components/messageReactions/messageReaction.entity';
 import { MessageStatus } from './@types/MessageStatus';
 import { UserMessageStatus } from './components/userMessageStatus/userMessageStatus.entity';
-import { UserMessageStatusType } from './@types/UserMessageStatusType';
+import { Conversation } from '../conversations/conversation.entity';
 
 @Entity({ name: 'message' })
 export class Message extends BaseEntity {
@@ -23,7 +23,6 @@ export class Message extends BaseEntity {
 	conversationId: number;
 
 	@Column({ name: 'sender_id' })
-	@Index()
 	senderId: number;
 
 	@Column({ name: 'content', length: 20000 })
@@ -44,15 +43,21 @@ export class Message extends BaseEntity {
 	@Column({ name: 'revoked_at', nullable: true })
 	revokedAt?: Date;
 
+	@ManyToOne(type => Conversation)
+	@JoinColumn({ name: 'conversation_id' })
+	conversation: Conversation;
+
 	@ManyToOne(type => User, user => user.id)
+	@JoinColumn({ name: 'sender_id' })
 	sender: User;
 
-	@OneToMany(type => MessageReaction, reaction => reaction.messageId)
+	@OneToMany(type => MessageReaction, reaction => reaction.message)
 	reactions: MessageReaction[];
 
 	@OneToMany(
 		type => UserMessageStatus,
-		userMessageStatus => userMessageStatus.messageId
+		userMessageStatus => userMessageStatus.message,
+		{ cascade: true }
 	)
 	userMessageStatuses: UserMessageStatus[];
 
@@ -67,16 +72,12 @@ export class Message extends BaseEntity {
 	}
 
 	public get readers(): UserMessageStatus[] {
-		return this.userMessageStatuses.filter(
-			userMessageStatus =>
-				userMessageStatus.status === UserMessageStatusType.READ
-		);
-	}
+		if (!this.userMessageStatuses) return [];
 
-	public get receivers(): UserMessageStatus[] {
 		return this.userMessageStatuses.filter(
 			userMessageStatus =>
-				userMessageStatus.status === UserMessageStatusType.RECEIVED
+				userMessageStatus.isRead === true &&
+				userMessageStatus.isSelfDeleted === false
 		);
 	}
 }

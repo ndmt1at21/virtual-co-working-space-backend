@@ -4,6 +4,5 @@ import { IMessageValidate } from './IMessageValidate';
 
 export type MessageServiceParams = {
 	messageRepository: MessageRepository;
-	messageValidate: IMessageValidate;
 	userMessageStatusRepository: UserMessageStatusRepository;
 };

@@ -1,6 +1,7 @@
 import {
 	Column,
 	Entity,
+	JoinColumn,
 	ManyToOne,
 	PrimaryColumn,
 	PrimaryGeneratedColumn
@@ -12,21 +13,35 @@ import { UserMessageStatusType } from '../../@types/UserMessageStatusType';
 
 @Entity({ name: 'user_message_status' })
 export class UserMessageStatus extends BaseEntity {
-	@PrimaryGeneratedColumn()
-	id: number;
-
 	@PrimaryColumn({ name: 'message_id' })
 	messageId: number;
 
 	@PrimaryColumn({ name: 'user_id' })
 	userId: number;
 
-	@Column()
-	status: UserMessageStatusType;
+	@Column({ name: 'is_read', default: false })
+	isRead: boolean;
 
-	@ManyToOne(type => Message, message => message.id)
+	@Column({ name: 'read_at', nullable: true })
+	readAt: Date;
+
+	@Column({ name: 'is_received', default: false })
+	isReceived: boolean;
+
+	@Column({ name: 'received_at', nullable: true })
+	receivedAt: Date;
+
+	@Column({ name: 'is_self_deleted', default: false })
+	isSelfDeleted: boolean;
+
+	@Column({ name: 'self_deleted_at', nullable: true })
+	selfDeletedAt: Date;
+
+	@ManyToOne(type => Message)
+	@JoinColumn({ name: 'message_id' })
 	message: Message;
 
-	@ManyToOne(type => User, user => user.id)
+	@ManyToOne(type => User)
+	@JoinColumn({ name: 'user_id' })
 	user: User;
 }

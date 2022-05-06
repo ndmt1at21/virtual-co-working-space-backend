@@ -5,10 +5,22 @@ import {
 	SocketMiddlewareFunction
 } from './@types/socketMiddleware';
 
-export const SocketMiddleware = () => {
+export const SocketMiddleware = (
+	fns: (SocketMiddlewareFunction | SocketMiddlewareErrorFunction)[]
+) => {
 	const middlewares: SocketMiddlewareFunction[] = [];
 	const middlewaresError: SocketMiddlewareErrorFunction[] = [];
 	let data: SocketContext | null = null;
+
+	fns.forEach(fn => {
+		if (fn.length === 3) {
+			middlewares.push(fn as SocketMiddlewareFunction);
+		}
+
+		if (fn.length === 4) {
+			middlewaresError.push(fn as SocketMiddlewareErrorFunction);
+		}
+	});
 
 	const use = (
 		middleware: SocketMiddlewareFunction | SocketMiddlewareErrorFunction

@@ -1,5 +1,6 @@
 import { mapConversationMemberToConversationMemberOverviewDto } from '../conversationMembers/conversationMember.mapping';
 import { mapMessageToMessageDto } from '../messages/message.mapping';
+import { mapUserToUserOverviewDto } from '../users/user.mapping';
 import { ConversationDetailDto } from './@types/dto/ConversationDetail.dto';
 import { ConversationOverviewDto } from './@types/dto/ConversationOverview.dto';
 import { Conversation } from './conversation.entity';
@@ -23,12 +24,21 @@ export const mapConversationToConversationOverviewDto = (
 export const mapConversationToConversationDetailDto = (
 	conversation: Conversation
 ): ConversationDetailDto => {
-	const { id, officeId, name, description, type, conversationMembers } =
-		conversation;
+	const {
+		id,
+		officeId,
+		name,
+		description,
+		type,
+		conversationMembers,
+		creator
+	} = conversation;
 
 	const membersDto = conversationMembers.map(cm =>
 		mapConversationMemberToConversationMemberOverviewDto(cm)
 	);
+
+	const creatorDto = mapUserToUserOverviewDto(creator);
 
 	return {
 		id,
@@ -36,7 +46,7 @@ export const mapConversationToConversationDetailDto = (
 		name,
 		description,
 		type,
-		conversationMembers: membersDto,
-		creator: {}
+		members: membersDto,
+		creator: creatorDto
 	};
 };

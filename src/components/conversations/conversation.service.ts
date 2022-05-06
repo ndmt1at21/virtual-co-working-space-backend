@@ -14,6 +14,9 @@ import {
 } from './conversation.mapping';
 import { ConversationOfUserDetailDto } from './@types/dto/ConversationOfUserDetail.dto';
 import { ConversationOfUserOverviewDto } from './@types/dto/ConversationOfUserOverview.dto';
+import { CreateConversationDto } from './@types/dto/CreateConversation.dto';
+import { ConversationOverviewDto } from './@types/dto/ConversationOverview.dto';
+import { ConversationType } from './@types/ConversationType';
 
 export const ConversationService = ({
 	conversationMemberRepository,
@@ -21,7 +24,20 @@ export const ConversationService = ({
 	messageRepository,
 	userMessageStatusRepository
 }: ConversationServiceParams): IConversationService => {
-	const createConversation = async () => {};
+	const createConversation = async (
+		createConversationDto: CreateConversationDto
+	): Promise<ConversationOverviewDto> => {
+		const { creatorId, officeId } = createConversationDto;
+
+		const conversation = await conversationRepository.save({
+			officeId,
+			creatorId,
+			type: ConversationType.GROUP_LEVEL,
+			conversationMembers: [{ memberId: creatorId }]
+		});
+
+		return mapConversationToConversationOverviewDto(conversation);
+	};
 
 	const findConversationsOverviewsOfUserInOffice = async (
 		userId: number,
@@ -88,22 +104,14 @@ export const ConversationService = ({
 		userId: number,
 		pageable: RecentMessagePageable
 	): Promise<RecentMessagesDto> => {
-		const conversation = await conversationRepository.findById(
-			conversationId
-		);
-
-		if (!conversation) {
-			throw new NotFoundError(
-				ConversationErrorMessages.CONVERSATION_NOT_FOUND
-			);
-		}
-
 		const [recentMessages, pageInfo] =
 			await messageRepository.findRecentMessagesIgnoreSelfDeletedByConversationIdAndUserId(
 				conversationId,
 				userId,
 				pageable
 			);
+
+		console.log(recentMessages);
 
 		const messagesDto = recentMessages.map(message =>
 			mapMessageToMessageDto(message)
@@ -140,29 +148,32 @@ export const ConversationService = ({
 
 		if (messagesUnreadIds.length == 0) return;
 
-		userMessageStatusRepository.manager.transaction(async entityManager => {
-			const messageReaders = messagesUnreadIds.map(messageId =>
-				userMessageStatusRepository.create({
-					messageId,
-					userId,
-					status: UserMessageStatusType.READ
-				})
-			);
+		const messageReaders = messagesUnreadIds.map(messageId =>
+			userMessageStatusRepository.create({
+				messageId,
+				userId,
+				isRead: true,
+				readAt: new Date()
+			})
+		);
 
+		userMessageStatusRepository.manager.transaction(async entityManager => {
 			await entityManager.save(messageReaders);
 			await entityManager.update(
 				ConversationMember,
-				{ conversationId, userId },
+				{ conversationId, memberId: userId },
 				{
 					numberOfUnreadMessages: () =>
-						`numberOfUnreadMessages - ${messagesUnreadIds.length}`
+						`number_of_unread_messages - ${messagesUnreadIds.length}`
 				}
 			);
 		});
 	};
 
 	return {
+		createConversation,
 		findRecentMessagesByConversationIdAndUserId,
+		findConversationsOverviewsOfUserInOffice,
 		findConversationDetailByConversationIdAndUserId,
 		markAsReadByConversationIdAndUserId
 	};

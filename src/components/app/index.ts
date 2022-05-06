@@ -1,4 +1,4 @@
-import { Application } from 'express';
+import { Application, Express } from 'express';
 import { Server as HttpServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import { globalErrorHandler } from '../globalHandlerError';
@@ -13,6 +13,7 @@ import {
 import { createMessageQueues } from './loaders/queue';
 import { socketEventHandlers } from './loaders/socket';
 import config from '@src/config';
+import { ExpressPeerServer } from 'peer';
 
 export const mainAppLoaders = async (
 	app: Application,
@@ -75,8 +76,18 @@ export const socketServerLoader = (
 	});
 	logger.info(`Socket server is initialized.`);
 
-	socketEventHandlers(socketServer);
+	socketEventHandlers(socketServer, logger);
 	logger.info(`Socket event handlers has been loaded.`);
 
 	return socketServer;
+};
+
+export const peerServerLoader = (
+	server: HttpServer,
+	app: Express
+) => {
+	const peerServer = ExpressPeerServer(server, {
+		path: '/'
+	});
+	app.use('/peer', peerServer);
 };

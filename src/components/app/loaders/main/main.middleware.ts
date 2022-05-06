@@ -11,6 +11,8 @@ import config from '@src/config';
 export const mainMiddleware = (app: Application, logger: ILogger) => {
 	const isProduction = appConfig.NODE_ENV === 'production';
 
+	app.enable('trust proxy');
+
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: true }));
 
@@ -20,8 +22,8 @@ export const mainMiddleware = (app: Application, logger: ILogger) => {
 
 	app.use(
 		helmet({
-			contentSecurityPolicy: false,
-			crossOriginEmbedderPolicy: false
+			contentSecurityPolicy: isProduction,
+			crossOriginEmbedderPolicy: isProduction
 		})
 	);
 

@@ -19,8 +19,8 @@ export const rateLimiting = ({
 
 	return async (req: Request, res: Response, next: NextFunction) => {
 		const ip =
-			req.connection.remoteAddress ||
 			(req.headers['x-forward-for'] as string) ||
+			req.connection.remoteAddress ||
 			'127.0.0.1';
 
 		const nRequest = await incrNumberRequestOfIp(ip);

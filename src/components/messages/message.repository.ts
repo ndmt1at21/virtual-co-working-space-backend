@@ -43,16 +43,18 @@ export class MessageRepository extends BaseRepository<Message> {
 
 	async findByMessageIdAndSenderId(
 		messageId: number,
-		creatorId: number
+		senderId: number
 	): Promise<Message | undefined> {
-		return await this.createQueryBuilder('message')
+		const message = await this.createQueryBuilder('message')
 			.where('message.id = :messageId', {
 				messageId
 			})
 			.andWhere('message.sender_id = :senderId', {
-				creatorId
+				senderId
 			})
 			.getOne();
+
+		return message;
 	}
 
 	async findRecentMessageIdsByConversationId(
@@ -83,11 +85,13 @@ export class MessageRepository extends BaseRepository<Message> {
 			.leftJoinAndSelect('message.sender', 'user')
 			.leftJoinAndSelect(
 				'message.userMessageStatuses',
-				'user_message_status'
+				'user_message_status',
+				'user_message_status.user_id = :userId',
+				{ userId }
 			)
-			.andWhere('user_message_status.is_self_deleted != :isSelfDeleted', {
-				isSelfDeleted: false
-			})
+			.andWhere(
+				'user_message_status.is_self_deleted = false OR user_message_status.is_self_deleted IS NULL'
+			)
 			.addOrderBy('message.createdAt', 'DESC')
 			.limit(limit);
 

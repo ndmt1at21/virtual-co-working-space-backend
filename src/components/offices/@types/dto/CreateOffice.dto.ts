@@ -6,4 +6,8 @@ export class CreateOfficeDto {
 	@IsDefined()
 	@Length(1, 255)
 	name: string;
+
+	@Expose()
+	@Length(1, 2000)
+	description?: string;
 }

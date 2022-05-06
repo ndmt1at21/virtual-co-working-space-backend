@@ -33,6 +33,9 @@ export class Office extends BaseEntity {
 	@Column({ name: 'avatar_url', nullable: true })
 	avatarUrl?: string;
 
+	@Column({ name: 'description', nullable: true })
+	description?: string;
+
 	@Column({ name: 'number_of_members', default: 0 })
 	numberOfMembers: number;
 

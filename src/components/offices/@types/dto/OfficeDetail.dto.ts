@@ -7,6 +7,7 @@ export type OfficeDetailDto = {
 	name: string;
 	invitationCode: string;
 	avatarUrl?: string;
+	description?: string;
 	createdAt: Date;
 	createdBy: UserOverviewDto;
 	officeItems: OfficeItemOverviewDto[];

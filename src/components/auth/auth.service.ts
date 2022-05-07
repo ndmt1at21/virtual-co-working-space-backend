@@ -13,6 +13,8 @@ import { IActiveUserTokenService } from '../activeUserToken/@types/IActiveUserTo
 import { LocalRegisterDto } from './@types/dto/LocalRegister.dto';
 import { PasswordResetTokenDto } from './components/passwordResetToken/@types/dto/PasswordResetToken.dto';
 import { IPasswordResetTokenService } from './components/passwordResetToken/@types/IPasswordService';
+import { IllegalArgumentError } from '@src/utils/appError';
+import { AuthErrorMessages } from './auth.error';
 
 export const AuthService = (
 	userService: IUserService,
@@ -27,6 +29,7 @@ export const AuthService = (
 		await authValidate.validateLocalUserCanLogin(loginDto);
 
 		const user = await userService.findUserByEmail(loginDto.email);
+
 		const [accessToken, refreshToken] =
 			await authTokenService.createAccessTokenAndRefreshToken(user!.id);
 

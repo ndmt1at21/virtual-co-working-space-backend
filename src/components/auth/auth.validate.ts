@@ -1,4 +1,4 @@
-import { UnauthorizedError } from '@src/utils/appError';
+import { IllegalArgumentError, UnauthorizedError } from '@src/utils/appError';
 import { compareSync } from 'bcrypt';
 import { UserLoginProvider } from '@src/components/UserLoginProvider';
 import { UserStatus } from '@components/users/@types/UserStatus';
@@ -67,13 +67,15 @@ export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 
 	function checkUserExists(user: User | undefined) {
 		if (!user) {
-			throw new UnauthorizedError(UserErrorMessage.USER_NOT_FOUND);
+			throw new IllegalArgumentError(
+				AuthErrorMessages.UNAUTHORIZED_USER_NOT_FOUND
+			);
 		}
 	}
 
 	function checkPasswordMatch(user: User, password: string) {
 		if (!compareSync(password, user!.password!)) {
-			throw new UnauthorizedError(
+			throw new IllegalArgumentError(
 				AuthErrorMessages.UNAUTHORIZED_INCORRECT_EMAIL_OR_PASSWORD
 			);
 		}
@@ -81,7 +83,7 @@ export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 
 	function checkLoginProviderMatch(user: User, provider: UserLoginProvider) {
 		if (user.provider !== provider) {
-			throw new UnauthorizedError(
+			throw new IllegalArgumentError(
 				AuthErrorMessages.UNAUTHORIZED_INCORRECT_EMAIL_OR_PASSWORD
 			);
 		}

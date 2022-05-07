@@ -19,7 +19,7 @@ export const AuthMiddleware = (
 		const accessToken = req.headers.authorization?.split(' ')[1];
 
 		if (!accessToken) {
-			throw new IllegalArgumentError(
+			throw new UnauthorizedError(
 				AuthErrorMessages.UNAUTHORIZED_MISSING_TOKEN
 			);
 		}

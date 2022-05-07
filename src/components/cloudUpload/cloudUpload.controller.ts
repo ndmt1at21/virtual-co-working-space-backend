@@ -11,8 +11,6 @@ export const CloudUploadController = (cloudService: ICloudUploadService) => {
 
 		if (!uploadFile) throw new IllegalArgumentError('File upload is empty');
 
-		console.log(uploadFile);
-
 		const url = await cloudService.uploadLargeFile({
 			name: uploadFile.originalname,
 			stream: createFileStream(uploadFile.buffer),

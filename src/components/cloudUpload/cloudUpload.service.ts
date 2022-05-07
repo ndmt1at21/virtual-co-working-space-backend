@@ -32,7 +32,10 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 		});
 	};
 
-	const uploadLargeFile = async (file: FileUploadDto): Promise<string> => {
+	const uploadLargeFile = async (
+		file: FileUploadDto,
+		groupCategory?: string
+	): Promise<string> => {
 		const s3 = new AWS.S3();
 
 		const params: AWS.S3.PutObjectRequest = {
@@ -59,7 +62,7 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 	}
 
 	async function initializeS3(): Promise<void> {
-		logger.info('Start config AWS S3 service');
+		logger.info('Start creating/updating AWS S3 bucket');
 
 		AWS.config.update({
 			apiVersion: '2006-03-01',
@@ -70,13 +73,32 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 			}
 		});
 
-		logger.info('Create new bucket contains file of models');
+		await createS3Bucket();
+
+		logger.info('Create/Update S3 bucket contains file of models');
+	}
+
+	async function createS3Bucket(): Promise<AWS.S3> {
 		const s3 = new AWS.S3();
 
+		try {
+			await s3
+				.createBucket({
+					CreateBucketConfiguration: {
+						LocationConstraint: config.cloud.MODEL_AWS_BUCKET_REGION
+					},
+					ACL: 'public-read',
+					Bucket: config.cloud.MODEL_AWS_BUCKET_NAME
+				})
+				.promise();
+		} catch (err: any) {
+			if (err.code !== 'BucketAlreadyOwnedByYou') throw err;
+		}
+
+		await configBucketPolicy(s3);
 		await configBucketCors(s3);
-		await s3.createBucket({
-			Bucket: config.cloud.MODEL_AWS_BUCKET_NAME
-		});
+
+		return s3;
 	}
 
 	async function configBucketCors(s3: AWS.S3): Promise<void> {
@@ -87,17 +109,31 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 					CORSRules: [
 						{
 							AllowedHeaders: ['*'],
-							AllowedMethods: ['PUT', 'POST', 'DELETE'],
-							AllowedOrigins: ['*']
-						},
-						{
-							AllowedMethods: ['GET'],
-							AllowedOrigins: ['*']
+							AllowedMethods: ['PUT', 'POST', 'DELETE', 'GET'],
+							AllowedOrigins: [config.app.SERVER_DOMAIN]
 						}
 					]
 				}
 			})
 			.promise();
+	}
+
+	async function configBucketPolicy(s3: AWS.S3): Promise<void> {
+		const bucketPolicy = {
+			Version: '2012-10-17',
+			Statement: {
+				Sid: 'PublicS3AccessPolicy',
+				Effect: 'Allow',
+				Principle: '*',
+				Action: ['s3:GetObject'],
+				Resource: [`arn:aws:s3:::${config.cloud.MODEL_AWS_BUCKET_NAME}`]
+			}
+		};
+
+		s3.putBucketPolicy({
+			Bucket: config.cloud.MODEL_AWS_BUCKET_NAME,
+			Policy: JSON.stringify(bucketPolicy)
+		});
 	}
 
 	return { initialize, uploadMedia, uploadLargeFile };

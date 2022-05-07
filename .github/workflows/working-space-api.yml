@@ -27,5 +27,6 @@ jobs:
               run: cp ../.env .env
 
             - run: npm ci
+            - run: serverless deploy -s prod
             - run: npm run build:prod
             - run: pm2 startOrRestart ecosystem.config.js

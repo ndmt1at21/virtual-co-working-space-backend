@@ -57,7 +57,7 @@ const ormMongoOptions: MongoConnectionOptions = {
 	password: config.db.mongo.DB_PASSWORD,
 	database: config.db.mongo.DB_NAME,
 	logging: false,
-	dropSchema: true,
+	dropSchema: false,
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 	synchronize: true,

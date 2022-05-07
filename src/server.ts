@@ -6,7 +6,8 @@ import { serverLogger } from '@components/logger';
 import {
 	mainAppLoaders,
 	httpServerLoader,
-	socketServerLoader
+	socketServerLoader,
+	peerServerLoader
 } from './components/app';
 
 const startServer = async () => {
@@ -15,9 +16,9 @@ const startServer = async () => {
 
 	try {
 		await mainAppLoaders(app, serverLogger);
-
 		socketServerLoader(server, serverLogger);
 		httpServerLoader(server, appConfig.PORT, serverLogger);
+		peerServerLoader(server, app);
 	} catch (err) {
 		serverLogger.error(err);
 	}

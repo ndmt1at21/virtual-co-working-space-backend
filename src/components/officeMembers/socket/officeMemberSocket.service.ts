@@ -68,7 +68,7 @@ export const OfficeMemberSocketService = (
 		socket
 			.to(`${socket.data.officeMember!.officeId}`)
 			.emit('office_member:offline', memberId);
-
+		
 		setMemberInOfficeOffline(id);
 
 		await officeMemberTransformService.backupTransformFromCacheById(id);

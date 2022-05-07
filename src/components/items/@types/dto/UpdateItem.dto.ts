@@ -1,11 +1,12 @@
 import { Expose } from 'class-transformer';
-import { IsUrl } from 'class-validator';
+import { IsUrl, Length } from 'class-validator';
 
 export class UpdateItemDto {
 	@Expose()
+	@Length(1, 255)
 	name?: string;
 
-	@IsUrl()
 	@Expose()
+	@IsUrl()
 	modelPath?: string;
 }

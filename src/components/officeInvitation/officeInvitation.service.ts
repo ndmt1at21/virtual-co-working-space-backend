@@ -1,6 +1,7 @@
 import { getManager } from 'typeorm';
 import { OfficeMember } from '../officeMembers/officeMember.entity';
 import { OfficeRoleType } from '../officeRoles/@types/OfficeRoleType';
+import { Office } from '../offices/office.entity';
 import { CreatePrivateInvitationDto } from './@types/dto/CreatePrivateInvitation.dto';
 import { OfficeInvitationDto } from './@types/dto/OfficeInvitation.dto';
 import { IOfficeInvitationService } from './@types/IOfficeInvitationService';
@@ -98,6 +99,12 @@ export const OfficeInvitationService = ({
 			});
 
 			await transactionManager.save<OfficeMember>(officeMember);
+			await transactionManager.increment(
+				Office,
+				{ id: officeInvitation!.officeId },
+				'numberOfMembers',
+				1
+			);
 			await transactionManager.remove(OfficeInvitation, officeInvitation);
 		});
 	};
@@ -121,7 +128,7 @@ export const OfficeInvitationService = ({
 			OfficeRoleType.MEMBER
 		);
 
-		await officeMemberRepository.save({
+		await officeMemberRepository.saveOfficeMember({
 			officeId: office!.id,
 			memberId: userId,
 			transform: {},

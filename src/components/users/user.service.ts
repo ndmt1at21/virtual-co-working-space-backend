@@ -13,6 +13,8 @@ import { UpdatePasswordDto } from './@types/dto/UpdatePassword.dto';
 import { IPasswordEncoder } from './components/passwordEncoder/@types/IPasswordEncoder';
 import { FindAllUsersOptions } from './@types/filter/FindAllUsersOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
+import { NotFoundError } from '@src/utils/appError';
+import { UserErrorMessage } from './user.error';
 
 export const UserService = (
 	userRepository: UserRepository,
@@ -116,12 +118,18 @@ export const UserService = (
 		await userRepository.softDelete(id);
 	};
 
-	const blockUserById = async (id: number): Promise<number> => {
+	const updateUserBlockStatus = async (
+		id: number,
+		status: UserStatus
+	): Promise<number> => {
 		const result = await userRepository.update(id, {
-			status: UserStatus.BLOCKED
+			status
 		});
 
-		return result.affected || 0;
+		if (result.affected === 0)
+			throw new NotFoundError(UserErrorMessage.USER_NOT_FOUND);
+
+		return id;
 	};
 
 	const activeNewUser = async (id: number): Promise<UserDto> => {
@@ -142,7 +150,7 @@ export const UserService = (
 		updateUserById,
 		updatePasswordById,
 		deleteUserById,
-		blockUserById,
+		updateUserBlockStatus,
 		activeNewUser
 	};
 };

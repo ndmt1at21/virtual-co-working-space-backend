@@ -4,6 +4,10 @@ export type OfficeOverviewDto = {
 	id: number;
 	name: string;
 	invitationCode: string;
+	avatarUrl?: string;
+	description?: string;
 	createdAt: Date;
 	createdBy: UserOverviewDto;
+	numberOfMembers: number;
+	numberOfItems: number;
 };

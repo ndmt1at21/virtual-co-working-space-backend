@@ -37,9 +37,12 @@ export const AuthController = (
 		logger.info(`User with id ${user.id} logged in successfully`);
 
 		res.status(HttpStatusCode.OK).json({
-			user,
-			accessToken,
-			refreshToken
+			code: HttpStatusCode.OK,
+			data: {
+				user,
+				accessToken,
+				refreshToken
+			}
 		});
 	});
 
@@ -66,9 +69,12 @@ export const AuthController = (
 			clientUrl
 		);
 
-		res.status(HttpStatusCode.CREATED).json({
-			user,
-			message: 'User created successfully'
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			message: 'User created successfully',
+			data: {
+				user
+			}
 		});
 	});
 
@@ -117,6 +123,7 @@ export const AuthController = (
 		await authService.logout(refreshToken);
 
 		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			message: 'User logged out successfully'
 		});
 	});
@@ -136,17 +143,16 @@ export const AuthController = (
 				);
 			}
 
-			const userId = req.user!.id;
 			const { accessToken, refreshToken } =
-				await authService.refreshAccessToken(
-					userId,
-					currentRefreshToken
-				);
+				await authService.refreshAccessToken(currentRefreshToken);
 
 			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
 				message: 'Access token renew successfully',
-				accessToken,
-				refreshToken
+				data: {
+					accessToken,
+					refreshToken
+				}
 			});
 		}
 	);
@@ -210,6 +216,7 @@ export const AuthController = (
 		});
 
 		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			message: 'Password reset successfully'
 		});
 	});
@@ -221,6 +228,7 @@ export const AuthController = (
 		await authService.activeNewUser(userId, token);
 
 		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			message: 'User activated successfully'
 		});
 	});

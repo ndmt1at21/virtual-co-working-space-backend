@@ -17,10 +17,7 @@ export interface IAuthService {
 
 	localRegister: (createUserDto: CreateUserDto) => Promise<LocalRegisterDto>;
 
-	refreshAccessToken: (
-		userId: number,
-		refreshToken: string
-	) => Promise<CredentialsDto>;
+	refreshAccessToken: (refreshToken: string) => Promise<CredentialsDto>;
 
 	logout: (refreshToken: string) => Promise<void>;
 

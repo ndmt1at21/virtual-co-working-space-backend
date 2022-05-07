@@ -7,6 +7,7 @@ import { UnauthorizedError } from '@src/utils/appError';
 import { AuthTokenErrorMessages } from './authToken.error';
 import { IAuthTokenService } from './@types/IAuthTokenService';
 import { IAuthTokenValidate } from './@types/IAuthTokenValidate';
+import { CredentialsDto } from '../../@types/dto/Credentials.dto';
 
 export const AuthTokenService = (
 	refreshTokenRepository: RefreshTokenRepository,
@@ -21,7 +22,7 @@ export const AuthTokenService = (
 	const createAccessToken = (userId: number): string => {
 		return jwt.sign({ userId }, config.auth.JWT_SECRET, {
 			issuer: config.auth.JWT_ISSUER,
-			expiresIn: Date.now() + config.auth.JWT_ACCESS_TOKEN_EXPIRES_TIME,
+			expiresIn: config.auth.JWT_ACCESS_TOKEN_EXPIRES_TIME,
 			algorithm: 'HS256'
 		});
 	};
@@ -65,23 +66,21 @@ export const AuthTokenService = (
 		try {
 			jwtPayload = (await util.promisify(jwt.verify)(
 				token,
-				config.auth.JWT_SECRET
+				config.auth.JWT_SECRET,
+				// @ts-ignore
+				{ issuer: config.auth.JWT_ISSUER }
 			)) as jwt.JwtPayload;
 		} catch (err) {
+			if (err instanceof jwt.TokenExpiredError) {
+				if (err.name === 'TokenExpiredError') {
+					throw new UnauthorizedError(
+						AuthTokenErrorMessages.ACCESS_TOKEN_EXPIRED
+					);
+				}
+			}
+
 			throw new UnauthorizedError(
 				AuthTokenErrorMessages.INVALID_ACCESS_TOKEN
-			);
-		}
-
-		if (jwtPayload.iss !== config.auth.JWT_ISSUER) {
-			throw new UnauthorizedError(
-				AuthTokenErrorMessages.INVALID_ACCESS_TOKEN
-			);
-		}
-
-		if (!jwtPayload.exp || jwtPayload.exp < Date.now()) {
-			throw new UnauthorizedError(
-				AuthTokenErrorMessages.ACCESS_TOKEN_EXPIRED
 			);
 		}
 
@@ -89,14 +88,11 @@ export const AuthTokenService = (
 	};
 
 	const validateRefreshToken = async (
-		userId: number,
 		refreshToken: string
 	): Promise<boolean> => {
-		const refreshTokenEntity =
-			await refreshTokenRepository.findByTokenAndUserId(
-				userId,
-				refreshToken
-			);
+		const refreshTokenEntity = await refreshTokenRepository.findByToken(
+			refreshToken
+		);
 
 		authTokenValidate.checkRefreshTokenExists(refreshTokenEntity);
 		authTokenValidate.checkRefreshTokenActive(refreshTokenEntity!);
@@ -106,10 +102,28 @@ export const AuthTokenService = (
 	};
 
 	const validateRefreshTokenCanRenewAccessToken = async (
-		userId: number,
 		refreshToken: string
 	): Promise<boolean> => {
-		return await validateRefreshToken(userId, refreshToken);
+		return await validateRefreshToken(refreshToken);
+	};
+
+	const renewCredentialByRefreshToken = async (
+		refreshToken: string
+	): Promise<CredentialsDto> => {
+		await validateRefreshTokenCanRenewAccessToken(refreshToken);
+
+		const refreshTokenEntity = await refreshTokenRepository.findByToken(
+			refreshToken
+		);
+
+		const newAccessToken = await createAccessToken(
+			refreshTokenEntity!.userId
+		);
+
+		return {
+			accessToken: newAccessToken,
+			refreshToken: refreshToken
+		};
 	};
 
 	return {
@@ -119,8 +133,7 @@ export const AuthTokenService = (
 		blockRefreshToken,
 		deleteRefreshToken,
 		validateAccessToken,
-		validateRefreshToken,
-		validateRefreshTokenCanRenewAccessToken,
+		renewCredentialByRefreshToken,
 		getUserIdFromAccessToken
 	};
 };

@@ -30,6 +30,18 @@ export class Office extends BaseEntity {
 	@Index()
 	createdByUserId: number;
 
+	@Column({ name: 'avatar_url', nullable: true })
+	avatarUrl?: string;
+
+	@Column({ name: 'description', nullable: true })
+	description?: string;
+
+	@Column({ name: 'number_of_members', default: 0 })
+	numberOfMembers: number;
+
+	@Column({ name: 'number_of_items', default: 0 })
+	numberOfItems: number;
+
 	@OneToMany(() => OfficeItem, officeItem => officeItem.office, {
 		cascade: true
 	})

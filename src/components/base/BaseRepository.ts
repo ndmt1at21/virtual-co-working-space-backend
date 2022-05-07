@@ -103,6 +103,10 @@ export abstract class BaseRepository<T> extends Repository<T> {
 								`Unknown filter operation: ${operation}`
 							);
 					}
+
+					if (operation.includes('.')) {
+						const joinTables = operation.split('.');
+					}
 				});
 			});
 		}

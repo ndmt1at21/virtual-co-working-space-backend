@@ -5,6 +5,7 @@ import { OfficeDetailDto } from './dto/OfficeDetail.dto';
 import { OfficeOverviewDto } from './dto/OfficeOverview.dto';
 import { OfficeWithItemsDto } from './dto/OfficeWithItems.dto';
 import { OfficeWithMembersDto } from './dto/OfficeWithMembers.dto';
+import { UpdateOfficeDto } from './dto/UpdateOffice.dto';
 import { FindAllOfficesOptions } from './filter/FindAllOfficesOptions';
 
 export interface IOfficeService {
@@ -34,6 +35,6 @@ export interface IOfficeService {
 
 	updateOfficeById(
 		officeId: number,
-		updateOfficeDto: CreateOfficeDto
+		updateOfficeDto: UpdateOfficeDto
 	): Promise<OfficeOverviewDto>;
 }

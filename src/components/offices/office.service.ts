@@ -49,7 +49,8 @@ export const OfficeService = (
 			invitationCode,
 			createdByUserId: createdUserId,
 			name: createOfficeDto.name,
-			officeMembers: [officeMember]
+			officeMembers: [officeMember],
+			numberOfMembers: 1
 		});
 
 		const officeDto = await officeCreator.createOfficeOverviewById(
@@ -67,7 +68,8 @@ export const OfficeService = (
 
 		await officeRepository.save({
 			id,
-			name: payload.name
+			name: payload.name,
+			avatarUrl: payload.avatar
 		});
 
 		return officeCreator.createOfficeOverviewById(id);

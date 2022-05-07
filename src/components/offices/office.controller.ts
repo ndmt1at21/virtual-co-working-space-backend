@@ -1,3 +1,4 @@
+import { ILogger } from '../logger/@types/ILogger';
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { IllegalArgumentError } from '@src/utils/appError';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
@@ -5,36 +6,44 @@ import { PaginateQueryParser } from '@src/utils/paginateQueryParser';
 import { validateRequestBody } from '@src/utils/requestValidation';
 import { CreateOfficeDto } from './@types/dto/CreateOffice.dto';
 import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
-import {
-	FindAllOfficesFilter,
-	FindAllOfficesOptions,
-	FindAllOfficesSort
-} from './@types/filter/FindAllOfficesOptions';
+import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
 import { IOfficeService } from './@types/IOfficeService';
 
-export const OfficeController = (officeService: IOfficeService) => {
+export const OfficeController = (
+	officeService: IOfficeService,
+	logger: ILogger
+) => {
 	const getOfficeDetailById = catchAsyncRequestHandler(
 		async (req, res, next) => {
+			logger.info(`Get office detail by id ${req.params.id}`);
+
 			const id = +req.params.id;
 			const office = await officeService.findOfficeDetailById(id);
+
+			logger.info('Get office detail successfully');
 
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
 				code: HttpStatusCode.OK,
-				office
+				data: { office }
 			});
 		}
 	);
 
 	const updateOfficeById = catchAsyncRequestHandler(
 		async (req, res, next) => {
+			logger.info(`Update office by id ${req.params.id}`);
+
 			const errors = await validateRequestBody(UpdateOfficeDto, req.body);
 			if (errors.length > 0) {
+				logger.error(`Update office has error: ${errors}`);
 				throw new IllegalArgumentError(
 					'Invalid update office data',
 					errors
 				);
 			}
+
+			logger.info('Upload office is starting');
 
 			const id = +req.params.id;
 
@@ -44,19 +53,24 @@ export const OfficeController = (officeService: IOfficeService) => {
 				updateOfficeDto
 			);
 
+			logger.info('Update office successfully');
+
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
 				code: HttpStatusCode.OK,
-				office
+				data: { office }
 			});
 		}
 	);
 
 	const deleteOfficeById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = +req.params.id;
+			logger.info(`Delete office by id ${req.params.id}`);
 
+			const id = +req.params.id;
 			await officeService.deleteOfficeById(id);
+
+			logger.info('Delete office successfully');
 
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
@@ -67,43 +81,54 @@ export const OfficeController = (officeService: IOfficeService) => {
 
 	const getOfficeItemsById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = +req.params.id;
+			logger.info(`Get office items by id ${req.params.id}`);
 
+			const id = +req.params.id;
 			const items = await officeService.findOfficeItemsById(id);
+
+			logger.info('Get office items successfully');
 
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
-				data: items
+				data: { items }
 			});
 		}
 	);
 
 	const getOfficeMembersById = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const id = +req.params.id;
+			logger.info(`Get office members by id ${req.params.id}`);
 
+			const id = +req.params.id;
 			const members = await officeService.findOfficeMembersById(id);
+
+			logger.info('Get office members successfully');
 
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
-				data: members
+				data: { members }
 			});
 		}
 	);
 
 	const getAllOfficesOverviewCurrentUserIsMember = catchAsyncRequestHandler(
 		async (req, res, next) => {
+			logger.info(
+				`Get all offices overview current user id ${req.user?.id} is member`
+			);
+
 			const [offices, total] =
 				await officeService.findAllOfficesOverviewUserIsMemberByUserId(
 					req.user!.id,
 					{ limit: 10, page: 10 }
 				);
 
+			logger.info('Get all offices overview successfully');
+
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
 				code: HttpStatusCode.OK,
-				total,
-				offices
+				data: { total, offices }
 			});
 		}
 	);
@@ -136,7 +161,7 @@ export const OfficeController = (officeService: IOfficeService) => {
 		res.status(HttpStatusCode.OK).json({
 			status: 'success',
 			code: HttpStatusCode.OK,
-			office
+			data: { office }
 		});
 	});
 

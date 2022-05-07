@@ -5,6 +5,7 @@ import { UpdatePasswordDto } from './dto/UpdatePassword.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { UserDto } from './dto/User.dto';
 import { FindAllUsersOptions } from './filter/FindAllUsersOptions';
+import { UserStatus } from './UserStatus';
 
 export interface IUserService {
 	createLocalUser: (payload: CreateUserDto) => Promise<UserDto>;
@@ -30,7 +31,7 @@ export interface IUserService {
 
 	deleteUserById: (id: number) => Promise<void>;
 
-	blockUserById: (id: number) => Promise<number>;
+	updateUserBlockStatus: (id: number, status: UserStatus) => Promise<number>;
 
 	activeNewUser: (id: number) => Promise<UserDto>;
 }

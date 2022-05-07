@@ -7,6 +7,8 @@ import { CreateUserDto } from './@types/dto/CreateUser.dto';
 import { UpdateUserDto } from './@types/dto/UpdateUser.dto';
 import { FindAllUsersOptions } from './@types/filter/FindAllUsersOptions';
 import { IUserService } from './@types/IUserService';
+import { UserStatus } from './@types/UserStatus';
+import { UserErrorMessage } from './user.error';
 
 export const UserController = (userService: IUserService) => {
 	const createUser = catchAsyncRequestHandler(async (req, res, next) => {
@@ -18,16 +20,20 @@ export const UserController = (userService: IUserService) => {
 		const createUserDto = req.body as CreateUserDto;
 		const user = await userService.createLocalUser(createUserDto);
 
-		res.status(HttpStatusCode.CREATED).json({
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			message: 'User created successfully',
-			user
+			data: { user }
 		});
 	});
 
 	const getProfile = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = req.user!.id;
 		const user = await userService.findUserById(userId);
-		res.status(HttpStatusCode.OK).json(user);
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { user }
+		});
 	});
 
 	const updateProfile = catchAsyncRequestHandler(async (req, res, next) => {
@@ -43,13 +49,19 @@ export const UserController = (userService: IUserService) => {
 			updateUserDto
 		);
 
-		res.status(HttpStatusCode.OK).json(updatedUser);
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { user: updatedUser }
+		});
 	});
 
 	const getUserById = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = +req.params.id;
 		const user = await userService.findUserById(userId);
-		res.status(HttpStatusCode.OK).json(user);
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { user }
+		});
 	});
 
 	const updateUser = catchAsyncRequestHandler(async (req, res, next) => {
@@ -65,7 +77,57 @@ export const UserController = (userService: IUserService) => {
 			updateUserDto
 		);
 
-		res.status(HttpStatusCode.OK).json(updatedUser);
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { user: updatedUser }
+		});
+	});
+
+	const blockUser = catchAsyncRequestHandler(async (req, res, next) => {
+		const userId = +req.params.id;
+
+		if (userId === req.user!.id) {
+			throw new IllegalArgumentError(
+				UserErrorMessage.USER_CANNOT_BLOCK_SELF
+			);
+		}
+
+		const id = await userService.updateUserBlockStatus(
+			userId,
+			UserStatus.BLOCKED
+		);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			message: 'User blocked successfully',
+			data: {
+				id
+			}
+		});
+	});
+
+	const unblockUser = catchAsyncRequestHandler(async (req, res, next) => {
+		const userId = +req.params.id;
+
+		if (userId === req.user!.id) {
+			throw new IllegalArgumentError(
+				UserErrorMessage.USER_CANNOT_UNBLOCK_SELF
+			);
+		}
+
+		// TODO: If user status before blocking is inactive??? -> move confirm status to another column
+		const id = await userService.updateUserBlockStatus(
+			userId,
+			UserStatus.ACTIVE
+		);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			message: 'User unblocked successfully',
+			data: {
+				id
+			}
+		});
 	});
 
 	const deleteUser = catchAsyncRequestHandler(async (req, res, next) => {
@@ -147,6 +209,8 @@ export const UserController = (userService: IUserService) => {
 		updateProfile,
 		getUserById,
 		updateUser,
+		blockUser,
+		unblockUser,
 		deleteUser,
 		getUsers
 	};

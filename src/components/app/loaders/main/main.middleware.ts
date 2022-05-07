@@ -11,6 +11,8 @@ import config from '@src/config';
 export const mainMiddleware = (app: Application, logger: ILogger) => {
 	const isProduction = appConfig.NODE_ENV === 'production';
 
+	app.enable('trust proxy');
+
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: true }));
 

@@ -16,14 +16,28 @@ type OfficeDetailMappingData = {
 export const mapOfficeToOfficeOverviewDto = (
 	office: Office
 ): OfficeOverviewDto => {
-	const { id, createdAt, invitationCode, name, createdBy } = office;
+	const {
+		id,
+		createdAt,
+		invitationCode,
+		name,
+		avatarUrl,
+		createdBy,
+		numberOfItems,
+		numberOfMembers,
+		description
+	} = office;
 
 	return {
 		id,
 		name,
 		invitationCode,
+		avatarUrl,
+		description,
 		createdBy: mapUserToUserOverviewDto(createdBy),
-		createdAt
+		createdAt,
+		numberOfItems,
+		numberOfMembers
 	};
 };
 
@@ -31,7 +45,15 @@ export const mapOfficeToOfficeDetailDto = (
 	data: OfficeDetailMappingData
 ): OfficeDetailDto => {
 	const { office, officeItems, officeMembers } = data;
-	const { id, createdAt, invitationCode, name, createdBy } = office;
+	const {
+		id,
+		createdAt,
+		invitationCode,
+		name,
+		createdBy,
+		avatarUrl,
+		description
+	} = office;
 
 	const itemsDto = officeItems.map(item =>
 		mapOfficeItemToOfficeItemOverviewDto(item)
@@ -45,6 +67,8 @@ export const mapOfficeToOfficeDetailDto = (
 		id,
 		name,
 		invitationCode,
+		avatarUrl,
+		description,
 		createdBy: mapUserToUserOverviewDto(createdBy),
 		officeItems: itemsDto,
 		officeMembers: membersDto,

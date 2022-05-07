@@ -29,6 +29,7 @@ export const CloudUploadController = (
 		logger.info(`Upload model is done`);
 
 		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			data: { url }
 		});
 	});
@@ -52,6 +53,7 @@ export const CloudUploadController = (
 		logger.info(`Upload avatar is done`);
 
 		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			data: { url }
 		});
 	});
@@ -75,6 +77,7 @@ export const CloudUploadController = (
 		logger.info(`Upload image is done`);
 
 		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
 			data: { url }
 		});
 	});

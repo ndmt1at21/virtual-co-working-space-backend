@@ -7,24 +7,27 @@ import { catchAsyncSocketMiddleware } from '@src/utils/catchAsyncSocketMiddlewar
 import { UnauthorizedError } from '@src/utils/appError';
 import { User } from '../users/user.entity';
 import { IAuthSocketMiddleware } from './@types/IAuthSocketMiddleware';
+import { ILogger } from '@components/logger/@types/ILogger';
 
 export const AuthSocketMiddleware = (
 	userRepository: UserRepository,
 	authTokenService: IAuthTokenService,
-	authValidate: IAuthValidate
+	authValidate: IAuthValidate,
+	logger: ILogger
 ): IAuthSocketMiddleware => {
 	const protect = catchAsyncSocketMiddleware(async (socket, next) => {
+		logger.info("Access Token: ");
 		const accessToken = socket.handshake.auth.accessToken;
-
+		logger.info(accessToken);
 		if (!accessToken) {
 			throw new UnauthorizedError(
 				AuthErrorMessages.UNAUTHORIZED_MISSING_TOKEN
 			);
 		}
-
+		logger.info("Access Token: ");
+		logger.info(accessToken);
 		const { id, type, email } = await deserializeUser(accessToken);
 		socket.user = { id, email, roles: [type] };
-
 		next();
 	});
 

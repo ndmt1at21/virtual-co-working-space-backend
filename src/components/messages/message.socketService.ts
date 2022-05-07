@@ -1,40 +1,46 @@
-// import { Server as SocketServer, Socket } from 'socket.io';
-// import { MessageClientToServerEvent } from './@types/MessageClientToServerEvent';
-// import { MessageServerToClientEvent } from './@types/MessageServerToClientEvent';
+import { Server as SocketServer, Socket } from 'socket.io';
+import { OfficeMemberSocketData } from '../officeMembers/@types/socket/OfficeMemberSocketData';
+import { IMessageSocketService } from './@types/IMessageSocketService';
+import { MessageClientToServerEvent } from './@types/MessageClientToServerEvent';
+import { MessageServerToClientEvent } from './@types/MessageServerToClientEvent';
+import { MessageSocketServiceParams } from './@types/MessageSocketServiceParams';
 
-// export const MessageSocketService = (
-// 	socketNamespace: SocketServer,
-// 	socket: Socket<
-// 		MessageClientToServerEvent,
-// 		MessageServerToClientEvent,
-// 		any,
-// 		OfficeMemberSocketData
-// 	>
-// ) => {
-// 	async function onJoinToOfficeRoom(data: JoinToOfficeRoomDto) {}
+export const MessageSocketService = ({
+	socketNamespace,
+	socket
+}: MessageSocketServiceParams): IMessageSocketService => {
+	async function onCreateMessage(message: any) {}
 
-// 	async function onMemberMove(transform: UpdateOfficeMemberTransformDto) {
-// 		socket
-// 			.to(`${socket.data.officeMember!.officeId}`)
-// 			.emit('office_member:moved', {
-// 				memberId: socket.user!.id,
-// 				officeId: socket.data.officeMember!.officeId,
-// 				...transform
-// 			});
+	async function onRevokeMessage(message: any) {}
 
-// 		await officeMemberTransformService.updateTransformInCacheById(
-// 			socket.data.officeMember!.id,
-// 			transform
-// 		);
-// 	}
+	async function onSelfDeleteMessage(message: any) {}
 
-// 	async function onMemberDisconnect() {
-// 		const { id, memberId } = socket.data.officeMember!;
+	async function onReadMessage(message: any) {}
 
-// 		socket
-// 			.to(`${socket.data.officeMember!.officeId}`)
-// 			.emit('office_member:offline', memberId);
-// 	}
+	// async function onJoinToOfficeRoom(data: JoinToOfficeRoomDto) {}
 
-// 	return {};
-// };
+	// async function onMemberMove(transform: UpdateOfficeMemberTransformDto) {
+	// 	socket
+	// 		.to(`${socket.data.officeMember!.officeId}`)
+	// 		.emit('office_member:moved', {
+	// 			memberId: socket.user!.id,
+	// 			officeId: socket.data.officeMember!.officeId,
+	// 			...transform
+	// 		});
+
+	// 	await officeMemberTransformService.updateTransformInCacheById(
+	// 		socket.data.officeMember!.id,
+	// 		transform
+	// 	);
+	// }
+
+	// async function onMemberDisconnect() {
+	// 	const { id, memberId } = socket.data.officeMember!;
+
+	// 	socket
+	// 		.to(`${socket.data.officeMember!.officeId}`)
+	// 		.emit('office_member:offline', memberId);
+	// }
+
+	return {};
+};

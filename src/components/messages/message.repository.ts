@@ -6,7 +6,6 @@ import {
 	RecentMessagePageable,
 	RecentMessagePaginationInfo
 } from './@types/RecentMessagePaginate';
-import { UserMessageStatusType } from './@types/UserMessageStatusType';
 import { Message } from './message.entity';
 
 @EntityRepository(Message)

@@ -21,6 +21,13 @@ export const CloudUploadMiddleware = (): ICloudUploadMiddleware => {
 		fileFilter: modelFilter
 	});
 
+	const accessoryUpload = multer({
+		limits: {
+			files: 1
+		},
+		fileFilter: accessoryFilter
+	});
+
 	function imageFilter(
 		req: Request,
 		file: Express.Multer.File,
@@ -45,5 +52,17 @@ export const CloudUploadMiddleware = (): ICloudUploadMiddleware => {
 		}
 	}
 
-	return { avatarUpload, imageUpload, modelUpload };
+	function accessoryFilter(
+		req: Request,
+		file: Express.Multer.File,
+		cb: multer.FileFilterCallback
+	) {
+		if (file.mimetype.split('/')[1]?.includes('gltf')) {
+			cb(null, true);
+		} else {
+			cb(new IllegalArgumentError('Only gltf file type is allowed'));
+		}
+	}
+
+	return { avatarUpload, imageUpload, modelUpload, accessoryUpload };
 };

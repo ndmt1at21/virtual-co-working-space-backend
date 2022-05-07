@@ -4,18 +4,53 @@ import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { IllegalArgumentError } from '@src/utils/appError';
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { Readable } from 'stream';
+import { ILogger } from '../logger/@types/ILogger';
 
-export const CloudUploadController = (cloudService: ICloudUploadService) => {
+export const CloudUploadController = (
+	cloudService: ICloudUploadService,
+	logger: ILogger
+) => {
 	const uploadModel = catchAsyncRequestHandler(async (req, res, next) => {
-		const uploadFile = req.file;
+		logger.info('Upload model is starting');
 
+		const uploadFile = req.file;
 		if (!uploadFile) throw new IllegalArgumentError('File upload is empty');
+
+		logger.info(
+			`Model information: size (${uploadFile.size}), mimetype (${uploadFile.mimetype}), filename (${uploadFile.filename})`
+		);
 
 		const url = await cloudService.uploadLargeFile({
 			name: uploadFile.originalname,
 			stream: createFileStream(uploadFile.buffer),
 			type: uploadFile.mimetype
 		});
+
+		logger.info(`Upload model is done`);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { url }
+		});
+	});
+
+	const uploadAccessory = catchAsyncRequestHandler(async (req, res, next) => {
+		logger.info('Upload accessory is starting');
+
+		const uploadFile = req.file;
+		if (!uploadFile) throw new IllegalArgumentError('File upload is empty');
+
+		logger.info(
+			`Accessory information: size (${uploadFile.size}), mimetype (${uploadFile.mimetype}), filename (${uploadFile.filename})`
+		);
+
+		const url = await cloudService.uploadLargeFile({
+			name: uploadFile.originalname,
+			stream: createFileStream(uploadFile.buffer),
+			type: uploadFile.mimetype
+		});
+
+		logger.info(`Upload accessory is done`);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -24,15 +59,22 @@ export const CloudUploadController = (cloudService: ICloudUploadService) => {
 	});
 
 	const uploadAvatar = catchAsyncRequestHandler(async (req, res, next) => {
-		const uploadFile = req.file;
+		logger.info('Upload avatar is starting');
 
+		const uploadFile = req.file;
 		if (!uploadFile) throw new IllegalArgumentError('File upload is empty');
+
+		logger.info(
+			`Avatar information: size (${uploadFile.size}), mimetype (${uploadFile.mimetype}), filename (${uploadFile.filename})`
+		);
 
 		const url = await cloudService.uploadMedia({
 			name: uploadFile.originalname,
 			stream: createFileStream(uploadFile.buffer),
 			type: uploadFile.mimetype
 		});
+
+		logger.info(`Upload avatar is done`);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -41,15 +83,22 @@ export const CloudUploadController = (cloudService: ICloudUploadService) => {
 	});
 
 	const uploadImage = catchAsyncRequestHandler(async (req, res, next) => {
-		const uploadFile = req.file;
+		logger.info('Upload image is starting');
 
+		const uploadFile = req.file;
 		if (!uploadFile) throw new IllegalArgumentError('File upload is empty');
+
+		logger.info(
+			`Image information: size (${uploadFile.size}), mimetype (${uploadFile.mimetype}), filename (${uploadFile.filename})`
+		);
 
 		const url = await cloudService.uploadMedia({
 			name: uploadFile.originalname,
 			stream: createFileStream(uploadFile.buffer),
 			type: uploadFile.mimetype
 		});
+
+		logger.info(`Upload image is done`);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -61,5 +110,5 @@ export const CloudUploadController = (cloudService: ICloudUploadService) => {
 		return streamifier.createReadStream(buffer);
 	}
 
-	return { uploadModel, uploadAvatar, uploadImage };
+	return { uploadModel, uploadAccessory, uploadAvatar, uploadImage };
 };

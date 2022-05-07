@@ -27,5 +27,11 @@ export const CloudUploadRouter = () => {
 		cloudUploadController.uploadModel
 	);
 
+	router.post(
+		'/accessory',
+		cloudUploadMiddleware.modelUpload.single('accessory'),
+		cloudUploadController.uploadAccessory
+	);
+
 	return router;
 };

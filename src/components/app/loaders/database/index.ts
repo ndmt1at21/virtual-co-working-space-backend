@@ -19,6 +19,8 @@ import { Message } from '@src/components/messages/message.entity';
 import { MessageStatus } from '@src/components/messageStatus/messageStatus.entity';
 import { RefreshToken } from '@src/components/auth/components/refreshToken/refreshToken.entity';
 import { PasswordResetToken } from '@src/components/auth/components/passwordResetToken/passwordResetToken.entity';
+import { AccessoryCategory } from '@src/components/accessoryCategories/accessoryCategory.entity';
+import { Accessory } from '@src/components/accessories/accessory.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -45,7 +47,9 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		Conversation,
 		ConversationMember,
 		Message,
-		MessageStatus
+		MessageStatus,
+		AccessoryCategory,
+		Accessory
 	]
 };
 

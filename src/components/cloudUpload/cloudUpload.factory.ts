@@ -5,7 +5,7 @@ import { CloudUploadService } from './cloudUpload.service';
 
 export function createCloudUploadController() {
 	const uploadService = createCloudUploadService();
-	return CloudUploadController(uploadService);
+	return CloudUploadController(uploadService, cloudLogger);
 }
 
 export function createCloudUploadMiddleware() {

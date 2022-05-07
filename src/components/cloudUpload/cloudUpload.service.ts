@@ -110,7 +110,8 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 						{
 							AllowedHeaders: ['*'],
 							AllowedMethods: ['PUT', 'POST', 'DELETE', 'GET'],
-							AllowedOrigins: [config.app.SERVER_DOMAIN]
+							AllowedOrigins:
+								config.cloud.MODEL_AWS_BUCKET_CORS_ORIGINS
 						}
 					]
 				}

@@ -21,6 +21,7 @@ export const AuthTokenService = (
 
 	const createAccessToken = (userId: number): string => {
 		return jwt.sign({ userId }, config.auth.JWT_SECRET, {
+			subject: userId.toString(),
 			issuer: config.auth.JWT_ISSUER,
 			expiresIn: config.auth.JWT_ACCESS_TOKEN_EXPIRES_TIME,
 			algorithm: 'HS256'
@@ -51,13 +52,15 @@ export const AuthTokenService = (
 		await refreshTokenRepository.deleteByToken(refreshToken);
 	};
 
-	const getUserIdFromAccessToken = async (token: string): Promise<number> => {
+	const decodedAccessToken = async (
+		token: string
+	): Promise<jwt.JwtPayload> => {
 		const payload = (await util.promisify(jwt.verify)(
 			token,
 			config.auth.JWT_SECRET
 		)) as jwt.JwtPayload;
 
-		return payload.userId;
+		return payload;
 	};
 
 	const validateAccessToken = async (token: string): Promise<boolean> => {
@@ -134,6 +137,6 @@ export const AuthTokenService = (
 		deleteRefreshToken,
 		validateAccessToken,
 		renewCredentialByRefreshToken,
-		getUserIdFromAccessToken
+		decodedAccessToken
 	};
 };

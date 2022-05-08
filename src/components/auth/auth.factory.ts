@@ -52,7 +52,9 @@ export function createAuthMiddleware() {
 
 export function createAuthValidate() {
 	const userRepository = createUserRepository();
-	return AuthValidate(userRepository);
+	const authTokenService = createAuthTokenService();
+
+	return AuthValidate(userRepository, authTokenService);
 }
 
 export function createAuthMailWorker() {

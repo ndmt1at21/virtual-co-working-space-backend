@@ -6,7 +6,7 @@ import { IAuthTokenService } from '@src/components/auth/components/authToken/@ty
 import { AuthErrorMessages } from './auth.error';
 import { UserRoleType } from '@components/users/@types/UserRoleType';
 import { IAuthMiddleware } from './@types/IAuthMiddleware';
-import { IllegalArgumentError, UnauthorizedError } from '@src/utils/appError';
+import { UnauthorizedError } from '@src/utils/appError';
 import { IAuthValidate } from './@types/IAuthValidate';
 import { UserStatus } from '../users/@types/UserStatus';
 
@@ -92,18 +92,9 @@ export const AuthMiddleware = (
 	};
 
 	async function deserializeUser(accessToken: string): Promise<User> {
-		await authTokenService.validateAccessToken(accessToken);
-
-		const userId = await authTokenService.getUserIdFromAccessToken(
-			accessToken
-		);
-
-		await authValidate.validateUserCanAccessResourceById(userId);
-		const user = await userRepository.findById(userId);
-
-		if (!user)
-			throw new UnauthorizedError(
-				AuthErrorMessages.UNAUTHORIZED_USER_NOT_FOUND
+		const user =
+			await authValidate.validateUserInAccessTokenCanBeAuthenticated(
+				accessToken
 			);
 
 		return user;

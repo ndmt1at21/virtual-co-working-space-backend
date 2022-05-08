@@ -14,6 +14,7 @@ const GoogleStrategy = () => {
 			clientSecret: config.auth.GOOGLE_CLIENT_SECRET
 		},
 		(accessToken, refreshToken, profile: any, done) => {
+			console.log(profile);
 			if (profile.emails.length === 0)
 				return done(
 					AuthErrorMessages.LOGIN_EXTERNAL_USER_NOT_FOUND,
@@ -21,7 +22,7 @@ const GoogleStrategy = () => {
 				);
 
 			const convertedProfile: OAuth2ProfileDto = {
-				email: profile.emails[0],
+				email: profile.emails[0].value,
 				avatar: profile.picture,
 				profileId: profile.id,
 				phone: profile.phone,

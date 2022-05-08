@@ -42,6 +42,7 @@ export const AuthService = (
 		await authValidate.validateExternalUserCanLogin(profile);
 
 		const user = await oauth2ProfileFindOrCreate(profile);
+
 		const [accessToken, refreshToken] =
 			await authTokenService.createAccessTokenAndRefreshToken(user.id);
 

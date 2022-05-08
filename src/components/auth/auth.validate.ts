@@ -9,17 +9,28 @@ import { User } from '../users/user.entity';
 import { OAuth2ProfileDto } from './@types/dto/OAuth2Profile.dto';
 import { LoginDto } from './@types/dto/Login.dto';
 import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
+import { IAuthTokenService } from './components/authToken/@types/IAuthTokenService';
 
-export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
-	const validateUserCanAccessResourceById = async (
-		id: number
-	): Promise<boolean> => {
-		const user = await userRepository.findById(id);
+export const AuthValidate = (
+	userRepository: UserRepository,
+	authTokenService: IAuthTokenService
+): IAuthValidate => {
+	const validateUserInAccessTokenCanBeAuthenticated = async (
+		accessToken: string
+	): Promise<User> => {
+		await authTokenService.validateAccessToken(accessToken);
+
+		const decodedToken = await authTokenService.decodedAccessToken(
+			accessToken
+		);
+
+		const user = await userRepository.findById(decodedToken.sub!);
 
 		checkUserExists(user);
 		checkUserActive(user!);
+		checkUserNotChangedPasswordAfter(user!, decodedToken.iat!);
 
-		return true;
+		return user!;
 	};
 
 	const validateLocalUserCanLogin = async (
@@ -32,9 +43,7 @@ export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 		checkUserExists(user);
 		checkLoginProviderMatch(user!, UserLoginProvider.LOCAL);
 		checkUserActive(user!);
-		checkPasswordMatch(user!.password, password);
-
-		// TODO: check time that password was updated
+		checkPasswordMatch(user!.password!, password);
 
 		return true;
 	};
@@ -52,9 +61,7 @@ export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 		checkUserExists(user);
 		checkLoginProviderMatch(user!, UserLoginProvider.LOCAL);
 		checkUserActive(user!);
-		checkPasswordMatch(user!.password, oldPassword);
-
-		// TODO: check time that password was updated
+		checkPasswordMatch(user!.password!, oldPassword);
 
 		return true;
 	};
@@ -65,6 +72,12 @@ export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 		const { email, provider } = profile;
 
 		const user = await userRepository.findUserByEmail(email);
+
+		if (user && user.provider === UserLoginProvider.LOCAL) {
+			throw new IllegalArgumentError(
+				AuthErrorMessages.LOGIN_EXTERNAL_USER_EXISTS_IN_LOCAL
+			);
+		}
 
 		if (user) {
 			checkLoginProviderMatch(user, provider);
@@ -126,10 +139,21 @@ export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 		}
 	}
 
+	function checkUserNotChangedPasswordAfter(user: User, time: number) {
+		if (
+			user.passwordUpdateAt &&
+			user.passwordUpdateAt.getTime() / 1000 > time
+		) {
+			throw new IllegalArgumentError(
+				AuthErrorMessages.PASSWORD_IS_CHANGED_AFTER_IAT_ACCESS_TOKEN
+			);
+		}
+	}
+
 	return {
 		validateLocalUserCanLogin,
 		validateExternalUserCanLogin,
-		validateUserCanAccessResourceById,
+		validateUserInAccessTokenCanBeAuthenticated,
 		validateUserForgotPassword,
 		validateLocalUserCanChangePassword
 	};

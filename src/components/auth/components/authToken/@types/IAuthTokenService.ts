@@ -1,4 +1,5 @@
 import { CredentialsDto } from '@src/components/auth/@types/dto/Credentials.dto';
+import jwt from 'jsonwebtoken';
 
 export interface IAuthTokenService {
 	createAccessTokenAndRefreshToken: (
@@ -9,7 +10,7 @@ export interface IAuthTokenService {
 
 	createRefreshToken: (userId: number) => Promise<string>;
 
-	getUserIdFromAccessToken: (token: string) => Promise<number>;
+	decodedAccessToken: (token: string) => Promise<jwt.JwtPayload>;
 
 	blockRefreshToken: (refreshToken: string) => Promise<void>;
 

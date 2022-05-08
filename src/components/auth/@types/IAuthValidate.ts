@@ -1,9 +1,17 @@
+import { User } from '@src/components/users/user.entity';
 import { ChangePasswordDto } from './dto/ChangePassword.dto';
 import { LoginDto } from './dto/Login.dto';
 import { OAuth2ProfileDto } from './dto/OAuth2Profile.dto';
 
 export type IAuthValidate = {
-	validateUserCanAccessResourceById: (id: number) => Promise<boolean>;
+	/**
+	 * Validate user in access token can be authenticated
+	 * and return user object if valid
+	 *
+	 * */
+	validateUserInAccessTokenCanBeAuthenticated(
+		accessToken: string
+	): Promise<User>;
 
 	validateLocalUserCanLogin: (loginDto: LoginDto) => Promise<boolean>;
 

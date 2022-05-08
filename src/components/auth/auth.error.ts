@@ -14,6 +14,7 @@ export const AuthErrorMessages = {
 	LOGIN_MISSING_EMAIL_PASSWORD: 'Email and password are required',
 	LOGIN_EXTERNAL_MISSING_EMAIL: 'Email is required',
 	LOGIN_EXTERNAL_USER_NOT_FOUND: 'User not found',
+	LOGIN_EXTERNAL_USER_EXISTS_IN_LOCAL: 'User already exists',
 
 	REGISTER_MISSING_EMAIL: 'Email is required for registration',
 	REGISTER_MISSING_DISPLAY_NAME: 'Email is required for registration',
@@ -35,5 +36,6 @@ export const AuthErrorMessages = {
 		'Refresh token is required for renew access token',
 	PASSWORD_MUST_BE_DIFFERENT_FROM_OLD:
 		'Password must be different from old password',
-	OLD_PASSWORD_IS_WRONG: 'Old password is incorrect'
+	OLD_PASSWORD_IS_WRONG: 'Old password is incorrect',
+	PASSWORD_IS_CHANGED_AFTER_IAT_ACCESS_TOKEN: 'Password is changed'
 };

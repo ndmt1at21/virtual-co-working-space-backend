@@ -80,6 +80,8 @@ export const AuthController = (
 	});
 
 	const googleLogin = catchAsyncRequestHandler(async (req, res, next) => {
+		logger.info(`User with id ${req.user?.id} login with google`);
+
 		passport.authenticate('google', {
 			session: false,
 			scope: ['email', 'profile']
@@ -89,6 +91,8 @@ export const AuthController = (
 	});
 
 	const facebookLogin = catchAsyncRequestHandler(async (req, res, next) => {
+		logger.info(`User with id ${req.user?.id} login with facebook`);
+
 		passport.authenticate('facebook', {
 			session: false,
 			scope: ['email', 'public_profile']
@@ -99,6 +103,7 @@ export const AuthController = (
 
 	const googleLoginCallback = catchAsyncRequestHandler(
 		async (req, res, next) => {
+			console.log(req);
 			oauth2LoginCallback('google', req, res, next);
 		}
 	);
@@ -272,7 +277,7 @@ export const AuthController = (
 			(err, user, info, status) => {
 				if (err) {
 					logger.error(
-						`Authenticating external user with provider ${provider} failed. Message ${err.message}`
+						`Authenticating external user with provider ${provider} failed: ${err.message}`
 					);
 					next(err);
 				}
@@ -288,12 +293,17 @@ export const AuthController = (
 					);
 				}
 
+				logger.info(
+					`External user with provider ${provider} [email = ${profile.email}] authenticated successfully`
+				);
+
 				authService
 					.oauth2LoginCallback(profile)
 					.then(([user, { accessToken, refreshToken }]) => {
 						const redirectUrl = queryString.stringifyUrl({
 							url: config.auth.BASE_FRONTEND_URL,
 							query: {
+								code: HttpStatusCode.OK,
 								access_token: accessToken,
 								refresh_token: refreshToken
 							}
@@ -308,9 +318,12 @@ export const AuthController = (
 						res.redirect(redirectUrl);
 					})
 					.catch(err => {
+						console.log(config.auth.BASE_FRONTEND_URL);
+
 						const redirectUrl = queryString.stringifyUrl({
 							url: config.auth.BASE_FRONTEND_URL,
 							query: {
+								code: HttpStatusCode.BAD_REQUEST,
 								error: err.message.toLowerCase()
 							}
 						});
@@ -323,16 +336,6 @@ export const AuthController = (
 					});
 			}
 		)(req, res, next);
-	}
-
-	function getClientUrlFromRequest(req: Request): string | undefined {
-		const clientUrl = req.headers['referer'] as string;
-
-		if (!clientUrl) {
-			return undefined;
-		}
-
-		return clientUrl.slice(0, -1);
 	}
 
 	return {

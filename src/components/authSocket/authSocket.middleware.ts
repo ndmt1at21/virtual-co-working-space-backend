@@ -56,18 +56,9 @@ export const AuthSocketMiddleware = (
 	};
 
 	async function deserializeUser(accessToken: string): Promise<User> {
-		await authTokenService.validateAccessToken(accessToken);
-
-		const userId = await authTokenService.getUserIdFromAccessToken(
-			accessToken
-		);
-
-		await authValidate.validateUserCanAccessResourceById(userId);
-		const user = await userRepository.findById(userId);
-
-		if (!user)
-			throw new IllegalArgumentError(
-				AuthErrorMessages.UNAUTHORIZED_USER_NOT_FOUND
+		const user =
+			await authValidate.validateUserInAccessTokenCanBeAuthenticated(
+				accessToken
 			);
 
 		return user;

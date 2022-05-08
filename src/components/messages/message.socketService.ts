@@ -1,4 +1,6 @@
 import { CreateMessageDto } from './@types/dto/CreateMessage.dto';
+import { DeleteMessageData } from './@types/dto/DeleteMessageData.dto';
+import { RevokeMessageData } from './@types/dto/RevokeMessageData.dto copy';
 import { IMessageSocketService } from './@types/IMessageSocketService';
 import { MessageSocketServiceParams } from './@types/MessageSocketServiceParams';
 
@@ -62,7 +64,10 @@ export const MessageSocketService = ({
 		);
 	}
 
-	async function onRevokeMessage(conversationId: number, messageId: number) {
+	async function onRevokeMessage({
+		conversationId,
+		messageId
+	}: RevokeMessageData) {
 		logger.info(
 			`User [id = ${socket.user?.id}] revokes message [id = ${messageId}] in conversation [id = ${conversationId}]`
 		);
@@ -81,10 +86,10 @@ export const MessageSocketService = ({
 		);
 	}
 
-	async function onSelfDeleteMessage(
-		conversationId: number,
-		messageId: number
-	) {
+	async function onSelfDeleteMessage({
+		conversationId,
+		messageId
+	}: DeleteMessageData) {
 		logger.info(
 			`User [id = ${socket.user?.id}] deletes message [id = ${messageId}] in conversation [id = ${conversationId}]`
 		);

@@ -9,6 +9,8 @@ import { UpdateOfficeItemTransformDto } from '../officeItems/@types/dto/UpdateOf
 import { UpdateOfficeMemberTransformDto } from '../officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
 import { createMessageSocketService } from '../messages/message.factory';
 import { CreateMessageDto } from '../messages/@types/dto/CreateMessage.dto';
+import { RevokeMessageData } from '../messages/@types/dto/RevokeMessageData.dto copy';
+import { DeleteMessageData } from '../messages/@types/dto/DeleteMessageData.dto';
 
 export const OfficeSocketHandler = (
 	socketNamespace: SocketServer,
@@ -93,12 +95,12 @@ export const OfficeSocketHandler = (
 			messageSocketService.onCreateMessage(data);
 		});
 
-		socket.on('message:revoke', (messageId: number) => {
-			messageSocketService.onRevokeMessage(messageId);
+		socket.on('message:revoke', (data: RevokeMessageData) => {
+			messageSocketService.onRevokeMessage(data);
 		});
 
-		socket.on('message:delete', (messageId: number) => {
-			messageSocketService.onSelfDeleteMessage(messageId);
+		socket.on('message:delete', (data: DeleteMessageData) => {
+			messageSocketService.onSelfDeleteMessage(data);
 		});
 
 		socket.on('message:markAsRead', () => {

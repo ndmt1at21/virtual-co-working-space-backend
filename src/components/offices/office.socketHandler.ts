@@ -43,19 +43,20 @@ export const OfficeSocketHandler = (
 			handleOfficeMemberEvents(socket);
 			handleOfficeItemsEvents(socket);
 			handleChatEvents(socket);
-
-			socket.on('disconnect', () => {
-				officeMemberSocketService.onMemberDisconnect();
-			});
 		} catch (err) {
 			socket.emit('office:error', err);
 		}
+	});
+
+	socket.on('disconnect', () => {
+		officeMemberSocketService.onMemberDisconnect();
 	});
 
 	function handleOfficeMemberEvents(socket: Socket) {
 		socket.on(
 			'office_member:move',
 			(transform: UpdateOfficeMemberTransformDto) => {
+				console.log('jmovvveeeee');
 				officeMemberSocketService.onMemberMove(transform);
 			}
 		);

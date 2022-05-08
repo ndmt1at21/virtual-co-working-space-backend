@@ -1,10 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import { getCustomRepository } from 'typeorm';
 import { getCacheConnection } from '../app/loaders/database/cache';
-import {
-	createOfficeMemberTransformRepository,
-	createOfficeMemberTransformService
-} from '../officeMemberTransform/officeMemberTransform.factory';
+import { officeMemberSocketLogger } from '../logger';
+import { createOfficeMemberTransformService } from '../officeMemberTransform/officeMemberTransform.factory';
 import { OfficeMemberController } from './officeMember.controller';
 import { OfficeMemberCreator } from './officeMember.creator';
 import { OfficeMemberRepository } from './officeMember.repository';
@@ -30,7 +28,8 @@ export function createOfficeMemberSocketService(io: Server, socket: Socket) {
 		socket,
 		officeMemberRepository,
 		officeMemberTransformService,
-		officeMemberCacheService
+		officeMemberCacheService,
+		officeMemberSocketLogger
 	);
 }
 

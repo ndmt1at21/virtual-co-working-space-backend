@@ -1,3 +1,4 @@
+import { ILogger } from '@src/components/logger/@types/ILogger';
 import { UpdateOfficeMemberTransformDto } from '@src/components/officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
 import { IOfficeMemberTransformService } from '@src/components/officeMemberTransform/@types/IOfficeMemberTransformService';
 import { JoinToOfficeRoomDto } from '@src/components/offices/@types/dto/JoinToOfficeRoom.dto';
@@ -20,9 +21,14 @@ export const OfficeMemberSocketService = (
 	>,
 	officeMemberRepository: OfficeMemberRepository,
 	officeMemberTransformService: IOfficeMemberTransformService,
-	officeMemberSocketCacheService: IOfficeMemberSocketCacheService
+	officeMemberSocketCacheService: IOfficeMemberSocketCacheService,
+	logger: ILogger
 ): IOfficeMemberSocketService => {
 	async function onJoinToOfficeRoom(data: JoinToOfficeRoomDto) {
+		logger.info(
+			`User ${socket.user?.id} joined to office ${data.officeId}`
+		);
+
 		const { officeId } = data;
 		const userId = socket.user!.id;
 
@@ -45,9 +51,17 @@ export const OfficeMemberSocketService = (
 		// await disconnectExistSocketHasSameUserId(userId);
 		emitMemberOnlineToOffice(officeMember.memberId, officeId);
 		setMemberInOfficeOnline(officeMember.memberId);
+
+		logger.info(
+			`User ${socket.user?.id} joined to office ${officeMember.officeId}`
+		);
 	}
 
 	async function onMemberMove(transform: UpdateOfficeMemberTransformDto) {
+		logger.info(`User ${socket.user?.id} starts update movement`);
+
+		console.log(`${socket.data.officeMember!.officeId}`);
+
 		socket
 			.to(`${socket.data.officeMember!.officeId}`)
 			.emit('office_member:moved', {
@@ -55,6 +69,12 @@ export const OfficeMemberSocketService = (
 				officeId: socket.data.officeMember!.officeId,
 				...transform
 			});
+
+		logger.info(
+			`User ${socket.user?.id} moved in office ${
+				socket.data.officeMember!.officeId
+			}`
+		);
 
 		await officeMemberTransformService.updateTransformInCacheById(
 			socket.data.officeMember!.id,

@@ -1,3 +1,8 @@
+export type OfficeData = {
+	id: number;
+	conversationId: number;
+};
+
 export type OfficeMemberData = {
 	id: number;
 	officeId: number;
@@ -5,5 +10,6 @@ export type OfficeMemberData = {
 };
 
 export interface OfficeMemberSocketData {
+	office: OfficeData;
 	officeMember: OfficeMemberData;
 }

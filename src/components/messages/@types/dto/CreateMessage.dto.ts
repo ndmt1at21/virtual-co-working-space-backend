@@ -1,0 +1,16 @@
+import { Expose } from 'class-transformer';
+import { IsDefined, IsIn, MaxLength } from 'class-validator';
+
+export class CreateMessageDto {
+	@IsDefined()
+	@Expose()
+	conversationId: number;
+
+	@Expose()
+	senderId: number;
+
+	@IsDefined()
+	@MaxLength(20000)
+	@Expose()
+	content: string;
+}

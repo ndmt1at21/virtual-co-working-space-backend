@@ -36,6 +36,7 @@ export const OfficeCreator = (
 			.queryBuilder()
 			.findById(id)
 			.withCreator()
+			.withConversations()
 			.build()
 			.getOne();
 
@@ -53,7 +54,8 @@ export const OfficeCreator = (
 		return mapOfficeToOfficeDetailDto({
 			office: office!,
 			officeItems: items,
-			officeMembers: members
+			officeMembers: members,
+			conversations: office!.conversations
 		});
 	};
 

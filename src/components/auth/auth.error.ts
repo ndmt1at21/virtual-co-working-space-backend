@@ -30,9 +30,10 @@ export const AuthErrorMessages = {
 	RESET_PASSWORD_MISMATCH: 'Password and confirm password must match',
 	RESET_PASSWORD_TOKEN_EXPIRED: 'Reset token has expired',
 	RESET_PASSWORD_TOKEN_INVALID: 'Reset token is invalid',
-
 	LOGOUT_MISSING_REFRESH_TOKEN: 'Refresh token is required for logout',
-
 	REFRESH_ACCESS_TOKEN_MISSING_REFRESH_TOKEN:
-		'Refresh token is required for renew access token'
+		'Refresh token is required for renew access token',
+	PASSWORD_MUST_BE_DIFFERENT_FROM_OLD:
+		'Password must be different from old password',
+	OLD_PASSWORD_IS_WRONG: 'Old password is incorrect'
 };

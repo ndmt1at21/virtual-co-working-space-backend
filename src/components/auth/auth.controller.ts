@@ -17,6 +17,7 @@ import { ForgotPasswordDto } from './@types/dto/ForgotPassword.dto';
 import { RegisterDto } from './@types/dto/Register.dto';
 import { IAuthMailQueueProducer } from './@types/IAuthMailQueueProducer';
 import { appConfig } from '@src/config/app';
+import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
 
 export const AuthController = (
 	authMailQueueProducer: IAuthMailQueueProducer,
@@ -233,6 +234,32 @@ export const AuthController = (
 		});
 	});
 
+	const changePassword = catchAsyncRequestHandler(async (req, res, next) => {
+		const errors = await validateRequestBody(ChangePasswordDto, req.body);
+		if (errors.length > 0) {
+			logger.error(`User cannot change password: ${errors}`);
+			throw new IllegalArgumentError(
+				'Invalid change password data',
+				errors
+			);
+		}
+
+		const changePasswordDto = req.body as ChangePasswordDto;
+		await authService.changePasswordByUserId(
+			req.user!.id,
+			changePasswordDto
+		);
+
+		logger.info(
+			`User with id ${req.user!.id} changed password successfully`
+		);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			message: 'Password changed successfully'
+		});
+	});
+
 	function oauth2LoginCallback(
 		provider: string,
 		req: Request,
@@ -319,6 +346,7 @@ export const AuthController = (
 		refreshAccessToken,
 		forgotPassword,
 		resetPassword,
-		activateNewUser
+		activateNewUser,
+		changePassword
 	};
 };

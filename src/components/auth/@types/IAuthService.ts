@@ -7,6 +7,7 @@ import { LocalRegisterDto } from './dto/LocalRegister.dto';
 import { OAuth2ProfileDto } from './dto/OAuth2Profile.dto';
 import { ResetPasswordDto } from './dto/ResetPassword.dto';
 import { PasswordResetTokenDto } from '../components/passwordResetToken/@types/dto/PasswordResetToken.dto';
+import { ChangePasswordDto } from './dto/ChangePassword.dto';
 
 export interface IAuthService {
 	localLogin: (loginDto: LoginDto) => Promise<[UserDto, CredentialsDto]>;
@@ -28,4 +29,9 @@ export interface IAuthService {
 	resetPassword: (resetPasswordDto: ResetPasswordDto) => Promise<void>;
 
 	activeNewUser: (userId: number, token: string) => Promise<void>;
+
+	changePasswordByUserId(
+		id: number,
+		updatePasswordDto: ChangePasswordDto
+	): Promise<void>;
 }

@@ -1,3 +1,4 @@
+import { ChangePasswordDto } from './dto/ChangePassword.dto';
 import { LoginDto } from './dto/Login.dto';
 import { OAuth2ProfileDto } from './dto/OAuth2Profile.dto';
 
@@ -11,4 +12,9 @@ export type IAuthValidate = {
 	) => Promise<boolean>;
 
 	validateUserForgotPassword: (email: string) => Promise<boolean>;
+
+	validateLocalUserCanChangePassword(
+		userId: number,
+		changePasswordDto: ChangePasswordDto
+	): Promise<boolean>;
 };

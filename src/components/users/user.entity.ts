@@ -19,8 +19,8 @@ export class User extends BaseEntity {
 	@Column({ nullable: true })
 	phone?: string;
 
-	@Column({ nullable: true })
-	password?: string;
+	@Column()
+	password: string;
 
 	@Column({ nullable: true })
 	avatar?: string;
@@ -40,4 +40,7 @@ export class User extends BaseEntity {
 
 	@Column({ type: 'enum', enum: UserStatus, default: UserStatus.INACTIVE })
 	status: UserStatus;
+
+	@Column({ name: 'password_update_at', nullable: true })
+	passwordUpdateAt?: Date;
 }

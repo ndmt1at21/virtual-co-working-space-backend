@@ -5,10 +5,10 @@ import { UserStatus } from '@components/users/@types/UserStatus';
 import { UserRepository } from '@components/users/user.repository';
 import { IAuthValidate } from './@types/IAuthValidate';
 import { AuthErrorMessages } from './auth.error';
-import { UserErrorMessage } from '../users/user.error';
 import { User } from '../users/user.entity';
 import { OAuth2ProfileDto } from './@types/dto/OAuth2Profile.dto';
 import { LoginDto } from './@types/dto/Login.dto';
+import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
 
 export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 	const validateUserCanAccessResourceById = async (
@@ -18,8 +18,6 @@ export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 
 		checkUserExists(user);
 		checkUserActive(user!);
-
-		// TODO: check time that password was updated
 
 		return true;
 	};
@@ -34,7 +32,27 @@ export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 		checkUserExists(user);
 		checkLoginProviderMatch(user!, UserLoginProvider.LOCAL);
 		checkUserActive(user!);
-		checkPasswordMatch(user!, password);
+		checkPasswordMatch(user!.password, password);
+
+		// TODO: check time that password was updated
+
+		return true;
+	};
+
+	const validateLocalUserCanChangePassword = async (
+		userId: number,
+		changePasswordDto: ChangePasswordDto
+	): Promise<boolean> => {
+		const { oldPassword, newPassword } = changePasswordDto;
+
+		checkOldPasswordDifferentFromNew(oldPassword, newPassword);
+
+		const user = await userRepository.findById(userId);
+
+		checkUserExists(user);
+		checkLoginProviderMatch(user!, UserLoginProvider.LOCAL);
+		checkUserActive(user!);
+		checkPasswordMatch(user!.password, oldPassword);
 
 		// TODO: check time that password was updated
 
@@ -73,8 +91,8 @@ export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 		}
 	}
 
-	function checkPasswordMatch(user: User, password: string) {
-		if (!compareSync(password, user!.password!)) {
+	function checkPasswordMatch(hashedPassword: string, password: string) {
+		if (!compareSync(password, hashedPassword)) {
 			throw new IllegalArgumentError(
 				AuthErrorMessages.UNAUTHORIZED_INCORRECT_EMAIL_OR_PASSWORD
 			);
@@ -97,10 +115,22 @@ export const AuthValidate = (userRepository: UserRepository): IAuthValidate => {
 		}
 	}
 
+	function checkOldPasswordDifferentFromNew(
+		oldPassword: string,
+		newPassword: string
+	) {
+		if (oldPassword === newPassword) {
+			throw new IllegalArgumentError(
+				AuthErrorMessages.PASSWORD_MUST_BE_DIFFERENT_FROM_OLD
+			);
+		}
+	}
+
 	return {
 		validateLocalUserCanLogin,
 		validateExternalUserCanLogin,
 		validateUserCanAccessResourceById,
-		validateUserForgotPassword
+		validateUserForgotPassword,
+		validateLocalUserCanChangePassword
 	};
 };

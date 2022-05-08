@@ -107,7 +107,8 @@ export const UserService = (
 
 		const updatedUser = await userRepository.save({
 			...user!,
-			password: hashPassword
+			password: hashPassword,
+			passwordUpdateAt: new Date()
 		});
 
 		return userCreator.userEntityToUserDto(updatedUser);

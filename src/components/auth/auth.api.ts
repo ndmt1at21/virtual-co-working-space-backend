@@ -11,10 +11,6 @@ export const AuthRouter = () => {
 	const router = Router();
 
 	router
-		.post('/login', restrictToGuest, authController.localLogin)
-		.post('/register', restrictToGuest, authController.localRegister)
-		.get('/google', restrictToGuest, authController.googleLogin)
-		.get('/facebook', restrictToGuest, authController.facebookLogin)
 		.get(
 			'/google/callback',
 			restrictToGuest,
@@ -25,8 +21,12 @@ export const AuthRouter = () => {
 			restrictToGuest,
 			authController.facebookLoginCallback
 		)
-		.post('/forgot', restrictToGuest, authController.forgotPassword)
 		.patch('/reset/:token', restrictToGuest, authController.resetPassword)
+		.post('/login', restrictToGuest, authController.localLogin)
+		.post('/register', restrictToGuest, authController.localRegister)
+		.get('/google', restrictToGuest, authController.googleLogin)
+		.get('/facebook', restrictToGuest, authController.facebookLogin)
+		.post('/forgot', restrictToGuest, authController.forgotPassword)
 		.post(
 			'/refreshToken',
 			restrictToGuest,
@@ -35,6 +35,7 @@ export const AuthRouter = () => {
 
 	router
 		.get('/activate/:token', protect, authController.activateNewUser)
+		.post('/change-password', protect, authController.changePassword)
 		.get('/logout', protect, authController.logout);
 
 	return router;

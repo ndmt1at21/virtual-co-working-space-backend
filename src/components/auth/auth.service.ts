@@ -13,8 +13,8 @@ import { IActiveUserTokenService } from '../activeUserToken/@types/IActiveUserTo
 import { LocalRegisterDto } from './@types/dto/LocalRegister.dto';
 import { PasswordResetTokenDto } from './components/passwordResetToken/@types/dto/PasswordResetToken.dto';
 import { IPasswordResetTokenService } from './components/passwordResetToken/@types/IPasswordService';
-import { IllegalArgumentError } from '@src/utils/appError';
-import { AuthErrorMessages } from './auth.error';
+import { UpdatePasswordDto } from '../users/@types/dto/UpdatePassword.dto';
+import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
 
 export const AuthService = (
 	userService: IUserService,
@@ -86,6 +86,21 @@ export const AuthService = (
 		return await passwordResetTokenService.createToken(user!.id);
 	};
 
+	const changePasswordByUserId = async (
+		id: number,
+		updatePasswordDto: ChangePasswordDto
+	): Promise<void> => {
+		await authValidate.validateLocalUserCanChangePassword(
+			id,
+			updatePasswordDto
+		);
+
+		await userService.updatePasswordById(id, {
+			password: updatePasswordDto.newPassword,
+			confirmPassword: updatePasswordDto.newPassword
+		});
+	};
+
 	const resetPassword = async (
 		resetPasswordDto: ResetPasswordDto
 	): Promise<void> => {
@@ -131,6 +146,7 @@ export const AuthService = (
 		logout,
 		forgotPassword,
 		resetPassword,
-		activeNewUser
+		activeNewUser,
+		changePasswordByUserId
 	};
 };

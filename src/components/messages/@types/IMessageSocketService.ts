@@ -8,4 +8,8 @@ export interface IMessageSocketService {
 	onSelfDeleteMessage(messageId: number): Promise<void>;
 
 	onMarkAsRead(): Promise<void>;
+
+	onJoinToConversation(conversationId: number): Promise<void>;
+
+	onLeaveFromConversation(conversationId: number): Promise<void>;
 }

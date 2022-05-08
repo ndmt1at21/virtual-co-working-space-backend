@@ -81,6 +81,14 @@ export const OfficeSocketHandler = (
 			OfficeSocketData
 		>
 	) {
+		socket.on('conversation:join', data => {
+			messageSocketService.onJoinToConversation(data.conversationId);
+		});
+
+		socket.on('conversation:leave', data => {
+			messageSocketService.onLeaveFromConversation(data.conversationId);
+		});
+
 		socket.on('message:send', (data: CreateMessageDto) => {
 			messageSocketService.onCreateMessage(data);
 		});

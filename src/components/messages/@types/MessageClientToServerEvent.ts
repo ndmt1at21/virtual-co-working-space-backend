@@ -5,4 +5,6 @@ export interface MessageClientToServerEvent {
 	'message:revoke': (messageId: number) => void;
 	'message:delete': (messageId: number) => void;
 	'message:markAsRead': () => void;
+	'conversation:join': (data: { conversationId: number }) => void;
+	'conversation:leave': (data: { conversationId: number }) => void;
 }

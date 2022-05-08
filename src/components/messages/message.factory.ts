@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { getCustomRepository } from 'typeorm';
 import { createConversationService } from '../conversations/conversation.factory';
+import { messageSocketLogger } from '../logger';
 import { createUserMessageStatusRepository } from './components/userMessageStatus/userMessageStatus.factory';
 import { MessageController } from './message.controller';
 import { MessageRepository } from './message.repository';
@@ -19,7 +20,8 @@ export function createMessageSocketService(io: Server, socket: Socket) {
 	return MessageSocketService({
 		socketNamespace: io,
 		socket,
-		messageService
+		messageService,
+		logger: messageSocketLogger
 	});
 }
 

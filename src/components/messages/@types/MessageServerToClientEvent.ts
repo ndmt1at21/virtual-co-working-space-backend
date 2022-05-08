@@ -6,4 +6,14 @@ export interface MessageServerToClientEvent {
 	'message:revoked': (messageId: number) => void;
 	'message:deleted': (messageId: number) => void;
 	'message:read': (toMessageId: number) => void;
+
+	'conversation:joined': (data: {
+		userId: number;
+		conversationId: number;
+	}) => void;
+
+	'conversation:left': (data: {
+		userId: number;
+		conversationId: number;
+	}) => void;
 }

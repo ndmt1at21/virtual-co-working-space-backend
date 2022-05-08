@@ -16,6 +16,9 @@ export class Accessory extends BaseEntity {
 	@Column()
 	path: string;
 
+	@Column()
+	name: string;
+
 	@Column({ nullable: true })
 	description?: string;
 

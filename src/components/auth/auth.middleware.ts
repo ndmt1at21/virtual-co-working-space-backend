@@ -6,7 +6,7 @@ import { IAuthTokenService } from '@src/components/auth/components/authToken/@ty
 import { AuthErrorMessages } from './auth.error';
 import { UserRoleType } from '@components/users/@types/UserRoleType';
 import { IAuthMiddleware } from './@types/IAuthMiddleware';
-import { UnauthorizedError } from '@src/utils/appError';
+import { IllegalArgumentError, UnauthorizedError } from '@src/utils/appError';
 import { IAuthValidate } from './@types/IAuthValidate';
 import { UserStatus } from '../users/@types/UserStatus';
 

@@ -7,6 +7,9 @@ import { OfficeItemRouter } from '@src/components/officeItems';
 import { OfficeMemberRouter } from '@src/components/officeMembers';
 import { CloudUploadRouter } from '@src/components/cloudUpload/cloudUpload.api';
 import { OfficeInvitationRouter } from '@src/components/officeInvitation/officeInvitation.api';
+import { MessageRouter } from '@src/components/messages/message.api';
+import { ConversationRouter } from '@src/components/conversations/conversation.api';
+import { AccessoryCategoryRouter } from '@src/components/accessories/accessory.api';
 
 export const mainRoutes = (app: Application) => {
 	const API_PREFIX = '/api/v1';
@@ -19,6 +22,9 @@ export const mainRoutes = (app: Application) => {
 	const officeMemberRouter = OfficeMemberRouter();
 	const cloudUploadRouter = CloudUploadRouter();
 	const officeInvitationRouter = OfficeInvitationRouter();
+	const messageRouter = MessageRouter();
+	const conversationRouter = ConversationRouter();
+	const accessoryCategoryRouter = AccessoryCategoryRouter();
 
 	app.use(`${API_PREFIX}/auth`, authRouter);
 	app.use(`${API_PREFIX}/users`, userRouter);
@@ -28,4 +34,8 @@ export const mainRoutes = (app: Application) => {
 	app.use(`${API_PREFIX}/office-members`, officeMemberRouter);
 	app.use(`${API_PREFIX}/uploads`, cloudUploadRouter);
 	app.use(`${API_PREFIX}/invites`, officeInvitationRouter);
+	app.use(`${API_PREFIX}/messages`, messageRouter);
+	app.use(`${API_PREFIX}/conversations`, conversationRouter);
+	app.use(`${API_PREFIX}/accessory-categories`, accessoryCategoryRouter);
+	app.use(`${API_PREFIX}/accessories`, accessoryCategoryRouter);
 };

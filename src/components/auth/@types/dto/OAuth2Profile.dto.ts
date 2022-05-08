@@ -1,4 +1,4 @@
-import { UserLoginProvider } from '@src/components/UserLoginProvider';
+import { UserLoginProvider } from '../UserLoginProvider';
 
 export type OAuth2ProfileDto = {
 	profileId: string;

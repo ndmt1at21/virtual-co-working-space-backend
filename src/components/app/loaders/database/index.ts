@@ -7,7 +7,7 @@ import { OfficeMemberTransform } from '@src/components/officeMemberTransform/off
 import { OfficeRole } from '@src/components/officeRoles/officeRole.entity';
 import { Office } from '@src/components/offices/office.entity';
 import { User } from '@src/components/users/user.entity';
-import { createConnection } from 'typeorm';
+import { createConnections } from 'typeorm';
 import { MongoConnectionOptions } from 'typeorm/driver/mongodb/MongoConnectionOptions';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { CacheConnectOption, createCacheConnection } from './cache';
@@ -16,11 +16,12 @@ import { OfficeInvitation } from '@src/components/officeInvitation/officeInvitat
 import { Conversation } from '@src/components/conversations/conversation.entity';
 import { ConversationMember } from '@src/components/conversationMembers/conversationMember.entity';
 import { Message } from '@src/components/messages/message.entity';
-import { MessageStatus } from '@src/components/messageStatus/messageStatus.entity';
 import { RefreshToken } from '@src/components/auth/components/refreshToken/refreshToken.entity';
 import { PasswordResetToken } from '@src/components/auth/components/passwordResetToken/passwordResetToken.entity';
 import { AccessoryCategory } from '@src/components/accessoryCategories/accessoryCategory.entity';
 import { Accessory } from '@src/components/accessories/accessory.entity';
+import { UserMessageStatus } from '@src/components/messages/components/userMessageStatus/userMessageStatus.entity';
+import { MessageReaction } from '@src/components/messages/components/messageReactions/messageReaction.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -47,7 +48,8 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		Conversation,
 		ConversationMember,
 		Message,
-		MessageStatus,
+		MessageReaction,
+		UserMessageStatus,
 		AccessoryCategory,
 		Accessory
 	]
@@ -61,11 +63,11 @@ const ormMongoOptions: MongoConnectionOptions = {
 	password: config.db.mongo.DB_PASSWORD,
 	database: config.db.mongo.DB_NAME,
 	logging: false,
-	dropSchema: true,
+	dropSchema: false,
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 	synchronize: true,
-	entities: []
+	entities: [Message]
 };
 
 const officeMemberTransformCache: CacheConnectOption = {
@@ -101,7 +103,7 @@ const officeMemberCache: CacheConnectOption = {
 export const connectDatabase = async (): Promise<void> => {
 	return new Promise(async (resolve, reject) => {
 		try {
-			await createConnection(ormPostgresOptions);
+			await createConnections([ormPostgresOptions]);
 			await createCacheConnection([
 				officeMemberTransformCache,
 				mailCache,

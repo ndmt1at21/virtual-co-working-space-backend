@@ -1,11 +1,10 @@
 import { EntityRepository } from 'typeorm';
 import { User } from './user.entity';
 import { BaseRepository } from '@src/components/base/BaseRepository';
-import { UserLoginProvider } from '../UserLoginProvider';
 import { FindAllOptions } from '../base/@types/FindAllOptions';
 import { FindAllUsersOptions } from './@types/filter/FindAllUsersOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
-import { UserStatusType } from 'aws-sdk/clients/cognitoidentityserviceprovider';
+import { UserLoginProvider } from '../auth/@types/UserLoginProvider';
 
 @EntityRepository(User)
 export class UserRepository extends BaseRepository<User> {

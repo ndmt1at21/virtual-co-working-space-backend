@@ -1,4 +1,4 @@
-import { UserLoginProvider } from '../../../UserLoginProvider';
+import { UserLoginProvider } from '@src/components/auth/@types/UserLoginProvider';
 
 export type CreateUserExternalDto = {
 	email: string;

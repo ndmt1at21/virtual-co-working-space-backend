@@ -1,6 +1,5 @@
 import { Expose } from 'class-transformer';
 import { IsDefined, IsIn, MaxLength } from 'class-validator';
-import { MessageType } from '../MessageType';
 
 export class CreateMessageDto {
 	@IsDefined()

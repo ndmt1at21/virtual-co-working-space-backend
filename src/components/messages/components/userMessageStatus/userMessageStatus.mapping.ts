@@ -7,13 +7,13 @@ import { UserMessageStatus } from './userMessageStatus.entity';
 export const mapUserMessageStatusToUserMessageReaderStatusDto = (
 	userMessageStatus: UserMessageStatus
 ): UserMessageReadStatusDto => {
-	const { id, userId, messageId, createdAt } = userMessageStatus;
-	return { id, readerId: userId, messageId, readAt: createdAt };
+	const { userId, messageId, readAt } = userMessageStatus;
+	return { readerId: userId, messageId, readAt };
 };
 
 export const mapUserMessageStatusToUserMessageReceivedStatusDto = (
 	userMessageStatus: UserMessageStatus
 ): UserMessageReceivedStatusDto => {
-	const { id, userId, messageId, createdAt } = userMessageStatus;
-	return { id, receiverId: userId, messageId, receivedAt: createdAt };
+	const { userId, messageId, receivedAt } = userMessageStatus;
+	return { receiverId: userId, messageId, receivedAt: receivedAt };
 };

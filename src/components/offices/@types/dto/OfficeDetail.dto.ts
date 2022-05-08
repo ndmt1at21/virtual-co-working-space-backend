@@ -1,3 +1,4 @@
+import { ConversationOverviewDto } from '@src/components/conversations/@types/dto/ConversationOverview.dto';
 import { OfficeItemOverviewDto } from '@src/components/officeItems/@types/dto/OfficeItemOverviewDto';
 import { OfficeMemberOverviewDto } from '@src/components/officeMembers/@types/dto/OfficeMemberOverview.dto';
 import { UserOverviewDto } from '@src/components/users/@types/dto/UserOverviewDto';
@@ -11,4 +12,5 @@ export type OfficeDetailDto = {
 	createdBy: UserOverviewDto;
 	officeItems: OfficeItemOverviewDto[];
 	officeMembers: OfficeMemberOverviewDto[];
+	conversations: ConversationOverviewDto[];
 };

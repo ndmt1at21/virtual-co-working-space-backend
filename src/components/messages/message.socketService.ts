@@ -1,46 +1,45 @@
-import { Server as SocketServer, Socket } from 'socket.io';
-import { OfficeMemberSocketData } from '../officeMembers/@types/socket/OfficeMemberSocketData';
+import { CreateMessageDto } from './@types/dto/CreateMessage.dto';
 import { IMessageSocketService } from './@types/IMessageSocketService';
-import { MessageClientToServerEvent } from './@types/MessageClientToServerEvent';
-import { MessageServerToClientEvent } from './@types/MessageServerToClientEvent';
 import { MessageSocketServiceParams } from './@types/MessageSocketServiceParams';
 
 export const MessageSocketService = ({
 	socketNamespace,
-	socket
+	socket,
+	messageService
 }: MessageSocketServiceParams): IMessageSocketService => {
-	async function onCreateMessage(message: any) {}
+	// TODO: Change officeId to main conversationId of office
+	const officeId = socket.data.officeMember!.officeId;
 
-	async function onRevokeMessage(message: any) {}
+	async function onCreateMessage(message: CreateMessageDto) {
+		const createdMessage = await messageService.createMessage({
+			...message,
+			senderId: socket.user!.id
+		});
 
-	async function onSelfDeleteMessage(message: any) {}
+		socket.to(`messages/${officeId}`).emit('message:sent', createdMessage);
+	}
 
-	async function onReadMessage(message: any) {}
+	async function onRevokeMessage(messageId: number) {
+		await messageService.revokeMessageByMessageIdAndSenderId(
+			messageId,
+			socket.user!.id
+		);
 
-	// async function onJoinToOfficeRoom(data: JoinToOfficeRoomDto) {}
+		socket.to(`messages/${officeId}`).emit('message:revoked', messageId);
+	}
 
-	// async function onMemberMove(transform: UpdateOfficeMemberTransformDto) {
-	// 	socket
-	// 		.to(`${socket.data.officeMember!.officeId}`)
-	// 		.emit('office_member:moved', {
-	// 			memberId: socket.user!.id,
-	// 			officeId: socket.data.officeMember!.officeId,
-	// 			...transform
-	// 		});
+	async function onSelfDeleteMessage(messageId: number) {
+		await messageService.deleteMessageSelfSide(messageId, socket.user!.id);
 
-	// 	await officeMemberTransformService.updateTransformInCacheById(
-	// 		socket.data.officeMember!.id,
-	// 		transform
-	// 	);
-	// }
+		socket.to(`messages/${officeId}`).emit('message:deleted', messageId);
+	}
 
-	// async function onMemberDisconnect() {
-	// 	const { id, memberId } = socket.data.officeMember!;
+	async function onMarkAsRead() {}
 
-	// 	socket
-	// 		.to(`${socket.data.officeMember!.officeId}`)
-	// 		.emit('office_member:offline', memberId);
-	// }
-
-	return {};
+	return {
+		onCreateMessage,
+		onRevokeMessage,
+		onSelfDeleteMessage,
+		onMarkAsRead
+	};
 };

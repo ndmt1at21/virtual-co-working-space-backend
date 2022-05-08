@@ -63,15 +63,17 @@ export const OfficeMemberSocketService = (
 	}
 
 	async function onMemberDisconnect() {
-		const { id, memberId } = socket.data.officeMember!;
+		if (socket.data.officeMember) {
+			const { id, memberId } = socket.data.officeMember!;
 
-		socket
-			.to(`${socket.data.officeMember!.officeId}`)
-			.emit('office_member:offline', memberId);
+			socket
+				.to(`${socket.data.officeMember!.officeId}`)
+				.emit('office_member:offline', memberId);
 
-		setMemberInOfficeOffline(id);
+			setMemberInOfficeOffline(id);
 
-		await officeMemberTransformService.backupTransformFromCacheById(id);
+			await officeMemberTransformService.backupTransformFromCacheById(id);
+		}
 	}
 
 	async function disconnectExistSocketHasSameUserId(

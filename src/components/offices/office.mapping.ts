@@ -3,6 +3,8 @@ import { mapOfficeItemToOfficeItemOverviewDto } from '@components/officeItems/of
 import { OfficeMember } from '@components/officeMembers/officeMember.entity';
 import { mapOfficeMemberToOfficeMemberOverviewDto } from '@components/officeMembers/officeMember.mapping';
 import { mapUserToUserOverviewDto } from '@components/users/user.mapping';
+import { Conversation } from '../conversations/conversation.entity';
+import { mapConversationToConversationOverviewDto } from '../conversations/conversation.mapping';
 import { OfficeDetailDto } from './@types/dto/OfficeDetail.dto';
 import { OfficeOverviewDto } from './@types/dto/OfficeOverview.dto';
 import { Office } from './office.entity';
@@ -11,6 +13,7 @@ type OfficeDetailMappingData = {
 	office: Office;
 	officeMembers: OfficeMember[];
 	officeItems: OfficeItem[];
+	conversations: Conversation[];
 };
 
 export const mapOfficeToOfficeOverviewDto = (
@@ -42,7 +45,7 @@ export const mapOfficeToOfficeOverviewDto = (
 export const mapOfficeToOfficeDetailDto = (
 	data: OfficeDetailMappingData
 ): OfficeDetailDto => {
-	const { office, officeItems, officeMembers } = data;
+	const { office, officeItems, officeMembers, conversations } = data;
 	const { id, createdAt, invitationCode, name, createdBy, avatarUrl } =
 		office;
 
@@ -54,6 +57,10 @@ export const mapOfficeToOfficeDetailDto = (
 		mapOfficeMemberToOfficeMemberOverviewDto(member)
 	);
 
+	const conversationsDto = conversations.map(conversation =>
+		mapConversationToConversationOverviewDto(conversation)
+	);
+
 	return {
 		id,
 		name,
@@ -62,6 +69,7 @@ export const mapOfficeToOfficeDetailDto = (
 		createdBy: mapUserToUserOverviewDto(createdBy),
 		officeItems: itemsDto,
 		officeMembers: membersDto,
+		conversations: conversationsDto,
 		createdAt
 	};
 };

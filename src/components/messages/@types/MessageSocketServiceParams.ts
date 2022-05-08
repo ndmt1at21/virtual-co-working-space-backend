@@ -1,5 +1,6 @@
 import { OfficeMemberSocketData } from '@src/components/officeMembers/@types/socket/OfficeMemberSocketData';
 import { Server, Socket } from 'socket.io';
+import { IMessageService } from './IMessageService';
 import { MessageClientToServerEvent } from './MessageClientToServerEvent';
 import { MessageServerToClientEvent } from './MessageServerToClientEvent';
 
@@ -11,4 +12,5 @@ export type MessageSocketServiceParams = {
 		any,
 		OfficeMemberSocketData
 	>;
+	messageService: IMessageService;
 };

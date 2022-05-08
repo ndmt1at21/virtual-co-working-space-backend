@@ -5,7 +5,7 @@ import {
 	SocketMiddlewareFunction
 } from './@types/socketMiddleware';
 
-export const SocketMiddleware = (
+export const socketMiddleware = (
 	fns: (SocketMiddlewareFunction | SocketMiddlewareErrorFunction)[]
 ) => {
 	const middlewares: SocketMiddlewareFunction[] = [];
@@ -35,8 +35,6 @@ export const SocketMiddleware = (
 	};
 
 	const execute = (io: Server, socket: Socket) => {
-		data = { io, socket };
-
 		let index = 0;
 		let indexError = -1;
 
@@ -52,7 +50,13 @@ export const SocketMiddleware = (
 
 				if (indexError < middlewaresError.length) {
 					const nextMiddlewareError = middlewaresError[indexError];
-					nextMiddlewareError(err, data!.io, data!.socket, next);
+					nextMiddlewareError(
+						err,
+						data!.io,
+						data!.socket,
+						data!.context,
+						next
+					);
 				}
 			}
 
@@ -61,12 +65,12 @@ export const SocketMiddleware = (
 
 				if (index < middlewares.length) {
 					const nextMiddleware = middlewares[index];
-					nextMiddleware(data!.io, data!.socket, next);
+					nextMiddleware(data!.io, data!.socket, data!.context, next);
 				}
 			}
 		};
 
-		firstMiddleware(data.io, data.socket, next);
+		firstMiddleware(data!.io, data!.socket, data!.context, next);
 	};
 
 	return { use, execute };

@@ -15,6 +15,7 @@ import { FindAllUsersOptions } from './@types/filter/FindAllUsersOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
 import { NotFoundError } from '@src/utils/appError';
 import { UserErrorMessage } from './user.error';
+import { mapUserToUserDto } from './user.mapping';
 
 export const UserService = (
 	userRepository: UserRepository,
@@ -37,7 +38,7 @@ export const UserService = (
 			password: encryptedPassword
 		});
 
-		return userCreator.userEntityToUserDto(userCreated);
+		return mapUserToUserDto(userCreated);
 	};
 
 	const findOrCreateUserByExternal = async (
@@ -48,34 +49,30 @@ export const UserService = (
 			payload.provider
 		);
 
-		if (user) return userCreator.userEntityToUserDto(user);
+		if (user) return mapUserToUserDto(user);
 
 		const userCreated = await userRepository.save({
 			...payload
 		});
 
-		return userCreator.userEntityToUserDto(userCreated);
+		return mapUserToUserDto(userCreated);
 	};
 
 	const findUserById = async (id: number): Promise<UserDto> => {
 		await userValidate.checkUserExistsById(id);
-		const user = await userRepository.findById(id);
-		return userCreator.userEntityToUserDto(user!);
+		return await userCreator.createUserDtoById(id);
 	};
 
 	const findUserByEmail = async (email: string): Promise<UserDto> => {
 		await userValidate.checkUserExistsByEmail(email);
-		const user = await userRepository.findUserByEmail(email);
-		return userCreator.userEntityToUserDto(user!);
+		return await userCreator.createUserDtoByEmail(email);
 	};
 
 	const findAllUsers = async (
 		options: FindAllUsersOptions
 	): Promise<[UserDto[], PaginationInfo]> => {
 		const [users, pageInfo] = await userRepository.findAllUsers(options);
-		const usersDto = users.map(user =>
-			userCreator.userEntityToUserDto(user)
-		);
+		const usersDto = users.map(user => mapUserToUserDto(user));
 
 		return [usersDto, pageInfo];
 	};
@@ -87,13 +84,12 @@ export const UserService = (
 		await userValidate.checkUserExistsById(id);
 
 		const user = await userRepository.findById(id);
-
 		const updatedUser = await userRepository.save({
 			...user!,
 			...payload
 		});
 
-		return userCreator.userEntityToUserDto(updatedUser);
+		return mapUserToUserDto(updatedUser);
 	};
 
 	const updatePasswordById = async (
@@ -111,7 +107,7 @@ export const UserService = (
 			passwordUpdateAt: new Date()
 		});
 
-		return userCreator.userEntityToUserDto(updatedUser);
+		return mapUserToUserDto(updatedUser);
 	};
 
 	const deleteUserById = async (id: number): Promise<void> => {

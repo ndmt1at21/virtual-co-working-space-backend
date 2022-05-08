@@ -4,7 +4,7 @@ import { BaseRepository } from '@src/components/base/BaseRepository';
 import { FindAllOptions } from '../base/@types/FindAllOptions';
 import { FindAllUsersOptions } from './@types/filter/FindAllUsersOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
-import { UserLoginProvider } from '../UserLoginProvider';
+import { UserLoginProvider } from '../auth/@types/UserLoginProvider';
 
 @EntityRepository(User)
 export class UserRepository extends BaseRepository<User> {

@@ -53,6 +53,15 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 		return this;
 	}
 
+	withConversations(): OfficeRepositoryQueryBuilder {
+		this.query.leftJoinAndSelect(
+			`${this.tableAlias}.conversations`,
+			'conversations'
+		);
+
+		return this;
+	}
+
 	private mapFindAllItemsOptionsToDatabaseField(
 		options: FindAllOfficesOptions
 	): FindAllOptions {

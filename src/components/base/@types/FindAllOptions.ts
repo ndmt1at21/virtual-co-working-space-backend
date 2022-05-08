@@ -28,8 +28,8 @@ export type Pageable = {
 	page?: number;
 };
 
-export interface FindAllOptions {
+export type FindAllOptions = {
 	sort?: Sort;
 	filter?: Filter;
 	paginate?: Pageable;
-}
+};

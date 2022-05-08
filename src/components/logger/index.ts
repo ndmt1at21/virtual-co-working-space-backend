@@ -87,6 +87,14 @@ export const cloudLogger = createLogger({
 	]
 });
 
+export const messageSocketLogger = createLogger({
+	defaultMeta: { service: 'message-socket-logger' },
+	transports: [
+		new transports.File(commonOptions),
+		new transports.Console(debugOptions)
+	]
+});
+
 export const officeInvitationLogger = createLogger({
 	defaultMeta: { service: 'office-invitation-service' },
 	transports: [

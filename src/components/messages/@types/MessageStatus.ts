@@ -1,6 +1,1 @@
-export enum MessageStatus {
-	SENT = 'sent',
-	RECEIVED = 'received',
-	READ = 'read',
-	FAILED = 'failed'
-}
+export type MessageStatus = 'read' | 'revoked' | 'sent' | 'failed';

@@ -16,16 +16,12 @@ export const AuthSocketMiddleware = (
 	logger: ILogger
 ): IAuthSocketMiddleware => {
 	const protect = catchAsyncSocketMiddleware(async (socket, next) => {
-		logger.info('Access Token: ');
 		const accessToken = socket.handshake.auth.accessToken;
-		logger.info(accessToken);
 		if (!accessToken) {
 			throw new UnauthorizedError(
 				AuthErrorMessages.UNAUTHORIZED_MISSING_TOKEN
 			);
 		}
-		logger.info('Access Token: ');
-		logger.info(accessToken);
 		const { id, type, email } = await deserializeUser(accessToken);
 		socket.user = { id, email, roles: [type] };
 		next();

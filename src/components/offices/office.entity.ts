@@ -52,9 +52,11 @@ export class Office extends BaseEntity {
 	})
 	officeMembers: OfficeMember[];
 
-	@OneToOne(() => Conversation)
+	@OneToMany(() => Conversation, conversation => conversation.office, {
+		cascade: true
+	})
 	@JoinColumn({ name: 'conversation_id' })
-	conversation: Conversation;
+	conversations: Conversation[];
 
 	@ManyToOne(() => User)
 	@JoinColumn({ name: 'created_by_user_id' })

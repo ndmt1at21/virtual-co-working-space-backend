@@ -1,3 +1,4 @@
+import { ILogger } from '@src/components/logger/@types/ILogger';
 import { OfficeMemberSocketData } from '@src/components/officeMembers/@types/socket/OfficeMemberSocketData';
 import { Server, Socket } from 'socket.io';
 import { IMessageService } from './IMessageService';
@@ -13,4 +14,5 @@ export type MessageSocketServiceParams = {
 		OfficeMemberSocketData
 	>;
 	messageService: IMessageService;
+	logger: ILogger;
 };

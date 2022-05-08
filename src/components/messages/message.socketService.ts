@@ -55,7 +55,7 @@ export const MessageSocketService = ({
 			senderId: socket.user!.id
 		});
 
-		socket
+		socketNamespace
 			.in(`conversation/${message.conversationId}`)
 			.emit('message:sent', createdMessage);
 

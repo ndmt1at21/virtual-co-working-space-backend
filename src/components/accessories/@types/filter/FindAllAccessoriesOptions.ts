@@ -6,6 +6,7 @@ import {
 
 export type FindAllAccessoriesFilter = {
 	name?: FilterValue;
+	categoryName?: FilterValue;
 	categoryId?: FilterValue;
 };
 

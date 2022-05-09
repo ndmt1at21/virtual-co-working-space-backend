@@ -1,4 +1,4 @@
-import { mapAccessoryCategoryToAccessoryCategoryDto } from '../accessoryCategories/accessoryCategory.mapping';
+import { mapAccessoryCategoryToAccessoryCategoryOverviewDto } from '../accessoryCategories/accessoryCategory.mapping';
 import { AccessoryDto } from './@types/dto/Accessory.dto';
 import { Accessory } from './accessory.entity';
 
@@ -7,7 +7,9 @@ export const mapAccessoryToAccessoryDto = (
 ): AccessoryDto => {
 	const { id, path, category, description, createdAt, updatedAt } = accessory;
 
-	const categoryDto = mapAccessoryCategoryToAccessoryCategoryDto(category);
+	const categoryDto =
+		mapAccessoryCategoryToAccessoryCategoryOverviewDto(category);
+
 	return {
 		id,
 		path,

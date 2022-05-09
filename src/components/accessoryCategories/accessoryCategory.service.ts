@@ -1,12 +1,12 @@
 import { NotFoundError } from '@src/utils/appError';
 import { Pageable } from '../base/@types/FindAllOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
-import { AccessoryCategoryDto } from './@types/dto/AccessoryCategory.dto';
+import { AccessoryCategoryDetailDto } from './@types/dto/AccessoryCategoryDetail.dto';
 import { CreateAccessoryCategoryDto } from './@types/dto/CreateAccessoryCategory.dto';
 import { UpdateAccessoryCategoryDto } from './@types/dto/UpdateAccessoryCategory.dto';
 import { IAccessoryCategoryService } from './@types/IAccessoryCategoryService';
 import { AccessoryCategoryErrorMessages } from './accessoryCategory.error';
-import { mapAccessoryCategoryToAccessoryCategoryDto } from './accessoryCategory.mapping';
+import { mapAccessoryCategoryToAccessoryCategoryDetailDto } from './accessoryCategory.mapping';
 import { AccessoryCategoryRepository } from './accessoryCategory.repository';
 
 export const AccessoryCategoryService = (
@@ -14,21 +14,25 @@ export const AccessoryCategoryService = (
 ): IAccessoryCategoryService => {
 	const create = async (
 		category: CreateAccessoryCategoryDto
-	): Promise<AccessoryCategoryDto> => {
+	): Promise<AccessoryCategoryDetailDto> => {
 		const createdCategory = await accessoryCategoryRepository.save(
 			category
 		);
 
-		const categoryDto =
-			mapAccessoryCategoryToAccessoryCategoryDto(createdCategory);
+		const accessoryCategory =
+			await accessoryCategoryRepository.findAccessoryCategoryById(
+				createdCategory.id
+			);
 
-		return categoryDto;
+		return mapAccessoryCategoryToAccessoryCategoryDetailDto(
+			accessoryCategory!
+		);
 	};
 
 	const updateAccessoryCategoryById = async (
 		id: number,
 		category: UpdateAccessoryCategoryDto
-	): Promise<AccessoryCategoryDto> => {
+	): Promise<AccessoryCategoryDetailDto> => {
 		const updateResult = await accessoryCategoryRepository.update(
 			id,
 			category
@@ -40,28 +44,52 @@ export const AccessoryCategoryService = (
 			);
 		}
 
-		const updatedCategory = await accessoryCategoryRepository.findById(id);
-		const categoryDto = mapAccessoryCategoryToAccessoryCategoryDto(
+		const updatedCategory =
+			await accessoryCategoryRepository.findAccessoryCategoryById(id);
+
+		const categoryDto = mapAccessoryCategoryToAccessoryCategoryDetailDto(
 			updatedCategory!
 		);
 
 		return categoryDto;
 	};
 
-	const getAllAccessoryCategories = async (
+	const findAccessoryCategoryById = async (
+		id: number
+	): Promise<AccessoryCategoryDetailDto> => {
+		const accessoryCategory =
+			await accessoryCategoryRepository.findAccessoryCategoryById(id);
+
+		if (!accessoryCategory) {
+			throw new NotFoundError(
+				AccessoryCategoryErrorMessages.ACCESSORY_CATEGORY_NOT_FOUND
+			);
+		}
+
+		return mapAccessoryCategoryToAccessoryCategoryDetailDto(
+			accessoryCategory
+		);
+	};
+
+	const findAllAccessoryCategories = async (
 		pageable?: Pageable
-	): Promise<[AccessoryCategoryDto[], PaginationInfo]> => {
+	): Promise<[AccessoryCategoryDetailDto[], PaginationInfo]> => {
 		const [categories, pagination] =
 			await accessoryCategoryRepository.findAllAccessoryCategories(
 				pageable
 			);
 
 		const categoriesDto = categories.map(category =>
-			mapAccessoryCategoryToAccessoryCategoryDto(category)
+			mapAccessoryCategoryToAccessoryCategoryDetailDto(category)
 		);
 
 		return [categoriesDto, pagination];
 	};
 
-	return { create, getAllAccessoryCategories, updateAccessoryCategoryById };
+	return {
+		create,
+		findAllAccessoryCategories,
+		updateAccessoryCategoryById,
+		findAccessoryCategoryById
+	};
 };

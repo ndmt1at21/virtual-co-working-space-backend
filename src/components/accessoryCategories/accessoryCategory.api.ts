@@ -20,10 +20,7 @@ export const AccessoryCategoryRouter = (): Router => {
 
 	router
 		.route('/:id')
-		.post(
-			accessoryCategoryReqValidation.validateCreateAccessoryCategoryDto,
-			accessoryCategoryController.createAccessoryCategory
-		)
+		.get(accessoryCategoryController.getAccessoryCategoryById)
 		.patch(
 			accessoryCategoryReqValidation.validateUpdateAccessoryCategoryDto,
 			accessoryCategoryController.updateAccessoryCategory
@@ -31,6 +28,10 @@ export const AccessoryCategoryRouter = (): Router => {
 
 	router
 		.route('/')
+		.post(
+			accessoryCategoryReqValidation.validateCreateAccessoryCategoryDto,
+			accessoryCategoryController.createAccessoryCategory
+		)
 		.get(accessoryCategoryController.getAllAccessoryCategories);
 
 	return router;

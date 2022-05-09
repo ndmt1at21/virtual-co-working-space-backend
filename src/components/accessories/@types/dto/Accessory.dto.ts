@@ -1,10 +1,10 @@
-import { AccessoryCategoryDto } from '@src/components/accessoryCategories/@types/dto/AccessoryCategory.dto';
+import { AccessoryCategoryOverviewDto } from '@src/components/accessoryCategories/@types/dto/AccessoryCategoryOverview.dto';
 
 export type AccessoryDto = {
 	id: number;
 	path: string;
 	description?: string;
-	category: AccessoryCategoryDto;
+	category: AccessoryCategoryOverviewDto;
 	createdAt: Date;
 	updatedAt: Date;
 };

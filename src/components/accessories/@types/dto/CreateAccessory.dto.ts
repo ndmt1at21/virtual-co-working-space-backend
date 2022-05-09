@@ -23,7 +23,6 @@ export class CreateAccessoryDto {
 	@IsOptional()
 	description?: string;
 
-	@IsDefined()
-	@IsNumber()
+	@Expose()
 	creatorId: number;
 }

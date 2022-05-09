@@ -10,7 +10,11 @@ export abstract class BaseRepository<T> extends Repository<T> {
 	}
 
 	async findAll(options: FindAllOptions): Promise<[T[], PaginationInfo]> {
-		const query = this.createFindAllQueryBuilder(options);
+		const query = this.createFindAllQueryBuilder(
+			this.metadata.tableName,
+			options
+		);
+
 		const [items, totalCount] = await query.getManyAndCount();
 
 		return [
@@ -23,7 +27,10 @@ export abstract class BaseRepository<T> extends Repository<T> {
 		];
 	}
 
-	createFindAllQueryBuilder(options: FindAllOptions): SelectQueryBuilder<T> {
+	createFindAllQueryBuilder(
+		alias: string,
+		options: FindAllOptions
+	): SelectQueryBuilder<T> {
 		const { filter, sort, paginate } = options;
 
 		const query = this.createQueryBuilder(this.metadata.tableName);

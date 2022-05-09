@@ -24,7 +24,7 @@ export const AccessoryCategoryReqValidation = () => {
 
 	const validateUpdateAccessoryCategoryDto = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			if (typeof req.params.id !== 'number') {
+			if (typeof +req.params.id !== 'number') {
 				throw new IllegalArgumentError('Invalid accessory category id');
 			}
 

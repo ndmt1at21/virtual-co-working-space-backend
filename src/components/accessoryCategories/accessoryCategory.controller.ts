@@ -1,5 +1,6 @@
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
+import { generateResponseData } from '@src/utils/generateResponseData';
 import { PaginateQueryParser } from '@src/utils/paginateQueryParser';
 import { CreateAccessoryCategoryDto } from './@types/dto/CreateAccessoryCategory.dto';
 import { UpdateAccessoryCategoryDto } from './@types/dto/UpdateAccessoryCategory.dto';
@@ -42,12 +43,28 @@ export const AccessoryCategoryController = (
 		}
 	);
 
+	const getAccessoryCategoryById = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			const id = +req.params.id;
+
+			const accessoryCategory =
+				await accessoryCategoryService.findAccessoryCategoryById(id);
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: { accessoryCategory }
+			});
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
+
 	const getAllAccessoryCategories = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const { pageable } = PaginateQueryParser.parse(req.query);
 
 			const [accessoryCategories, paginationInfo] =
-				await accessoryCategoryService.getAllAccessoryCategories(
+				await accessoryCategoryService.findAllAccessoryCategories(
 					pageable
 				);
 
@@ -64,6 +81,7 @@ export const AccessoryCategoryController = (
 	return {
 		createAccessoryCategory,
 		updateAccessoryCategory,
+		getAccessoryCategoryById,
 		getAllAccessoryCategories
 	};
 };

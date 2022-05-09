@@ -6,6 +6,19 @@ import { AccessoryCategory } from './accessoryCategory.entity';
 
 @EntityRepository(AccessoryCategory)
 export class AccessoryCategoryRepository extends BaseRepository<AccessoryCategory> {
+	async findAccessoryCategoryById(
+		id: number
+	): Promise<AccessoryCategory | undefined> {
+		const accessoryCategory = await this.createQueryBuilder(
+			'accessory_category'
+		)
+			.where('accessory_category.id = :id', { id })
+			.leftJoinAndSelect('accessory_category.creator', 'creator')
+			.getOne();
+
+		return accessoryCategory;
+	}
+
 	async findAllAccessoryCategories(
 		pageable?: Pageable
 	): Promise<[AccessoryCategory[], PaginationInfo]> {

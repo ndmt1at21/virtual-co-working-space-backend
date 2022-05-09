@@ -22,6 +22,7 @@ import { AccessoryCategory } from '@src/components/accessoryCategories/accessory
 import { Accessory } from '@src/components/accessories/accessory.entity';
 import { UserMessageStatus } from '@src/components/messages/components/userMessageStatus/userMessageStatus.entity';
 import { MessageReaction } from '@src/components/messages/components/messageReactions/messageReaction.entity';
+import { ItemCategory } from '@src/components/itemCategories/itemCategory.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -51,7 +52,8 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		MessageReaction,
 		UserMessageStatus,
 		AccessoryCategory,
-		Accessory
+		Accessory,
+		ItemCategory
 	]
 };
 

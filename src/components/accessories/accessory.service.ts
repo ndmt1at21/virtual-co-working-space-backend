@@ -5,6 +5,7 @@ import { CreateAccessoryDto } from './@types/dto/CreateAccessory.dto';
 import { UpdateAccessoryDto } from './@types/dto/UpdateAccessory.dto';
 import { FindAllAccessoriesOptions } from './@types/filter/FindAllAccessoriesOptions';
 import { IAccessoryService } from './@types/IAccessoryService';
+import { AccessoryErrorMessages } from './accessory.error';
 import { mapAccessoryToAccessoryDto } from './accessory.mapping';
 import { AccessoryRepository } from './accessory.repository';
 
@@ -53,12 +54,32 @@ export const AccessoryService = (
 		return mapAccessoryToAccessoryDto(accessory);
 	};
 
+	const findAccessories = async (
+		options: FindAllAccessoriesOptions
+	): Promise<[AccessoryDto[], PaginationInfo]> => {
+		const [accessories, pageInfo] =
+			await accessoryRepository.findAccessories(options);
 
+		const accessoriesDto = accessories.map(accessory =>
+			mapAccessoryToAccessoryDto(accessory)
+		);
+
+		return [accessoriesDto, pageInfo];
+	};
+
+	const deleteAccessoryById = async (id: number): Promise<void> => {
+		const deleteResult = await accessoryRepository.softDelete(id);
+
+		if (deleteResult.affected === 0) {
+			throw new NotFoundError(AccessoryErrorMessages.ACCESSORY_NOT_FOUND);
+		}
+	};
 
 	return {
 		createAccessory,
 		updateAccessoryById,
 		findAccessoryById,
+		deleteAccessoryById,
 		findAccessories
 	};
 };

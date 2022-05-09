@@ -7,7 +7,7 @@ import { OfficeMemberTransform } from '@src/components/officeMemberTransform/off
 import { OfficeRole } from '@src/components/officeRoles/officeRole.entity';
 import { Office } from '@src/components/offices/office.entity';
 import { User } from '@src/components/users/user.entity';
-import { createConnection, createConnections } from 'typeorm';
+import { createConnections } from 'typeorm';
 import { MongoConnectionOptions } from 'typeorm/driver/mongodb/MongoConnectionOptions';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { CacheConnectOption, createCacheConnection } from './cache';
@@ -18,6 +18,8 @@ import { ConversationMember } from '@src/components/conversationMembers/conversa
 import { Message } from '@src/components/messages/message.entity';
 import { RefreshToken } from '@src/components/auth/components/refreshToken/refreshToken.entity';
 import { PasswordResetToken } from '@src/components/auth/components/passwordResetToken/passwordResetToken.entity';
+import { AccessoryCategory } from '@src/components/accessoryCategories/accessoryCategory.entity';
+import { Accessory } from '@src/components/accessories/accessory.entity';
 import { UserMessageStatus } from '@src/components/messages/components/userMessageStatus/userMessageStatus.entity';
 import { MessageReaction } from '@src/components/messages/components/messageReactions/messageReaction.entity';
 
@@ -45,9 +47,11 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		OfficeInvitation,
 		Conversation,
 		ConversationMember,
-		UserMessageStatus,
+		Message,
 		MessageReaction,
-		Message
+		UserMessageStatus,
+		AccessoryCategory,
+		Accessory
 	]
 };
 

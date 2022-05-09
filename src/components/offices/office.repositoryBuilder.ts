@@ -39,11 +39,15 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 	findAllOffices(
 		options: FindAllOfficesOptions
 	): OfficeRepositoryQueryBuilder {
-		const optionsWithDbField =
-			this.mapFindAllItemsOptionsToDatabaseField(options);
+		const optionsWithDbField = this.mapFindAllItemsOptionsToDatabaseField(
+			this.repository.metadata.tableName,
+			options
+		);
 
-		this.query =
-			this.repository.createFindAllQueryBuilder(optionsWithDbField);
+		this.query = this.repository.createFindAllQueryBuilder(
+			this.repository.metadata.tableName,
+			optionsWithDbField
+		);
 
 		return this;
 	}
@@ -63,10 +67,10 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 	}
 
 	private mapFindAllItemsOptionsToDatabaseField(
+		alias: string,
 		options: FindAllOfficesOptions
 	): FindAllOptions {
 		const { filter, pageable, sort } = options;
-		const alias = this.tableAlias;
 
 		return {
 			filter: {

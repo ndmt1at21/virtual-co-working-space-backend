@@ -34,6 +34,30 @@ export const CloudUploadController = (
 		});
 	});
 
+	const uploadAccessory = catchAsyncRequestHandler(async (req, res, next) => {
+		logger.info('Upload accessory is starting');
+
+		const uploadFile = req.file;
+		if (!uploadFile) throw new IllegalArgumentError('File upload is empty');
+
+		logger.info(
+			`Accessory information: size (${uploadFile.size}), mimetype (${uploadFile.mimetype}), filename (${uploadFile.filename})`
+		);
+
+		const url = await cloudService.uploadLargeFile({
+			name: uploadFile.originalname,
+			stream: createFileStream(uploadFile.buffer),
+			type: uploadFile.mimetype
+		});
+
+		logger.info(`Upload accessory is done`);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { url }
+		});
+	});
+
 	const uploadAvatar = catchAsyncRequestHandler(async (req, res, next) => {
 		logger.info('Upload avatar is starting');
 
@@ -86,5 +110,5 @@ export const CloudUploadController = (
 		return streamifier.createReadStream(buffer);
 	}
 
-	return { uploadModel, uploadAvatar, uploadImage };
+	return { uploadModel, uploadAccessory, uploadAvatar, uploadImage };
 };

@@ -1,9 +1,14 @@
 import { createLogger, format, transports } from 'winston';
 
 const debugFormat = format.combine(
+	format(info => ({ ...info, level: info.level.toUpperCase() }))(),
 	format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
 	format.align(),
-	format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+	format.colorize(),
+	format.printf(
+		info =>
+			`${info.timestamp} ${info.level} ${info.service}: ${info.message}`
+	)
 );
 
 const defaultFormat = format.combine(

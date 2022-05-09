@@ -60,8 +60,6 @@ export const OfficeMemberSocketService = (
 	async function onMemberMove(transform: UpdateOfficeMemberTransformDto) {
 		logger.info(`User ${socket.user?.id} starts update movement`);
 
-		console.log(`${socket.data.officeMember!.officeId}`);
-
 		socket
 			.to(`${socket.data.officeMember!.officeId}`)
 			.emit('office_member:moved', {

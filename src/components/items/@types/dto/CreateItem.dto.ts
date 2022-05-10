@@ -11,4 +11,13 @@ export class CreateItemDto {
 	@IsUrl()
 	@Expose()
 	modelPath: string;
+
+	@IsDefined()
+	@IsUrl()
+	@Expose()
+	image?: string;
+
+	@IsDefined()
+	@Expose()
+	categoryId: number;
 }

@@ -1,11 +1,11 @@
 import { PaginationInfo } from '@src/components/base/@types/PaginationInfo';
 import { CreateItemDto } from './dto/CreateItem.dto';
 import { ItemDto } from './dto/Item.dto';
-import { FindItemOptions } from './FindAllItemsOptions';
+import { FindAllItemsOptions } from './filter/FindAllItemsOptions';
 
 export interface IItemService {
 	findAllItems(
-		options: FindItemOptions
+		options: FindAllItemsOptions
 	): Promise<[ItemDto[], PaginationInfo]>;
 
 	findItemById(id: number): Promise<ItemDto>;

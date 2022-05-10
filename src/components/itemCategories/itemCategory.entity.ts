@@ -8,6 +8,7 @@ import {
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { BaseEntity } from '../base/BaseEntity';
+import { Item } from '../items/item.entity';
 import { User } from '../users/user.entity';
 
 @Entity({ name: 'item_category' })
@@ -27,4 +28,7 @@ export class ItemCategory extends BaseEntity {
 	@ManyToOne(type => User)
 	@JoinColumn({ name: 'creator_id' })
 	creator: User;
+
+	@OneToMany(type => Item, item => item.category)
+	items: Item[];
 }

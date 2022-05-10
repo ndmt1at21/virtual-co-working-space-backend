@@ -3,13 +3,12 @@ import { IItemCreator } from './@types/IItemCreator';
 import { mapItemToItemDto } from './item.mapping';
 import { ItemRepository } from './item.repository';
 
-export const ItemCreator = (itemRepository: ItemRepository): IItemCreator => {
-	const createItemDetail = async (id: number): Promise<ItemDto> => {
-		const item = await itemRepository.findById(id);
-		const itemDto = mapItemToItemDto(item!);
+export class ItemCreator implements IItemCreator {
+	constructor(private itemRepository: ItemRepository) {}
 
+	createItemDetail = async (id: number): Promise<ItemDto> => {
+		const item = await this.itemRepository.findItemById(id);
+		const itemDto = mapItemToItemDto(item!);
 		return itemDto;
 	};
-
-	return { createItemDetail };
-};
+}

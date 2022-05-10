@@ -4,21 +4,23 @@ import {
 	SortOrder
 } from '@src/components/base/@types/FindAllOptions';
 
-export type FindItemFilter = {
+export type FindAllItemsFilter = {
 	name?: FilterValue;
 	path?: FilterValue;
+	categoryId?: FilterValue;
 	createdAt?: FilterValue;
 };
 
-export type FindItemSort = {
+export type FindAllItemsSort = {
 	name?: SortOrder;
 	path?: SortOrder;
+	categoryName?: SortOrder;
 	createdAt?: SortOrder;
 	updatedAt?: SortOrder;
 };
 
-export type FindItemOptions = {
-	filter?: FindItemFilter;
-	sort?: FindItemSort;
+export type FindAllItemsOptions = {
+	filter?: FindAllItemsFilter;
+	sort?: FindAllItemsSort;
 	pageable?: Pageable;
 };

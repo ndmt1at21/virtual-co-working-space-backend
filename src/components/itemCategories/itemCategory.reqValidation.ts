@@ -3,9 +3,10 @@ import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { validateRequestBody } from '@src/utils/requestValidation';
 import { CreateItemCategoryDto } from './@types/dto/CreateItemCategory.dto';
 import { UpdateItemCategoryDto } from './@types/dto/UpdateItemCategory,dto';
+import { IItemCategoryReqValidation } from './@types/IItemCategoryReqValidation';
 
-export const ItemCategoryReqValidation = () => {
-	const validateCreateItemCategoryDto = catchAsyncRequestHandler(
+export class ItemCategoryReqValidation implements IItemCategoryReqValidation {
+	validateCreateItemCategoryDto = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const errors = await validateRequestBody(
 				CreateItemCategoryDto,
@@ -22,7 +23,7 @@ export const ItemCategoryReqValidation = () => {
 		}
 	);
 
-	const validateUpdateItemCategoryDto = catchAsyncRequestHandler(
+	validateUpdateItemCategoryDto = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			if (typeof +req.params.id !== 'number') {
 				throw new IllegalArgumentError('Invalid accessory category id');
@@ -48,9 +49,4 @@ export const ItemCategoryReqValidation = () => {
 			next();
 		}
 	);
-
-	return {
-		validateCreateItemCategoryDto,
-		validateUpdateItemCategoryDto
-	};
-};
+}

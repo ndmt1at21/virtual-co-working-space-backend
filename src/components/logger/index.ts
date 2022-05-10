@@ -108,6 +108,14 @@ export const officeMemberSocketLogger = createLogger({
 	]
 });
 
+export const itemLogger = createLogger({
+	defaultMeta: { service: 'item-logger' },
+	transports: [
+		new transports.File(commonOptions),
+		new transports.Console(debugOptions)
+	]
+});
+
 export const itemCategoryLogger = createLogger({
 	defaultMeta: { service: 'item-category-logger' },
 	transports: [

@@ -7,107 +7,94 @@ import { CreateItemCategoryDto } from './@types/dto/CreateItemCategory.dto';
 import { UpdateItemCategoryDto } from './@types/dto/UpdateItemCategory,dto';
 import { IItemCategoryService } from './@types/IItemCategoryService';
 
-export const ItemCategoryController = (
-	itemCategoryService: IItemCategoryService,
-	logger: ILogger
-) => {
-	const createItemCategory = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			logger.info(`Create item category with name ${req.body.name}`);
+export class ItemCategoryController {
+	constructor(
+		private itemCategoryService: IItemCategoryService,
+		private logger: ILogger
+	) {}
 
-			const createDto = req.body as CreateItemCategoryDto;
-			const createdItemCategory = await itemCategoryService.create({
-				...createDto,
-				creatorId: req.user!.id
-			});
+	createItemCategory = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`Create item category with name ${req.body.name}`);
 
-			logger.info(
-				`Item category is created with id = ${createdItemCategory.id}`
+		const createDto = req.body as CreateItemCategoryDto;
+		const createdItemCategory = await this.itemCategoryService.create({
+			...createDto,
+			creatorId: req.user!.id
+		});
+
+		this.logger.info(
+			`Item category is created with id = ${createdItemCategory.id}`
+		);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { itemCategory: createdItemCategory }
+		});
+	});
+
+	updateItemCategory = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(
+			`Update item category with id = ${
+				req.params.id
+			}, update data = ${JSON.stringify(req.body)}`
+		);
+
+		const id = +req.params.id;
+		const updateDto = req.body as UpdateItemCategoryDto;
+
+		const updatedItemCategory =
+			await this.itemCategoryService.updateItemCategoryById(
+				id,
+				updateDto
 			);
 
-			res.status(HttpStatusCode.OK).json({
-				code: HttpStatusCode.OK,
-				data: { itemCategory: createdItemCategory }
-			});
-		}
-	);
+		this.logger.info(
+			`Item category with id = ${id} is updated successfully`
+		);
 
-	const updateItemCategory = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			logger.info(
-				`Update item category with id = ${
-					req.params.id
-				}, update data = ${JSON.stringify(req.body)}`
-			);
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { itemCategory: updatedItemCategory }
+		});
+	});
 
-			const id = +req.params.id;
-			const updateDto = req.body as UpdateItemCategoryDto;
+	getItemCategoryById = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`Get item category with id = ${req.params.id}`);
 
-			const updatedItemCategory =
-				await itemCategoryService.updateItemCategoryById(id, updateDto);
+		const id = +req.params.id;
 
-			logger.info(
-				`Item category with id = ${id} is updated successfully`
-			);
+		const itemCategory =
+			await this.itemCategoryService.findItemCategoryById(id);
 
-			res.status(HttpStatusCode.OK).json({
-				code: HttpStatusCode.OK,
-				data: { itemCategory: updatedItemCategory }
-			});
-		}
-	);
+		const resData = generateResponseData({
+			code: HttpStatusCode.OK,
+			data: { itemCategory }
+		});
 
-	const getItemCategoryById = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			logger.info(`Get item category with id = ${req.params.id}`);
+		this.logger.info(`Item category with id = ${id} is found successfully`);
 
-			const id = +req.params.id;
+		res.status(HttpStatusCode.OK).json(resData);
+	});
 
-			const itemCategory = await itemCategoryService.findItemCategoryById(
-				id
-			);
+	getAllItemCategories = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(
+			`Get all item categories with query = ${JSON.stringify(req.query)}`
+		);
 
-			const resData = generateResponseData({
-				code: HttpStatusCode.OK,
-				data: { itemCategory }
-			});
+		const { pageable } = PaginateQueryParser.parse(req.query);
 
-			logger.info(`Item category with id = ${id} is found successfully`);
+		const [itemCategories, paginationInfo] =
+			await this.itemCategoryService.findAllItemCategories(pageable);
 
-			res.status(HttpStatusCode.OK).json(resData);
-		}
-	);
+		const resData = generateResponseData({
+			code: HttpStatusCode.OK,
+			data: { itemCategories, pagination: paginationInfo }
+		});
 
-	const getAllItemCategories = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			logger.info(
-				`Get all item categories with query = ${JSON.stringify(
-					req.query
-				)}`
-			);
+		this.logger.info(
+			`Get all item categories successfully with [totalCount = ${paginationInfo.totalCount}, count = ${paginationInfo.count}, page = ${paginationInfo.page}]`
+		);
 
-			const { pageable } = PaginateQueryParser.parse(req.query);
-
-			const [itemCategories, paginationInfo] =
-				await itemCategoryService.findAllItemCategories(pageable);
-
-			const resData = generateResponseData({
-				code: HttpStatusCode.OK,
-				data: { itemCategories, paginationInfo }
-			});
-
-			logger.info(
-				`Get all item categories successfully with [totalCount = ${paginationInfo.totalCount}, count = ${paginationInfo.count}, page = ${paginationInfo.page}]`
-			);
-
-			res.status(HttpStatusCode.OK).json(resData);
-		}
-	);
-
-	return {
-		createItemCategory,
-		updateItemCategory,
-		getItemCategoryById,
-		getAllItemCategories
-	};
-};
+		res.status(HttpStatusCode.OK).json(resData);
+	});
+}

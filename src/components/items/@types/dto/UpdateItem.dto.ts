@@ -9,4 +9,12 @@ export class UpdateItemDto {
 	@Expose()
 	@IsUrl()
 	modelPath?: string;
+
+	@Expose()
+	@IsUrl()
+	image?: string;
+
+	@Expose()
+	@IsUrl()
+	categoryId?: number;
 }

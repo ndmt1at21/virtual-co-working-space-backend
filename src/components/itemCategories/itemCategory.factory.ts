@@ -7,11 +7,11 @@ import { ItemCategoryService } from './itemCategory.service';
 
 export function createItemCategoryController() {
 	const service = createItemCategoryService();
-	return ItemCategoryController(service, itemCategoryLogger);
+	return new ItemCategoryController(service, itemCategoryLogger);
 }
 
 export function createItemCategoryReqValidation() {
-	return ItemCategoryReqValidation();
+	return new ItemCategoryReqValidation();
 }
 
 export function createItemCategoryService() {

@@ -1,10 +1,8 @@
 import { Router } from 'express';
-import { createItemService } from './item.factory';
-import { ItemController } from './item.controller';
+import { createItemController } from './item.factory';
 
 export const ItemRouter = (): Router => {
-	const itemService = createItemService();
-	const itemController = ItemController(itemService);
+	const itemController = createItemController();
 
 	const router = Router();
 

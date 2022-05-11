@@ -26,7 +26,9 @@ export class ItemCategoryReqValidation implements IItemCategoryReqValidation {
 	validateUpdateItemCategoryDto = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			if (typeof +req.params.id !== 'number') {
-				throw new IllegalArgumentError('Invalid accessory category id');
+				throw new IllegalArgumentError(
+					'Invalid appearance category id'
+				);
 			}
 
 			if (Object.keys(req.body).length === 0) {

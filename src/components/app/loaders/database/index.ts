@@ -18,8 +18,7 @@ import { ConversationMember } from '@src/components/conversationMembers/conversa
 import { Message } from '@src/components/messages/message.entity';
 import { RefreshToken } from '@src/components/auth/components/refreshToken/refreshToken.entity';
 import { PasswordResetToken } from '@src/components/auth/components/passwordResetToken/passwordResetToken.entity';
-import { AccessoryCategory } from '@src/components/accessoryCategories/accessoryCategory.entity';
-import { Accessory } from '@src/components/accessories/accessory.entity';
+import { Appearance } from '@src/components/appearances/appearance.entity';
 import { UserMessageStatus } from '@src/components/messages/components/userMessageStatus/userMessageStatus.entity';
 import { MessageReaction } from '@src/components/messages/components/messageReactions/messageReaction.entity';
 import { ItemCategory } from '@src/components/itemCategories/itemCategory.entity';
@@ -51,8 +50,7 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		Message,
 		MessageReaction,
 		UserMessageStatus,
-		AccessoryCategory,
-		Accessory,
+		Appearance,
 		ItemCategory
 	]
 };

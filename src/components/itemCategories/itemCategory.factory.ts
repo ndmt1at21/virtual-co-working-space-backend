@@ -15,8 +15,8 @@ export function createItemCategoryReqValidation() {
 }
 
 export function createItemCategoryService() {
-	const accessoryCategoryRepository = createItemCategoryRepository();
-	return new ItemCategoryService(accessoryCategoryRepository);
+	const appearanceCategoryRepository = createItemCategoryRepository();
+	return new ItemCategoryService(appearanceCategoryRepository);
 }
 
 export function createItemCategoryRepository() {

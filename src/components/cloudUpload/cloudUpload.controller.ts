@@ -34,29 +34,32 @@ export const CloudUploadController = (
 		});
 	});
 
-	const uploadAccessory = catchAsyncRequestHandler(async (req, res, next) => {
-		logger.info('Upload accessory is starting');
+	const uploadAppearance = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			logger.info('Upload appearance is starting');
 
-		const uploadFile = req.file;
-		if (!uploadFile) throw new IllegalArgumentError('File upload is empty');
+			const uploadFile = req.file;
+			if (!uploadFile)
+				throw new IllegalArgumentError('File upload is empty');
 
-		logger.info(
-			`Accessory information: size (${uploadFile.size}), mimetype (${uploadFile.mimetype}), filename (${uploadFile.filename})`
-		);
+			logger.info(
+				`Appearance information: size (${uploadFile.size}), mimetype (${uploadFile.mimetype}), filename (${uploadFile.filename})`
+			);
 
-		const url = await cloudService.uploadLargeFile({
-			name: uploadFile.originalname,
-			stream: createFileStream(uploadFile.buffer),
-			type: uploadFile.mimetype
-		});
+			const url = await cloudService.uploadLargeFile({
+				name: uploadFile.originalname,
+				stream: createFileStream(uploadFile.buffer),
+				type: uploadFile.mimetype
+			});
 
-		logger.info(`Upload accessory is done`);
+			logger.info(`Upload appearance is done`);
 
-		res.status(HttpStatusCode.OK).json({
-			code: HttpStatusCode.OK,
-			data: { url }
-		});
-	});
+			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
+				data: { url }
+			});
+		}
+	);
 
 	const uploadAvatar = catchAsyncRequestHandler(async (req, res, next) => {
 		logger.info('Upload avatar is starting');
@@ -110,5 +113,5 @@ export const CloudUploadController = (
 		return streamifier.createReadStream(buffer);
 	}
 
-	return { uploadModel, uploadAccessory, uploadAvatar, uploadImage };
+	return { uploadModel, uploadAppearance, uploadAvatar, uploadImage };
 };

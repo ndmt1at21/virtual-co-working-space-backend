@@ -28,9 +28,9 @@ export const CloudUploadRouter = () => {
 	);
 
 	router.post(
-		'/accessory',
-		cloudUploadMiddleware.modelUpload.single('accessory'),
-		cloudUploadController.uploadAccessory
+		'/appearance',
+		cloudUploadMiddleware.modelUpload.single('appearance'),
+		cloudUploadController.uploadAppearance
 	);
 
 	return router;

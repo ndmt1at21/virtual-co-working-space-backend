@@ -5,14 +5,11 @@ import {
 } from '@src/components/base/@types/FindAllOptions';
 
 export type FindAllAccessoriesFilter = {
-	name?: FilterValue;
-	categoryName?: FilterValue;
-	categoryId?: FilterValue;
+	userId?: FilterValue;
 };
 
 export type FindAllAccessoriesSort = {
-	name?: SortOrder;
-	categoryName?: SortOrder;
+	key?: SortOrder;
 	createdAt?: SortOrder;
 };
 

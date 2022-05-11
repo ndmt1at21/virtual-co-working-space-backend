@@ -21,11 +21,11 @@ export const CloudUploadMiddleware = (): ICloudUploadMiddleware => {
 		fileFilter: modelFilter
 	});
 
-	const accessoryUpload = multer({
+	const appearanceUpload = multer({
 		limits: {
 			files: 1
 		},
-		fileFilter: accessoryFilter
+		fileFilter: appearanceFilter
 	});
 
 	function imageFilter(
@@ -52,7 +52,7 @@ export const CloudUploadMiddleware = (): ICloudUploadMiddleware => {
 		}
 	}
 
-	function accessoryFilter(
+	function appearanceFilter(
 		req: Request,
 		file: Express.Multer.File,
 		cb: multer.FileFilterCallback
@@ -64,5 +64,5 @@ export const CloudUploadMiddleware = (): ICloudUploadMiddleware => {
 		}
 	}
 
-	return { avatarUpload, imageUpload, modelUpload, accessoryUpload };
+	return { avatarUpload, imageUpload, modelUpload, appearanceUpload };
 };

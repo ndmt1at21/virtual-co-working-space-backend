@@ -7,5 +7,5 @@ export interface ICloudUploadMiddleware {
 
 	modelUpload: multer.Multer;
 
-	accessoryUpload: multer.Multer;
+	appearanceUpload: multer.Multer;
 }

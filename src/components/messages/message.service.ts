@@ -2,30 +2,33 @@ import { IllegalArgumentError, NotFoundError } from '@src/utils/appError';
 import { CreateMessageDto } from './@types/dto/CreateMessage.dto';
 import { MessageOverviewDto } from './@types/dto/MessageOverview.dto';
 import { IMessageService } from './@types/IMessageService';
-import { MessageServiceParams } from './@types/MessageServiceParams';
 import { UserMessageStatusType } from './@types/UserMessageStatusType';
+import { UserMessageStatusRepository } from './components/userMessageStatus/userMessageStatus.repository';
 import { MessageErrorMessages } from './message.error';
 import { mapMessageToMessageOverviewDto } from './message.mapping';
+import { MessageRepository } from './message.repository';
 
-export const MessageService = ({
-	messageRepository,
-	userMessageStatusRepository
-}: MessageServiceParams): IMessageService => {
-	const createMessage = async (
+export class MessageService implements IMessageService {
+	constructor(
+		private readonly messageRepository: MessageRepository,
+		private readonly userMessageStatusRepository: UserMessageStatusRepository
+	) {}
+
+	createMessage = async (
 		createMessageDto: CreateMessageDto
 	): Promise<MessageOverviewDto> => {
-		const createdMessage = await messageRepository.createMessage(
+		const createdMessage = await this.messageRepository.createMessage(
 			createMessageDto
 		);
 
 		return mapMessageToMessageOverviewDto(createdMessage);
 	};
 
-	const revokeMessageByMessageIdAndSenderId = async (
+	revokeMessageByMessageIdAndSenderId = async (
 		messageId: number,
 		senderId: number
 	): Promise<boolean> => {
-		const message = await messageRepository.findByMessageIdAndSenderId(
+		const message = await this.messageRepository.findByMessageIdAndSenderId(
 			messageId,
 			senderId
 		);
@@ -40,7 +43,7 @@ export const MessageService = ({
 			);
 		}
 
-		await messageRepository.save({
+		await this.messageRepository.save({
 			...message,
 			isRevoked: true,
 			revokedAt: new Date()
@@ -49,12 +52,12 @@ export const MessageService = ({
 		return true;
 	};
 
-	const deleteMessageSelfSide = async (
+	deleteMessageSelfSide = async (
 		messageId: number,
 		userId: number
 	): Promise<void> => {
 		const userMessageStatus =
-			await userMessageStatusRepository.findByMessageIdAndUserIdAndStatus(
+			await this.userMessageStatusRepository.findByMessageIdAndUserIdAndStatus(
 				messageId,
 				userId,
 				UserMessageStatusType.DELETED
@@ -66,7 +69,7 @@ export const MessageService = ({
 			);
 		}
 
-		await userMessageStatusRepository.save({
+		await this.userMessageStatusRepository.save({
 			messageId,
 			userId,
 			isSelfDeleted: true,
@@ -74,11 +77,11 @@ export const MessageService = ({
 		});
 	};
 
-	const addMessageReceiver = async (
+	addMessageReceiver = async (
 		messageId: number,
 		receiverId: number
 	): Promise<void> => {
-		await userMessageStatusRepository.save({
+		await this.userMessageStatusRepository.save({
 			messageId,
 			userId: receiverId,
 			isReceived: true,
@@ -86,17 +89,9 @@ export const MessageService = ({
 		});
 	};
 
-	const addMessageReaction = async (
+	addMessageReaction = async (
 		messageId: number,
 		actorId: number,
 		reaction: string
 	): Promise<void> => {};
-
-	return {
-		addMessageReaction,
-		addMessageReceiver,
-		createMessage,
-		deleteMessageSelfSide,
-		revokeMessageByMessageIdAndSenderId
-	};
-};
+}

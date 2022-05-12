@@ -1,33 +1,31 @@
-import { UserRepository } from '@components/users/user.repository';
 import { UserRoleType } from '../users/@types/UserRoleType';
 import { IAuthValidate } from '../auth/@types/IAuthValidate';
 import { AuthErrorMessages } from '../auth/auth.error';
-import { IAuthTokenService } from '../auth/components/authToken/@types/IAuthTokenService';
 import { catchAsyncSocketMiddleware } from '@src/utils/catchAsyncSocketMiddleware';
-import { IllegalArgumentError, UnauthorizedError } from '@src/utils/appError';
+import { UnauthorizedError } from '@src/utils/appError';
 import { User } from '../users/user.entity';
 import { IAuthSocketMiddleware } from './@types/IAuthSocketMiddleware';
-import { ILogger } from '@components/logger/@types/ILogger';
+import { ILogger } from '../logger/@types/ILogger';
 
-export const AuthSocketMiddleware = (
-	userRepository: UserRepository,
-	authTokenService: IAuthTokenService,
-	authValidate: IAuthValidate,
-	logger: ILogger
-): IAuthSocketMiddleware => {
-	const protect = catchAsyncSocketMiddleware(async (socket, next) => {
+export class AuthSocketMiddleware implements IAuthSocketMiddleware {
+	constructor(
+		private readonly authValidate: IAuthValidate,
+		private readonly logger: ILogger
+	) {}
+
+	protect = catchAsyncSocketMiddleware(async (socket, next) => {
 		const accessToken = socket.handshake.auth.accessToken;
 		if (!accessToken) {
 			throw new UnauthorizedError(
 				AuthErrorMessages.UNAUTHORIZED_MISSING_TOKEN
 			);
 		}
-		const { id, type, email } = await deserializeUser(accessToken);
+		const { id, type, email } = await this.deserializeUser(accessToken);
 		socket.user = { id, email, roles: [type] };
 		next();
 	});
 
-	const restrictToGuest = catchAsyncSocketMiddleware(async (socket, next) => {
+	restrictToGuest = catchAsyncSocketMiddleware(async (socket, next) => {
 		if (socket.user) {
 			throw new Error(AuthErrorMessages.UNAUTHORIZED_ALREADY_LOGGED_IN);
 		}
@@ -37,7 +35,7 @@ export const AuthSocketMiddleware = (
 		}
 	});
 
-	const restrictTo = (roles: UserRoleType[]) => {
+	restrictTo = (roles: UserRoleType[]) => {
 		return catchAsyncSocketMiddleware(async (req, next) => {
 			const hasPermission = roles.every(role =>
 				req.user?.roles.includes(role)
@@ -55,14 +53,12 @@ export const AuthSocketMiddleware = (
 		});
 	};
 
-	async function deserializeUser(accessToken: string): Promise<User> {
+	async deserializeUser(accessToken: string): Promise<User> {
 		const user =
-			await authValidate.validateUserInAccessTokenCanBeAuthenticated(
+			await this.authValidate.validateUserInAccessTokenCanBeAuthenticated(
 				accessToken
 			);
 
 		return user;
 	}
-
-	return { protect, restrictTo, restrictToGuest };
-};
+}

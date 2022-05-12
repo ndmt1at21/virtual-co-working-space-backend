@@ -22,7 +22,7 @@ export function createOfficeInvitationController() {
 	const service = createOfficeInvitationService();
 	const mailProducer = createOfficeInvitationMailProducer();
 
-	return OfficeInvitationController(service, mailProducer);
+	return new OfficeInvitationController(service, mailProducer);
 }
 
 export function createOfficeInvitationService() {
@@ -35,7 +35,7 @@ export function createOfficeInvitationService() {
 	const officeInvitationTokenGenerator =
 		createOfficeInvitationTokenGenerator();
 
-	return OfficeInvitationService({
+	return new OfficeInvitationService({
 		officeInvitationCreator,
 		officeRepository,
 		officeInvitationRepository,
@@ -66,7 +66,7 @@ export function createOfficeInvitationCreator() {
 	const officeInvitationRepository = createOfficeInvitationRepository();
 	const officeRepository = createOfficeRepository();
 
-	return OfficeInvitationCreator(
+	return new OfficeInvitationCreator(
 		officeInvitationRepository,
 		officeRepository
 	);

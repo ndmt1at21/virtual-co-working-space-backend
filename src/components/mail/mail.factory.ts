@@ -7,9 +7,9 @@ import { MailService } from './mail.service';
 
 export const createMailService = (): IMailService => {
 	const mailCache = createMailCacheService();
-	return MailService(mailCache, mailLogger);
+	return new MailService(mailCache, mailLogger);
 };
 
 export function createMailCacheService(): IMailCacheService {
-	return MailCacheService(getCacheConnection('mail'));
+	return new MailCacheService(getCacheConnection('mail'));
 }

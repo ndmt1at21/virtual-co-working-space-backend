@@ -6,7 +6,7 @@ import { OfficeInvitationRepository } from '../officeInvitation.repository';
 import { IOfficeInvitationCreator } from './IOfficeInvitationCreator';
 import { IOfficeInvitationValidate } from './IOfficeInvitationValidate';
 
-export type OfficeInvitationServiceParams = {
+export type OfficeInvitationServiceProps = {
 	officeInvitationRepository: OfficeInvitationRepository;
 	officeRepository: OfficeRepository;
 	officeMemberRepository: OfficeMemberRepository;

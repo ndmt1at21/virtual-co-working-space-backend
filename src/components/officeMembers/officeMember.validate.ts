@@ -3,13 +3,14 @@ import { IOfficeMemberValidate } from './@types/IOfficeMemberValidate';
 import { OfficeMemberErrorMessages } from './officeMember.error';
 import { OfficeMemberRepository } from './officeMember.repository';
 
-export const OfficeMemberValidate = (
-	officeMemberRepository: OfficeMemberRepository
-): IOfficeMemberValidate => {
-	const checkExistsOfficeMemberById = async (id: number): Promise<void> => {
-		const isExisted = await officeMemberRepository.existsOfficeMemberById(
-			id
-		);
+export class OfficeMemberValidate implements IOfficeMemberValidate {
+	constructor(
+		private readonly officeMemberRepository: OfficeMemberRepository
+	) {}
+
+	checkExistsOfficeMemberById = async (id: number): Promise<void> => {
+		const isExisted =
+			await this.officeMemberRepository.existsOfficeMemberById(id);
 
 		if (!isExisted) {
 			throw new IllegalArgumentError(
@@ -18,14 +19,15 @@ export const OfficeMemberValidate = (
 		}
 	};
 
-	const checkUniqueUserInOffice = async (
+	checkUniqueUserInOffice = async (
 		userId: number,
 		officeId: number
 	): Promise<void> => {
-		const memberExisted = await officeMemberRepository.existsUserInOffice(
-			userId,
-			officeId
-		);
+		const memberExisted =
+			await this.officeMemberRepository.existsUserInOffice(
+				userId,
+				officeId
+			);
 
 		if (memberExisted) {
 			throw new IllegalArgumentError(
@@ -33,9 +35,4 @@ export const OfficeMemberValidate = (
 			);
 		}
 	};
-
-	return {
-		checkExistsOfficeMemberById,
-		checkUniqueUserInOffice
-	};
-};
+}

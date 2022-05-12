@@ -12,11 +12,13 @@ import { ILogger } from '../logger/@types/ILogger';
 
 let transporter: Transporter;
 
-export const MailService = (
-	mailCache: IMailCacheService,
-	logger: ILogger
-): IMailService => {
-	const initialize = async (): Promise<void> => {
+export class MailService implements IMailService {
+	constructor(
+		private readonly mailCache: IMailCacheService,
+		private readonly logger: ILogger
+	) {}
+
+	initialize = async (): Promise<void> => {
 		transporter = nodeMailer.createTransport({
 			service: config.mail.EMAIL_SERVICE_NAME,
 			host: config.mail.EMAIL_SERVICE_HOST,
@@ -31,26 +33,26 @@ export const MailService = (
 			}
 		});
 
-		logger.info('Start verify SMTP');
+		this.logger.info('Start verify SMTP');
 
 		try {
 			const success = await util.promisify(transporter.verify)();
-			success && logger.info('SMTP ready...');
+			success && this.logger.info('SMTP ready...');
 		} catch (err) {
-			logger.error(`SMTP Error: ${err}`);
-			logger.error('SMTP not ready!');
+			this.logger.error(`SMTP Error: ${err}`);
+			this.logger.error('SMTP not ready!');
 			throw err;
 		}
 	};
 
-	const sendBulkMails = async (options: MailOptions[]): Promise<void> => {
-		options.map(async opt => await sendMail(opt));
+	sendBulkMails = async (options: MailOptions[]): Promise<void> => {
+		options.map(async opt => await this.sendMail(opt));
 	};
 
-	const sendMail = async (option: MailOptions): Promise<SentResult> => {
+	sendMail = async (option: MailOptions): Promise<SentResult> => {
 		const { from, to, context, subject, templateUrl } = option;
 
-		const htmlTemplate = await getHtmlTemplate(templateUrl);
+		const htmlTemplate = await this.getHtmlTemplate(templateUrl);
 		const compiledTemplate = Handlebars.compile(htmlTemplate);
 		const renderedTemplate = compiledTemplate({ ...context });
 
@@ -70,8 +72,8 @@ export const MailService = (
 		};
 	};
 
-	async function getHtmlTemplate(url: string): Promise<string> {
-		const htmlTemplateCached = await mailCache.getMailTemplate(url);
+	async getHtmlTemplate(url: string): Promise<string> {
+		const htmlTemplateCached = await this.mailCache.getMailTemplate(url);
 
 		if (htmlTemplateCached) {
 			return htmlTemplateCached;
@@ -83,6 +85,4 @@ export const MailService = (
 
 		return htmlTemplate;
 	}
-
-	return { initialize, sendBulkMails, sendMail };
-};
+}

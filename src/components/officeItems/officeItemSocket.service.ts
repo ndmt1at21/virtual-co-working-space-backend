@@ -5,43 +5,43 @@ import { IOfficeItemService } from './@types/IOfficeItemService';
 import { OfficeItemClientToServerEvent } from './@types/OfficeItemClientToServerEvent';
 import { OfficeItemServerToClientEvent } from './@types/OfficeItemServerToClientEvent';
 
-export const OfficeItemSocketService = (
-	socketNamespace: SocketServer,
-	socket: Socket<
-		OfficeItemClientToServerEvent,
-		OfficeItemServerToClientEvent,
-		any,
-		any
-	>,
-	officeItemService: IOfficeItemService
-) => {
-	const onOfficeItemCreate = async (data: CreateOfficeItemDto) => {
+export class OfficeItemSocketService {
+	constructor(
+		private readonly socketNamespace: SocketServer,
+		private readonly socket: Socket<
+			OfficeItemClientToServerEvent,
+			OfficeItemServerToClientEvent,
+			any,
+			any
+		>,
+		private readonly officeItemService: IOfficeItemService
+	) {}
+
+	onOfficeItemCreate = async (data: CreateOfficeItemDto) => {
 		const { itemId, officeId, ...transform } = data;
 
-		const officeItem = await officeItemService.createOfficeItem({
+		const officeItem = await this.officeItemService.createOfficeItem({
 			itemId,
 			officeId,
 			...transform
 		});
 
-		socket.emit('office_item:created', officeItem);
+		this.socket.emit('office_item:created', officeItem);
 	};
 
-	const onOfficeItemMove = async (data: UpdateOfficeItemTransformDto) => {
+	onOfficeItemMove = async (data: UpdateOfficeItemTransformDto) => {
 		const { id, transform } = data;
 
-		socket.emit('office_item:moved', {
+		this.socket.emit('office_item:moved', {
 			id,
 			transform
 		});
 
-		await officeItemService.updateOfficeItemTransform(id, transform);
+		await this.officeItemService.updateOfficeItemTransform(id, transform);
 	};
 
-	const onOfficeItemDelete = async (id: number) => {
-		await officeItemService.deleteOfficeItem(id);
-		socket.emit('office_item:deleted', id);
+	onOfficeItemDelete = async (id: number) => {
+		await this.officeItemService.deleteOfficeItem(id);
+		this.socket.emit('office_item:deleted', id);
 	};
-
-	return { onOfficeItemCreate, onOfficeItemMove, onOfficeItemDelete };
-};
+}

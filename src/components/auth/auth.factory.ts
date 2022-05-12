@@ -18,11 +18,12 @@ import { createPasswordResetTokenService } from './components/passwordResetToken
 export function createAuthController() {
 	const authService = createAuthService();
 	const authMailQueueProducer = createAuthMailQueueProducer();
-	const authController = AuthController(
+	const authController = new AuthController(
 		authMailQueueProducer,
 		authService,
 		authLogger
 	);
+
 	return authController;
 }
 
@@ -43,18 +44,15 @@ export function createAuthService() {
 }
 
 export function createAuthMiddleware() {
-	const userRepository = createUserRepository();
-	const authTokenService = createAuthTokenService();
 	const authValidate = createAuthValidate();
-
-	return AuthMiddleware(userRepository, authTokenService, authValidate);
+	return new AuthMiddleware(authValidate);
 }
 
 export function createAuthValidate() {
 	const userRepository = createUserRepository();
 	const authTokenService = createAuthTokenService();
 
-	return AuthValidate(userRepository, authTokenService);
+	return new AuthValidate(userRepository, authTokenService);
 }
 
 export function createAuthMailWorker() {

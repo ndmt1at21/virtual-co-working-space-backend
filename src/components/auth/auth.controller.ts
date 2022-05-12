@@ -19,23 +19,25 @@ import { IAuthMailQueueProducer } from './@types/IAuthMailQueueProducer';
 import { appConfig } from '@src/config/app';
 import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
 
-export const AuthController = (
-	authMailQueueProducer: IAuthMailQueueProducer,
-	authService: IAuthService,
-	logger: ILogger
-) => {
-	const localLogin = catchAsyncRequestHandler(async (req, res, next) => {
+export class AuthController {
+	constructor(
+		private authMailQueueProducer: IAuthMailQueueProducer,
+		private authService: IAuthService,
+		private logger: ILogger
+	) {}
+
+	localLogin = catchAsyncRequestHandler(async (req, res, next) => {
 		const errors = await validateRequestBody(LoginDto, req.body);
 		if (errors.length > 0) {
-			logger.error(`User cannot login: ${errors}`);
+			this.logger.error(`User cannot login: ${errors}`);
 			throw new IllegalArgumentError('Invalid login data', errors);
 		}
 
 		const loginDto = req.body as LoginDto;
 		const [user, { accessToken, refreshToken }] =
-			await authService.localLogin(loginDto);
+			await this.authService.localLogin(loginDto);
 
-		logger.info(`User with id ${user.id} logged in successfully`);
+		this.logger.info(`User with id ${user.id} logged in successfully`);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -47,24 +49,24 @@ export const AuthController = (
 		});
 	});
 
-	const localRegister = catchAsyncRequestHandler(async (req, res, next) => {
+	localRegister = catchAsyncRequestHandler(async (req, res, next) => {
 		const errors = await validateRequestBody(RegisterDto, req.body);
 		if (errors.length > 0) {
-			logger.error(`User create login: ${errors}`);
+			this.logger.error(`User create login: ${errors}`);
 			throw new IllegalArgumentError('Invalid register data', errors);
 		}
 
 		const registerDto = req.body as RegisterDto;
-		const { user, activeToken } = await authService.localRegister(
+		const { user, activeToken } = await this.authService.localRegister(
 			registerDto
 		);
 
-		logger.info(
+		this.logger.info(
 			`User with email ${user.email} registered successfully has id ${user.id}`
 		);
 
 		const clientUrl = appConfig.CLIENT_DOMAIN;
-		authMailQueueProducer.addRegisterConfirmationJob(
+		this.authMailQueueProducer.addRegisterConfirmationJob(
 			user,
 			activeToken,
 			clientUrl
@@ -79,54 +81,50 @@ export const AuthController = (
 		});
 	});
 
-	const googleLogin = catchAsyncRequestHandler(async (req, res, next) => {
-		logger.info(`User with id ${req.user?.id} login with google`);
+	googleLogin = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`User with id ${req.user?.id} login with google`);
 
 		passport.authenticate('google', {
 			session: false,
 			scope: ['email', 'profile']
 		})(req, res, next);
 
-		logger.info('Success redirect to google login page');
+		this.logger.info('Success redirect to google login page');
 	});
 
-	const facebookLogin = catchAsyncRequestHandler(async (req, res, next) => {
-		logger.info(`User with id ${req.user?.id} login with facebook`);
+	facebookLogin = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`User with id ${req.user?.id} login with facebook`);
 
 		passport.authenticate('facebook', {
 			session: false,
 			scope: ['email', 'public_profile']
 		})(req, res, next);
 
-		logger.info('Success redirect to facebook login page');
+		this.logger.info('Success redirect to facebook login page');
 	});
 
-	const googleLoginCallback = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			console.log(req);
-			oauth2LoginCallback('google', req, res, next);
-		}
-	);
+	googleLoginCallback = catchAsyncRequestHandler(async (req, res, next) => {
+		console.log(req);
+		this.oauth2LoginCallback('google', req, res, next);
+	});
 
-	const facebookLoginCallback = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			oauth2LoginCallback('facebook', req, res, next);
-		}
-	);
+	facebookLoginCallback = catchAsyncRequestHandler(async (req, res, next) => {
+		this.oauth2LoginCallback('facebook', req, res, next);
+	});
 
-	const logout = catchAsyncRequestHandler(async (req, res, next) => {
+	logout = catchAsyncRequestHandler(async (req, res, next) => {
 		const refreshToken = req.headers[
 			HeaderConstants.REFRESH_TOKEN
 		] as string;
 
 		if (!refreshToken) {
-			logger.error('Cannot logout: missing refresh token');
+			this.logger.error('Cannot logout: missing refresh token');
 			throw new IllegalArgumentError(
 				AuthErrorMessages.LOGOUT_MISSING_REFRESH_TOKEN
 			);
 		}
 
-		await authService.logout(refreshToken);
+		await this.authService.logout(refreshToken);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -134,39 +132,37 @@ export const AuthController = (
 		});
 	});
 
-	const refreshAccessToken = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			const currentRefreshToken = req.headers[
-				HeaderConstants.REFRESH_TOKEN
-			] as string;
+	refreshAccessToken = catchAsyncRequestHandler(async (req, res, next) => {
+		const currentRefreshToken = req.headers[
+			HeaderConstants.REFRESH_TOKEN
+		] as string;
 
-			if (!currentRefreshToken) {
-				logger.error(
-					'Cannot refresh access token: missing refresh token'
-				);
-				throw new IllegalArgumentError(
-					AuthErrorMessages.REFRESH_ACCESS_TOKEN_MISSING_REFRESH_TOKEN
-				);
-			}
-
-			const { accessToken, refreshToken } =
-				await authService.refreshAccessToken(currentRefreshToken);
-
-			res.status(HttpStatusCode.OK).json({
-				code: HttpStatusCode.OK,
-				message: 'Access token renew successfully',
-				data: {
-					accessToken,
-					refreshToken
-				}
-			});
+		if (!currentRefreshToken) {
+			this.logger.error(
+				'Cannot refresh access token: missing refresh token'
+			);
+			throw new IllegalArgumentError(
+				AuthErrorMessages.REFRESH_ACCESS_TOKEN_MISSING_REFRESH_TOKEN
+			);
 		}
-	);
 
-	const forgotPassword = catchAsyncRequestHandler(async (req, res, next) => {
+		const { accessToken, refreshToken } =
+			await this.authService.refreshAccessToken(currentRefreshToken);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			message: 'Access token renew successfully',
+			data: {
+				accessToken,
+				refreshToken
+			}
+		});
+	});
+
+	forgotPassword = catchAsyncRequestHandler(async (req, res, next) => {
 		const errors = await validateRequestBody(ForgotPasswordDto, req.body);
 		if (errors.length > 0) {
-			logger.error(`Cannot reset password: ${errors}`);
+			this.logger.error(`Cannot reset password: ${errors}`);
 			throw new IllegalArgumentError(
 				'Invalid forgot password request',
 				errors
@@ -175,14 +171,16 @@ export const AuthController = (
 
 		// TODO: not show user not found, just show email was sent
 		const forgotPasswordDto = req.body as ForgotPasswordDto;
-		const resetToken = await authService.forgotPassword(forgotPasswordDto);
+		const resetToken = await this.authService.forgotPassword(
+			forgotPasswordDto
+		);
 
-		logger.info(
+		this.logger.info(
 			`Reset password token sent to email ${forgotPasswordDto.email}`
 		);
 
 		const clientUrl = appConfig.CLIENT_DOMAIN;
-		authMailQueueProducer.addResetPasswordMailJob(
+		this.authMailQueueProducer.addResetPasswordMailJob(
 			forgotPasswordDto.email,
 			resetToken.passwordResetToken,
 			clientUrl
@@ -193,10 +191,10 @@ export const AuthController = (
 		});
 	});
 
-	const resetPassword = catchAsyncRequestHandler(async (req, res, next) => {
+	resetPassword = catchAsyncRequestHandler(async (req, res, next) => {
 		const resetToken = req.params.token as string;
 		if (!resetToken) {
-			logger.error('Cannot reset password: missing reset token');
+			this.logger.error('Cannot reset password: missing reset token');
 			throw new IllegalArgumentError(
 				AuthErrorMessages.RESET_PASSWORD_MISSING_RESET_TOKEN
 			);
@@ -207,7 +205,7 @@ export const AuthController = (
 			req.body
 		);
 		if (errors.length > 0) {
-			logger.error(`Cannot reset password: ${errors}`);
+			this.logger.error(`Cannot reset password: ${errors}`);
 			throw new IllegalArgumentError(
 				'Invalid reset password request',
 				errors
@@ -216,7 +214,7 @@ export const AuthController = (
 
 		const resetPasswordContentDto = req.body as ResetPasswordContentDto;
 
-		await authService.resetPassword({
+		await this.authService.resetPassword({
 			resetToken,
 			...resetPasswordContentDto
 		});
@@ -227,11 +225,11 @@ export const AuthController = (
 		});
 	});
 
-	const activateNewUser = catchAsyncRequestHandler(async (req, res, next) => {
+	activateNewUser = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = req.user!.id;
 		const token = req.params.token as string;
 
-		await authService.activeNewUser(userId, token);
+		await this.authService.activeNewUser(userId, token);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -239,10 +237,10 @@ export const AuthController = (
 		});
 	});
 
-	const changePassword = catchAsyncRequestHandler(async (req, res, next) => {
+	changePassword = catchAsyncRequestHandler(async (req, res, next) => {
 		const errors = await validateRequestBody(ChangePasswordDto, req.body);
 		if (errors.length > 0) {
-			logger.error(`User cannot change password: ${errors}`);
+			this.logger.error(`User cannot change password: ${errors}`);
 			throw new IllegalArgumentError(
 				'Invalid change password data',
 				errors
@@ -250,12 +248,12 @@ export const AuthController = (
 		}
 
 		const changePasswordDto = req.body as ChangePasswordDto;
-		await authService.changePasswordByUserId(
+		await this.authService.changePasswordByUserId(
 			req.user!.id,
 			changePasswordDto
 		);
 
-		logger.info(
+		this.logger.info(
 			`User with id ${req.user!.id} changed password successfully`
 		);
 
@@ -265,7 +263,7 @@ export const AuthController = (
 		});
 	});
 
-	function oauth2LoginCallback(
+	oauth2LoginCallback(
 		provider: string,
 		req: Request,
 		res: Response,
@@ -276,7 +274,7 @@ export const AuthController = (
 			{ session: false },
 			(err, user, info, status) => {
 				if (err) {
-					logger.error(
+					this.logger.error(
 						`Authenticating external user with provider ${provider} failed: ${err.message}`
 					);
 					next(err);
@@ -285,7 +283,7 @@ export const AuthController = (
 				const profile = user as OAuth2ProfileDto;
 
 				if (!profile) {
-					logger.error(
+					this.logger.error(
 						`Invalid external user information. Message ${err.message}`
 					);
 					throw new UnauthorizedError(
@@ -293,11 +291,11 @@ export const AuthController = (
 					);
 				}
 
-				logger.info(
+				this.logger.info(
 					`External user with provider ${provider} [email = ${profile.email}] authenticated successfully`
 				);
 
-				authService
+				this.authService
 					.oauth2LoginCallback(profile)
 					.then(([user, { accessToken, refreshToken }]) => {
 						const redirectUrl = queryString.stringifyUrl({
@@ -309,7 +307,7 @@ export const AuthController = (
 							}
 						});
 
-						logger.info(
+						this.logger.info(
 							`User with id ${
 								user!.id
 							} logged in (oauth2, provider: ${provider}) successfully`
@@ -328,7 +326,7 @@ export const AuthController = (
 							}
 						});
 
-						logger.error(
+						this.logger.error(
 							`User with id ${user.id} logged in (oauth2, provider: ${provider}) failed. Message: ${err.message}`
 						);
 
@@ -337,19 +335,4 @@ export const AuthController = (
 			}
 		)(req, res, next);
 	}
-
-	return {
-		localLogin,
-		localRegister,
-		googleLogin,
-		facebookLogin,
-		googleLoginCallback,
-		facebookLoginCallback,
-		logout,
-		refreshAccessToken,
-		forgotPassword,
-		resetPassword,
-		activateNewUser,
-		changePassword
-	};
-};
+}

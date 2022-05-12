@@ -3,14 +3,16 @@ import { OfficeInvitationDto } from './@types/dto/OfficeInvitation.dto';
 import { IOfficeInvitationCreator } from './@types/IOfficeInvitationCreator';
 import { OfficeInvitationRepository } from './officeInvitation.repository';
 
-export const OfficeInvitationCreator = (
-	officeInvitationRepository: OfficeInvitationRepository,
-	officeRepository: OfficeRepository
-): IOfficeInvitationCreator => {
-	const createPrivateOfficeInvitationByToken = async (
+export class OfficeInvitationCreator implements IOfficeInvitationCreator {
+	constructor(
+		private readonly officeInvitationRepository: OfficeInvitationRepository,
+		private readonly officeRepository: OfficeRepository
+	) {}
+
+	createPrivateOfficeInvitationByToken = async (
 		token: string
 	): Promise<OfficeInvitationDto> => {
-		const officeInvitation = await officeInvitationRepository
+		const officeInvitation = await this.officeInvitationRepository
 			.createQueryBuilder('office_invitation')
 			.where('office_invitation.token = :token', { token })
 			.leftJoinAndSelect('office_invitation.office', 'office')
@@ -37,10 +39,10 @@ export const OfficeInvitationCreator = (
 		};
 	};
 
-	const createPublicOfficeInvitation = async (
+	createPublicOfficeInvitation = async (
 		invitationCode: string
 	): Promise<OfficeInvitationDto> => {
-		const office = await officeRepository
+		const office = await this.officeRepository
 			.queryBuilder()
 			.findByInvitationCode(invitationCode)
 			.build()
@@ -57,9 +59,4 @@ export const OfficeInvitationCreator = (
 			}
 		};
 	};
-
-	return {
-		createPrivateOfficeInvitationByToken,
-		createPublicOfficeInvitation
-	};
-};
+}

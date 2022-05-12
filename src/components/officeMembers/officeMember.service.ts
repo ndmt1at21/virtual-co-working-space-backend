@@ -10,63 +10,67 @@ import { OfficeMemberErrorMessages } from './officeMember.error';
 import { OfficeMemberOnlineStatus } from './@types/OfficeMemberOnlineStatus';
 import { mapOfficeMemberToOfficeMemberDetailDto } from './officeMember.mapping';
 import { IOfficeMemberValidate } from './@types/IOfficeMemberValidate';
-import { OfficeMemberTransformRepository } from '@components/officeMemberTransform/officeMemberTransform.repository';
 import { Pageable } from '../base/@types/FindAllOptions';
-import { getManager } from 'typeorm';
-import { OfficeMember } from './officeMember.entity';
-import { Office } from '../offices/office.entity';
 
-export const OfficeMemberService = (
-	officeMemberRepository: OfficeMemberRepository,
-	officeMemberCreator: IOfficeMemberCreator,
-	officeMemberValidate: IOfficeMemberValidate
-): IOfficeMemberService => {
-	const createOfficeMember = async (
+export class OfficeMemberService implements IOfficeMemberService {
+	constructor(
+		private readonly officeMemberRepository: OfficeMemberRepository,
+		private readonly officeMemberCreator: IOfficeMemberCreator,
+		private readonly officeMemberValidate: IOfficeMemberValidate
+	) {}
+
+	createOfficeMember = async (
 		createOfficeMemberDto: CreateOfficeMemberDto
 	): Promise<OfficeMemberOverviewDto> => {
 		const { memberId, officeId } = createOfficeMemberDto;
 
-		await officeMemberValidate.checkUniqueUserInOffice(memberId, officeId);
-
-		const createdMember = await officeMemberRepository.saveOfficeMember({
+		await this.officeMemberValidate.checkUniqueUserInOffice(
 			memberId,
-			officeId,
-			transform: {}
-		});
+			officeId
+		);
 
-		return await officeMemberCreator.createOfficeMemberOverviewById(
+		const createdMember =
+			await this.officeMemberRepository.saveOfficeMember({
+				memberId,
+				officeId,
+				transform: {}
+			});
+
+		return await this.officeMemberCreator.createOfficeMemberOverviewById(
 			createdMember.id
 		);
 	};
 
-	const deleteOfficeMemberById = async (id: number): Promise<void> => {
-		await officeMemberValidate.checkExistsOfficeMemberById(id);
-		await officeMemberRepository.delete(id);
+	deleteOfficeMemberById = async (id: number): Promise<void> => {
+		await this.officeMemberValidate.checkExistsOfficeMemberById(id);
+		await this.officeMemberRepository.delete(id);
 	};
 
-	const updateOfficeMemberTransformById = async (
+	updateOfficeMemberTransformById = async (
 		id: number,
 		transform: UpdateOfficeMemberTransformDto
 	): Promise<void> => {
 		// await officeMemberTransformService.updateTransform(id, transform);
 	};
 
-	const findOfficeMemberOverviewById = async (
+	findOfficeMemberOverviewById = async (
 		id: number
 	): Promise<OfficeMemberOverviewDto> => {
-		return await officeMemberCreator.createOfficeMemberOverviewById(id);
+		return await this.officeMemberCreator.createOfficeMemberOverviewById(
+			id
+		);
 	};
 
-	const findOfficeMemberDetailById = async (
+	findOfficeMemberDetailById = async (
 		id: number
 	): Promise<OfficeMemberDetailDto> => {
-		return await officeMemberCreator.createOfficeMemberDetailById(id);
+		return await this.officeMemberCreator.createOfficeMemberDetailById(id);
 	};
 
-	const findOfficeMembersDetail = async (
+	findOfficeMembersDetail = async (
 		pageable: Pageable
 	): Promise<[OfficeMemberDetailDto[], number]> => {
-		const officeMembers = await officeMemberRepository
+		const officeMembers = await this.officeMemberRepository
 			.queryBuilder()
 			.withMember()
 			.withOfficeHasCreator()
@@ -75,7 +79,7 @@ export const OfficeMemberService = (
 			.build()
 			.getMany();
 
-		const total = await officeMemberRepository.count();
+		const total = await this.officeMemberRepository.count();
 
 		const officeMembersDto = officeMembers.map(om =>
 			mapOfficeMemberToOfficeMemberDetailDto(om)
@@ -84,11 +88,11 @@ export const OfficeMemberService = (
 		return [officeMembersDto, total];
 	};
 
-	const setOfficeMemberOnlineStatusById = async (
+	setOfficeMemberOnlineStatusById = async (
 		id: number,
 		status: OfficeMemberOnlineStatus
 	): Promise<void> => {
-		const officeMember = await officeMemberRepository.findOne(id);
+		const officeMember = await this.officeMemberRepository.findOne(id);
 
 		if (!officeMember) {
 			throw new NotFoundError(
@@ -96,19 +100,9 @@ export const OfficeMemberService = (
 			);
 		}
 
-		await officeMemberRepository.setOfficeMemberOnlineStatusById(
+		await this.officeMemberRepository.setOfficeMemberOnlineStatusById(
 			id,
 			status
 		);
 	};
-
-	return {
-		createOfficeMember,
-		deleteOfficeMemberById,
-		updateOfficeMemberTransformById,
-		findOfficeMemberOverviewById,
-		findOfficeMemberDetailById,
-		findOfficeMembersDetail,
-		setOfficeMemberOnlineStatusById
-	};
-};
+}

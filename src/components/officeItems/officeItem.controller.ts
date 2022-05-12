@@ -2,13 +2,15 @@ import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { IOfficeItemService } from './@types/IOfficeItemService';
 
-export const OfficeItemController = (officeItemService: IOfficeItemService) => {
-	const getOfficeItemDetailById = catchAsyncRequestHandler(
+export class OfficeItemController {
+	constructor(private readonly officeItemService: IOfficeItemService) {}
+
+	getOfficeItemDetailById = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const id = +req.params.id;
 
 			const officeItemDto =
-				await officeItemService.findOfficeItemDetailById(id);
+				await this.officeItemService.findOfficeItemDetailById(id);
 
 			res.status(HttpStatusCode.OK).json({
 				code: HttpStatusCode.OK,
@@ -17,47 +19,34 @@ export const OfficeItemController = (officeItemService: IOfficeItemService) => {
 		}
 	);
 
-	const getOfficeItemsDetail = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			const [offices, total] =
-				await officeItemService.findOfficeItemsDetail({
-					page: 10,
-					limit: 10
-				});
-
-			res.status(HttpStatusCode.OK).json({
-				code: HttpStatusCode.OK,
-				data: { total, offices }
+	getOfficeItemsDetail = catchAsyncRequestHandler(async (req, res, next) => {
+		const [offices, total] =
+			await this.officeItemService.findOfficeItemsDetail({
+				page: 10,
+				limit: 10
 			});
-		}
-	);
 
-	const deleteOfficeItemById = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			const id = +req.params.id;
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { total, offices }
+		});
+	});
 
-			await officeItemService.deleteOfficeItem(id);
+	deleteOfficeItemById = catchAsyncRequestHandler(async (req, res, next) => {
+		const id = +req.params.id;
 
-			res.status(HttpStatusCode.OK).json({
-				code: HttpStatusCode.OK
-			});
-		}
-	);
+		await this.officeItemService.deleteOfficeItem(id);
 
-	const updateOfficeItemById = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			const id = +req.params.id;
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK
+		});
+	});
 
-			res.status(HttpStatusCode.OK).json({
-				code: HttpStatusCode.OK
-			});
-		}
-	);
+	updateOfficeItemById = catchAsyncRequestHandler(async (req, res, next) => {
+		const id = +req.params.id;
 
-	return {
-		getOfficeItemDetailById,
-		getOfficeItemsDetail,
-		deleteOfficeItemById,
-		updateOfficeItemById
-	};
-};
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK
+		});
+	});
+}

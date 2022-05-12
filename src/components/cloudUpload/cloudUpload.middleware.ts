@@ -3,32 +3,34 @@ import { IllegalArgumentError } from '@src/utils/appError';
 import { Request } from 'express';
 import { ICloudUploadMiddleware } from './@types/ICloudUploadMiddleware';
 
-export const CloudUploadMiddleware = (): ICloudUploadMiddleware => {
-	const avatarUpload = multer({
+export class CloudUploadMiddleware implements ICloudUploadMiddleware {
+	constructor() {}
+
+	avatarUpload = multer({
 		limits: { files: 1, fileSize: 20 * 1024 * 1024 },
-		fileFilter: imageFilter
+		fileFilter: this.imageFilter
 	});
 
-	const imageUpload = multer({
+	imageUpload = multer({
 		limits: { files: 1, fileSize: 20 * 1024 * 1024 },
-		fileFilter: imageFilter
+		fileFilter: this.imageFilter
 	});
 
-	const modelUpload = multer({
+	modelUpload = multer({
 		limits: {
 			files: 1
 		},
-		fileFilter: modelFilter
+		fileFilter: this.modelFilter
 	});
 
-	const appearanceUpload = multer({
+	appearanceUpload = multer({
 		limits: {
 			files: 1
 		},
-		fileFilter: appearanceFilter
+		fileFilter: this.appearanceFilter
 	});
 
-	function imageFilter(
+	imageFilter(
 		req: Request,
 		file: Express.Multer.File,
 		cb: multer.FileFilterCallback
@@ -40,7 +42,7 @@ export const CloudUploadMiddleware = (): ICloudUploadMiddleware => {
 		}
 	}
 
-	function modelFilter(
+	modelFilter(
 		req: Request,
 		file: Express.Multer.File,
 		cb: multer.FileFilterCallback
@@ -52,7 +54,7 @@ export const CloudUploadMiddleware = (): ICloudUploadMiddleware => {
 		}
 	}
 
-	function appearanceFilter(
+	appearanceFilter(
 		req: Request,
 		file: Express.Multer.File,
 		cb: multer.FileFilterCallback
@@ -63,6 +65,4 @@ export const CloudUploadMiddleware = (): ICloudUploadMiddleware => {
 			cb(new IllegalArgumentError('Only gltf file type is allowed'));
 		}
 	}
-
-	return { avatarUpload, imageUpload, modelUpload, appearanceUpload };
-};
+}

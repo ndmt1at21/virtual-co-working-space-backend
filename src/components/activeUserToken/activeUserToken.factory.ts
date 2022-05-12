@@ -7,5 +7,5 @@ export const createActiveUserTokenService = () => {
 		ActiveUserTokenRepository
 	);
 
-	return ActiveUserTokenService(activeUserTokenRepository);
+	return new ActiveUserTokenService(activeUserTokenRepository);
 };

@@ -15,7 +15,7 @@ import {
 
 export function createOfficeMemberController() {
 	const service = createOfficeMemberService();
-	return OfficeMemberController(service);
+	return new OfficeMemberController(service);
 }
 
 export function createOfficeMemberSocketService(io: Server, socket: Socket) {
@@ -38,7 +38,7 @@ export function createOfficeMemberService() {
 	const officeMemberCreator = createOfficeMemberCreator();
 	const officeMemberValidate = createOfficeMemberValidate();
 
-	return OfficeMemberService(
+	return new OfficeMemberService(
 		officeMemberRepository,
 		officeMemberCreator,
 		officeMemberValidate
@@ -52,12 +52,12 @@ export function createOfficeMemberCache() {
 
 export function createOfficeMemberValidate() {
 	const officeMemberRepository = createOfficeMemberRepository();
-	return OfficeMemberValidate(officeMemberRepository);
+	return new OfficeMemberValidate(officeMemberRepository);
 }
 
 export function createOfficeMemberCreator() {
 	const officeMemberRepository = createOfficeMemberRepository();
-	return OfficeMemberCreator(officeMemberRepository);
+	return new OfficeMemberCreator(officeMemberRepository);
 }
 
 export function createOfficeMemberRepository() {

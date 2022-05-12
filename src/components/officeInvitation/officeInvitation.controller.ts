@@ -7,11 +7,13 @@ import { CreatePrivateInvitationDto } from './@types/dto/CreatePrivateInvitation
 import { IOfficeInvitationMailQueueProducer } from './@types/IOfficeInvitationMailQueueProducer';
 import { IOfficeInvitationService } from './@types/IOfficeInvitationService';
 
-export const OfficeInvitationController = (
-	officeInvitationService: IOfficeInvitationService,
-	officeInvitationMailQueueProducer: IOfficeInvitationMailQueueProducer
-) => {
-	const createOfficeInvitationByEmail = catchAsyncRequestHandler(
+export class OfficeInvitationController {
+	constructor(
+		private readonly officeInvitationService: IOfficeInvitationService,
+		private readonly officeInvitationMailQueueProducer: IOfficeInvitationMailQueueProducer
+	) {}
+
+	createOfficeInvitationByEmail = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const errors = await validateRequestBody(
 				CreatePrivateInvitationDto,
@@ -27,13 +29,13 @@ export const OfficeInvitationController = (
 			const createInvitationDto = req.body as CreatePrivateInvitationDto;
 
 			const officeInvitation =
-				await officeInvitationService.createPrivateInvitation({
+				await this.officeInvitationService.createPrivateInvitation({
 					...createInvitationDto,
 					inviterId: req.user!.id
 				});
 
 			const clientUrl = config.app.CLIENT_DOMAIN;
-			officeInvitationMailQueueProducer.addPrivateOfficeInviteJob(
+			this.officeInvitationMailQueueProducer.addPrivateOfficeInviteJob(
 				officeInvitation,
 				clientUrl
 			);
@@ -45,45 +47,41 @@ export const OfficeInvitationController = (
 		}
 	);
 
-	const getPrivateInvitation = catchAsyncRequestHandler(
+	getPrivateInvitation = catchAsyncRequestHandler(async (req, res, next) => {
+		const token = req.params.inviteToken;
+
+		const invitation =
+			await this.officeInvitationService.findPrivateInvitation(
+				req.user!.id,
+				token
+			);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { invitation }
+		});
+	});
+
+	getPublicInvitation = catchAsyncRequestHandler(async (req, res, next) => {
+		const officeInviteCode = req.params.inviteCode;
+
+		const invitation =
+			await this.officeInvitationService.findPublicInvitation(
+				req.user!.id,
+				officeInviteCode
+			);
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { invitation }
+		});
+	});
+
+	joinWithPrivateInvitation = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const token = req.params.inviteToken;
 
-			const invitation =
-				await officeInvitationService.findPrivateInvitation(
-					req.user!.id,
-					token
-				);
-
-			res.status(HttpStatusCode.OK).json({
-				code: HttpStatusCode.OK,
-				data: { invitation }
-			});
-		}
-	);
-
-	const getPublicInvitation = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			const officeInviteCode = req.params.inviteCode;
-
-			const invitation =
-				await officeInvitationService.findPublicInvitation(
-					req.user!.id,
-					officeInviteCode
-				);
-
-			res.status(HttpStatusCode.OK).json({
-				code: HttpStatusCode.OK,
-				data: { invitation }
-			});
-		}
-	);
-
-	const joinWithPrivateInvitation = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			const token = req.params.inviteToken;
-
-			await officeInvitationService.acceptPrivateInvitation(
+			await this.officeInvitationService.acceptPrivateInvitation(
 				req.user!.id,
 				token
 			);
@@ -95,11 +93,11 @@ export const OfficeInvitationController = (
 		}
 	);
 
-	const joinWithPublicInvitation = catchAsyncRequestHandler(
+	joinWithPublicInvitation = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const officeInviteCode = req.params.inviteCode;
 
-			await officeInvitationService.acceptPublicInvitation(
+			await this.officeInvitationService.acceptPublicInvitation(
 				req.user!.id,
 				officeInviteCode
 			);
@@ -111,16 +109,5 @@ export const OfficeInvitationController = (
 		}
 	);
 
-	const deleteInvitation = catchAsyncRequestHandler(
-		async (req, res, next) => {}
-	);
-
-	return {
-		createOfficeInvitationByEmail,
-		getPrivateInvitation,
-		getPublicInvitation,
-		joinWithPrivateInvitation,
-		joinWithPublicInvitation,
-		deleteInvitation
-	};
-};
+	deleteInvitation = catchAsyncRequestHandler(async (req, res, next) => {});
+}

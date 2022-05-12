@@ -5,13 +5,13 @@ import { CloudUploadService } from './cloudUpload.service';
 
 export function createCloudUploadController() {
 	const uploadService = createCloudUploadService();
-	return CloudUploadController(uploadService, cloudLogger);
+	return new CloudUploadController(uploadService, cloudLogger);
 }
 
 export function createCloudUploadMiddleware() {
-	return CloudUploadMiddleware();
+	return new CloudUploadMiddleware();
 }
 
 export function createCloudUploadService() {
-	return CloudUploadService(cloudLogger);
+	return new CloudUploadService(cloudLogger);
 }

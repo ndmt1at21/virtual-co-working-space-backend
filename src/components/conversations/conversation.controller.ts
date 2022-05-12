@@ -4,18 +4,19 @@ import { generateResponseData } from '@src/utils/generateResponseData';
 import { RecentMessagePageable } from '../messages/@types/RecentMessagePaginate';
 import { IConversationService } from './@types/IConversationService';
 
-export const ConversationController = (
-	conversationService: IConversationService
-) => {
-	const createConversationInOffice = catchAsyncRequestHandler(
+export class ConversationController {
+	constructor(private conversationService: IConversationService) {}
+
+	createConversationInOffice = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const officeId = req.body.officeId;
 			const userId = req.user!.id;
 
-			const conversation = await conversationService.createConversation({
-				creatorId: userId,
-				officeId
-			});
+			const conversation =
+				await this.conversationService.createConversation({
+					creatorId: userId,
+					officeId
+				});
 
 			const resData = generateResponseData({
 				code: HttpStatusCode.OK,
@@ -26,13 +27,13 @@ export const ConversationController = (
 		}
 	);
 
-	const getConversationDetailOfUser = catchAsyncRequestHandler(
+	getConversationDetailOfUser = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const conversationId = +req.params.id;
 			const userId = req.user!.id;
 
 			const conversation =
-				await conversationService.findConversationDetailByConversationIdAndUserId(
+				await this.conversationService.findConversationDetailByConversationIdAndUserId(
 					conversationId,
 					userId
 				);
@@ -46,13 +47,13 @@ export const ConversationController = (
 		}
 	);
 
-	const getConversationsOfUserInOffice = catchAsyncRequestHandler(
+	getConversationsOfUserInOffice = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const officeId = +req.params.officeId;
 			const userId = req.user!.id;
 
 			const conversations =
-				await conversationService.findConversationsOverviewsOfUserInOffice(
+				await this.conversationService.findConversationsOverviewsOfUserInOffice(
 					userId,
 					1
 				);
@@ -66,14 +67,14 @@ export const ConversationController = (
 		}
 	);
 
-	const getRecentMessagesByConversationIdAndUserId = catchAsyncRequestHandler(
+	getRecentMessagesByConversationIdAndUserId = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const conversationId = +req.params.id;
 			const userId = req.user!.id;
 			const { limit, nextCursor } = req.query as RecentMessagePageable;
 
 			const recentMessages =
-				await conversationService.findRecentMessagesByConversationIdAndUserId(
+				await this.conversationService.findRecentMessagesByConversationIdAndUserId(
 					conversationId,
 					userId,
 					{ limit, nextCursor }
@@ -87,11 +88,4 @@ export const ConversationController = (
 			res.status(HttpStatusCode.OK).json(resData);
 		}
 	);
-
-	return {
-		createConversationInOffice,
-		getRecentMessagesByConversationIdAndUserId,
-		getConversationDetailOfUser,
-		getConversationsOfUserInOffice
-	};
-};
+}

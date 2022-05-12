@@ -6,15 +6,17 @@ import { ActiveUserTokenRepository } from './activeUserToken.repository';
 import { ActiveUserTokenDto } from './@types/dto/ActiveUserToken.dto';
 import { IActiveUserTokenService } from './@types/IActiveUserTokenService';
 
-export const ActiveUserTokenService = (
-	activeUserTokenRepository: ActiveUserTokenRepository
-): IActiveUserTokenService => {
-	const createToken = async (userId: number): Promise<ActiveUserTokenDto> => {
+export class ActiveUserTokenService implements IActiveUserTokenService {
+	constructor(
+		private readonly activeUserTokenRepository: ActiveUserTokenRepository
+	) {}
+
+	createToken = async (userId: number): Promise<ActiveUserTokenDto> => {
 		const token = crypto
 			.randomBytes(config.auth.ACTIVE_USER_TOKEN_LENGTH)
 			.toString('hex');
 
-		const createdToken = await activeUserTokenRepository.save({
+		const createdToken = await this.activeUserTokenRepository.save({
 			userId,
 			token
 		});
@@ -22,16 +24,16 @@ export const ActiveUserTokenService = (
 		return { ...createdToken };
 	};
 
-	const deleteToken = async (token: string): Promise<number> => {
-		return await activeUserTokenRepository.deleteByToken(token);
+	deleteToken = async (token: string): Promise<number> => {
+		return await this.activeUserTokenRepository.deleteByToken(token);
 	};
 
-	const validateToken = async (
-		userId: number,
-		token: string
-	): Promise<boolean> => {
+	validateToken = async (userId: number, token: string): Promise<boolean> => {
 		const activeUserToken =
-			await activeUserTokenRepository.findByUserIdAndToken(userId, token);
+			await this.activeUserTokenRepository.findByUserIdAndToken(
+				userId,
+				token
+			);
 
 		if (!activeUserToken) {
 			throw new IllegalArgumentError(
@@ -41,10 +43,4 @@ export const ActiveUserTokenService = (
 
 		return true;
 	};
-
-	return {
-		createToken,
-		validateToken,
-		deleteToken
-	};
-};
+}

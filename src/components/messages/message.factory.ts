@@ -11,28 +11,25 @@ import { MessageSocketService } from './message.socketService';
 export function createMessageController() {
 	const officeService = createMessageService();
 	const conversationService = createConversationService();
-	return MessageController(officeService, conversationService);
+	return new MessageController(officeService, conversationService);
 }
 
 export function createMessageSocketService(io: Server, socket: Socket) {
 	const messageService = createMessageService();
 
-	return MessageSocketService({
-		socketNamespace: io,
+	return new MessageSocketService(
+		io,
 		socket,
 		messageService,
-		logger: messageSocketLogger
-	});
+		messageSocketLogger
+	);
 }
 
 export function createMessageService() {
 	const messageRepository = createMessageRepository();
 	const userMessageStatusRepository = createUserMessageStatusRepository();
 
-	return MessageService({
-		messageRepository,
-		userMessageStatusRepository
-	});
+	return new MessageService(messageRepository, userMessageStatusRepository);
 }
 
 export function createMessageRepository() {

@@ -7,13 +7,15 @@ import { ILogger } from '../logger/@types/ILogger';
 import { FileUploadDto } from './@types/FileUpload.dto';
 import { ICloudUploadService } from './@types/ICloudUploadService';
 
-export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
-	const initialize = async () => {
-		initializeCloudinary();
-		await initializeS3();
+export class CloudUploadService implements ICloudUploadService {
+	constructor(private readonly logger: ILogger) {}
+
+	initialize = async () => {
+		this.initializeCloudinary();
+		await this.initializeS3();
 	};
 
-	const uploadMedia = async (file: FileUploadDto): Promise<string> => {
+	uploadMedia = async (file: FileUploadDto): Promise<string> => {
 		return new Promise((resolve, reject) => {
 			const stream = cloudinary.uploader.upload_stream(
 				{},
@@ -32,7 +34,7 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 		});
 	};
 
-	const uploadLargeFile = async (
+	uploadLargeFile = async (
 		file: FileUploadDto,
 		groupCategory?: string
 	): Promise<string> => {
@@ -51,8 +53,8 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 		return result.Location;
 	};
 
-	function initializeCloudinary(): void {
-		logger.info('Start config cloudinary');
+	initializeCloudinary(): void {
+		this.logger.info('Start config cloudinary');
 
 		cloudinary.config({
 			cloud_name: config.cloud.IMAGE_CLOUDINARY_CLOUD_NAME,
@@ -61,8 +63,8 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 		});
 	}
 
-	async function initializeS3(): Promise<void> {
-		logger.info('Start creating/updating AWS S3 bucket');
+	async initializeS3(): Promise<void> {
+		this.logger.info('Start creating/updating AWS S3 bucket');
 
 		AWS.config.update({
 			apiVersion: '2006-03-01',
@@ -73,12 +75,12 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 			}
 		});
 
-		await createS3Bucket();
+		await this.createS3Bucket();
 
-		logger.info('Create/Update S3 bucket contains file of models');
+		this.logger.info('Create/Update S3 bucket contains file of models');
 	}
 
-	async function createS3Bucket(): Promise<AWS.S3> {
+	async createS3Bucket(): Promise<AWS.S3> {
 		const s3 = new AWS.S3();
 
 		try {
@@ -95,13 +97,13 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 			if (err.code !== 'BucketAlreadyOwnedByYou') throw err;
 		}
 
-		await configBucketPolicy(s3);
-		await configBucketCors(s3);
+		await this.configBucketPolicy(s3);
+		await this.configBucketCors(s3);
 
 		return s3;
 	}
 
-	async function configBucketCors(s3: AWS.S3): Promise<void> {
+	async configBucketCors(s3: AWS.S3): Promise<void> {
 		await s3
 			.putBucketCors({
 				Bucket: config.cloud.MODEL_AWS_BUCKET_NAME,
@@ -119,7 +121,7 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 			.promise();
 	}
 
-	async function configBucketPolicy(s3: AWS.S3): Promise<void> {
+	async configBucketPolicy(s3: AWS.S3): Promise<void> {
 		const bucketPolicy = {
 			Version: '2012-10-17',
 			Statement: {
@@ -136,6 +138,4 @@ export const CloudUploadService = (logger: ILogger): ICloudUploadService => {
 			Policy: JSON.stringify(bucketPolicy)
 		});
 	}
-
-	return { initialize, uploadMedia, uploadLargeFile };
-};
+}

@@ -6,8 +6,6 @@ import { RecentMessagesDto } from './@types/dto/RecentMessages.dto';
 import { NotFoundError } from '@src/utils/appError';
 import { ConversationErrorMessages } from './conversation.error';
 import { ConversationMember } from '../conversationMembers/conversationMember.entity';
-import { UserMessageStatusType } from '../messages/@types/UserMessageStatusType';
-import { ConversationDetailDto } from './@types/dto/ConversationDetail.dto';
 import {
 	mapConversationToConversationDetailDto,
 	mapConversationToConversationOverviewDto
@@ -17,19 +15,25 @@ import { ConversationOfUserOverviewDto } from './@types/dto/ConversationOfUserOv
 import { CreateConversationDto } from './@types/dto/CreateConversation.dto';
 import { ConversationOverviewDto } from './@types/dto/ConversationOverview.dto';
 import { ConversationType } from './@types/ConversationType';
+import { ConversationRepository } from './conversation.repository';
+import { ConversationMemberRepository } from '../conversationMembers/conversationMember.repository';
+import { MessageRepository } from '../messages/message.repository';
+import { UserMessageStatusRepository } from '../messages/components/userMessageStatus/userMessageStatus.repository';
 
-export const ConversationService = ({
-	conversationMemberRepository,
-	conversationRepository,
-	messageRepository,
-	userMessageStatusRepository
-}: ConversationServiceParams): IConversationService => {
-	const createConversation = async (
+export class ConversationService implements IConversationService {
+	constructor(
+		private readonly conversationRepository: ConversationRepository,
+		private readonly conversationMemberRepository: ConversationMemberRepository,
+		private readonly messageRepository: MessageRepository,
+		private readonly userMessageStatusRepository: UserMessageStatusRepository
+	) {}
+
+	createConversation = async (
 		createConversationDto: CreateConversationDto
 	): Promise<ConversationOverviewDto> => {
 		const { creatorId, officeId } = createConversationDto;
 
-		const conversation = await conversationRepository.save({
+		const conversation = await this.conversationRepository.save({
 			officeId,
 			creatorId,
 			type: ConversationType.GROUP_LEVEL,
@@ -39,12 +43,12 @@ export const ConversationService = ({
 		return mapConversationToConversationOverviewDto(conversation);
 	};
 
-	const findConversationsOverviewsOfUserInOffice = async (
+	findConversationsOverviewsOfUserInOffice = async (
 		userId: number,
 		officeId: number
 	): Promise<ConversationOfUserOverviewDto[]> => {
 		const [conversationMembers, _] =
-			await conversationMemberRepository.findConversationMembersByUserIdAndOfficeId(
+			await this.conversationMemberRepository.findConversationMembersByUserIdAndOfficeId(
 				userId,
 				officeId
 			);
@@ -62,12 +66,12 @@ export const ConversationService = ({
 		});
 	};
 
-	const findConversationDetailByConversationIdAndUserId = async (
+	findConversationDetailByConversationIdAndUserId = async (
 		conversationId: number,
 		memberId: number
 	): Promise<ConversationOfUserDetailDto> => {
 		const conversation =
-			await conversationRepository.findConversationByIdWithMembers(
+			await this.conversationRepository.findConversationByIdWithMembers(
 				conversationId
 			);
 
@@ -78,7 +82,7 @@ export const ConversationService = ({
 		}
 
 		const conversationMember =
-			await conversationMemberRepository.findConversationMemberByConversationIdAndUserId(
+			await this.conversationMemberRepository.findConversationMemberByConversationIdAndUserId(
 				conversationId,
 				memberId
 			);
@@ -99,13 +103,13 @@ export const ConversationService = ({
 		};
 	};
 
-	const findRecentMessagesByConversationIdAndUserId = async (
+	findRecentMessagesByConversationIdAndUserId = async (
 		conversationId: number,
 		userId: number,
 		pageable: RecentMessagePageable
 	): Promise<RecentMessagesDto> => {
 		const [recentMessages, pageInfo] =
-			await messageRepository.findRecentMessagesIgnoreSelfDeletedByConversationIdAndUserId(
+			await this.messageRepository.findRecentMessagesIgnoreSelfDeletedByConversationIdAndUserId(
 				conversationId,
 				userId,
 				pageable
@@ -121,12 +125,12 @@ export const ConversationService = ({
 		};
 	};
 
-	const markAsReadByConversationIdAndUserId = async (
+	markAsReadByConversationIdAndUserId = async (
 		conversationId: number,
 		userId: number
 	): Promise<void> => {
 		const conversationMember =
-			await conversationMemberRepository.findConversationMemberByConversationIdAndUserId(
+			await this.conversationMemberRepository.findConversationMemberByConversationIdAndUserId(
 				conversationId,
 				userId
 			);
@@ -138,7 +142,7 @@ export const ConversationService = ({
 		}
 
 		const messagesUnreadIds = (
-			await messageRepository.findRecentMessageIdsByConversationId(
+			await this.messageRepository.findRecentMessageIdsByConversationId(
 				conversationId,
 				conversationMember.numberOfUnreadMessages
 			)
@@ -147,7 +151,7 @@ export const ConversationService = ({
 		if (messagesUnreadIds.length == 0) return;
 
 		const messageReaders = messagesUnreadIds.map(messageId =>
-			userMessageStatusRepository.create({
+			this.userMessageStatusRepository.create({
 				messageId,
 				userId,
 				isRead: true,
@@ -155,24 +159,18 @@ export const ConversationService = ({
 			})
 		);
 
-		userMessageStatusRepository.manager.transaction(async entityManager => {
-			await entityManager.save(messageReaders);
-			await entityManager.update(
-				ConversationMember,
-				{ conversationId, memberId: userId },
-				{
-					numberOfUnreadMessages: () =>
-						`number_of_unread_messages - ${messagesUnreadIds.length}`
-				}
-			);
-		});
+		this.userMessageStatusRepository.manager.transaction(
+			async entityManager => {
+				await entityManager.save(messageReaders);
+				await entityManager.update(
+					ConversationMember,
+					{ conversationId, memberId: userId },
+					{
+						numberOfUnreadMessages: () =>
+							`number_of_unread_messages - ${messagesUnreadIds.length}`
+					}
+				);
+			}
+		);
 	};
-
-	return {
-		createConversation,
-		findRecentMessagesByConversationIdAndUserId,
-		findConversationsOverviewsOfUserInOffice,
-		findConversationDetailByConversationIdAndUserId,
-		markAsReadByConversationIdAndUserId
-	};
-};
+}

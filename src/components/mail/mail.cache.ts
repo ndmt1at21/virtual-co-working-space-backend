@@ -4,27 +4,29 @@ import {
 	MailCacheOptions
 } from './@types/IMailCacheService';
 
-export const MailCacheService = (
-	cacheConnection: RedisClientType
-): IMailCacheService => {
-	const PREFIX = 'mail_template';
+export class MailCacheService implements IMailCacheService {
+	private readonly PREFIX = 'mail_template';
 
-	const setMailTemplate = async (
+	constructor(private readonly cacheConnection: RedisClientType) {}
+
+	setMailTemplate = async (
 		templateUrl: string,
 		content: string,
 		opts?: MailCacheOptions
 	) => {
-		await cacheConnection.set(`${PREFIX}:${templateUrl}`, content, {
-			EX: opts?.mailTemplateExpireSeconds || 30 * 60
-		});
+		await this.cacheConnection.set(
+			`${this.PREFIX}:${templateUrl}`,
+			content,
+			{
+				EX: opts?.mailTemplateExpireSeconds || 30 * 60
+			}
+		);
 	};
 
-	const getMailTemplate = async (
-		templateUrl: string
-	): Promise<string | null> => {
-		const result = await cacheConnection.get(`${PREFIX}:${templateUrl}`);
+	getMailTemplate = async (templateUrl: string): Promise<string | null> => {
+		const result = await this.cacheConnection.get(
+			`${this.PREFIX}:${templateUrl}`
+		);
 		return result;
 	};
-
-	return { setMailTemplate, getMailTemplate };
-};
+}

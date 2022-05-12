@@ -3,13 +3,11 @@ import {
 	Entity,
 	JoinColumn,
 	ManyToOne,
-	OneToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { Conversation } from '@src/components/conversations/conversation.entity';
 import { User } from '@components/users/user.entity';
 import { BaseEntity } from '../base/BaseEntity';
-import { Message } from '../messages/message.entity';
 
 @Entity({ name: 'conversation_member' })
 export class ConversationMember extends BaseEntity {

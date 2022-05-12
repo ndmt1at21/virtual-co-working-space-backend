@@ -7,13 +7,15 @@ import {
 	mapOfficeMemberToOfficeMemberOverviewDto
 } from './officeMember.mapping';
 
-export const OfficeMemberCreator = (
-	officeMemberRepository: OfficeMemberRepository
-): IOfficeMemberCreator => {
-	const createOfficeMemberOverviewById = async (
+export class OfficeMemberCreator implements IOfficeMemberCreator {
+	constructor(
+		private readonly officeMemberRepository: OfficeMemberRepository
+	) {}
+
+	createOfficeMemberOverviewById = async (
 		id: number
 	): Promise<OfficeMemberOverviewDto> => {
-		const officeMember = await officeMemberRepository
+		const officeMember = await this.officeMemberRepository
 			.queryBuilder()
 			.findById(id)
 			.withMember()
@@ -24,10 +26,10 @@ export const OfficeMemberCreator = (
 		return mapOfficeMemberToOfficeMemberOverviewDto(officeMember!);
 	};
 
-	const createOfficeMemberDetailById = async (
+	createOfficeMemberDetailById = async (
 		id: number
 	): Promise<OfficeMemberDetailDto> => {
-		const officeMember = await officeMemberRepository
+		const officeMember = await this.officeMemberRepository
 			.queryBuilder()
 			.findById(id)
 			.withMember()
@@ -40,10 +42,10 @@ export const OfficeMemberCreator = (
 		return mapOfficeMemberToOfficeMemberDetailDto(officeMember!);
 	};
 
-	const createOfficeMembersOverviewByOfficeId = async (
+	createOfficeMembersOverviewByOfficeId = async (
 		officeId: number
 	): Promise<OfficeMemberOverviewDto[]> => {
-		const officeMembers = await officeMemberRepository
+		const officeMembers = await this.officeMemberRepository
 			.queryBuilder()
 			.findByOfficeId(officeId)
 			.withMember()
@@ -55,10 +57,4 @@ export const OfficeMemberCreator = (
 			mapOfficeMemberToOfficeMemberOverviewDto(o)
 		);
 	};
-
-	return {
-		createOfficeMemberOverviewById,
-		createOfficeMemberDetailById,
-		createOfficeMembersOverviewByOfficeId
-	};
-};
+}

@@ -13,7 +13,6 @@ import { IActiveUserTokenService } from '../activeUserToken/@types/IActiveUserTo
 import { LocalRegisterDto } from './@types/dto/LocalRegister.dto';
 import { PasswordResetTokenDto } from './components/passwordResetToken/@types/dto/PasswordResetToken.dto';
 import { IPasswordResetTokenService } from './components/passwordResetToken/@types/IPasswordService';
-import { UpdatePasswordDto } from '../users/@types/dto/UpdatePassword.dto';
 import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
 
 export const AuthService = (

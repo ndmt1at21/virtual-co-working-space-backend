@@ -7,7 +7,7 @@ import { ConversationRepository } from './conversation.repository';
 import { ConversationService } from './conversation.service';
 
 export function createConversationController() {
-	return ConversationController(createConversationService());
+	return new ConversationController(createConversationService());
 }
 
 export function createConversationService() {
@@ -16,12 +16,12 @@ export function createConversationService() {
 	const messageRepository = createMessageRepository();
 	const userMessageStatusRepository = createUserMessageStatusRepository();
 
-	return ConversationService({
-		conversationMemberRepository,
+	return new ConversationService(
 		conversationRepository,
+		conversationMemberRepository,
 		messageRepository,
 		userMessageStatusRepository
-	});
+	);
 }
 
 export function createConversationRepository() {

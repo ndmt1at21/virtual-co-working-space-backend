@@ -9,19 +9,19 @@ import { OfficeItemValidate } from './officeItemValidate';
 
 export function createOfficeItemController() {
 	const officeItemService = createOfficeItemService();
-	return OfficeItemController(officeItemService);
+	return new OfficeItemController(officeItemService);
 }
 
 export function createOfficeItemSocketService(io: Server, socket: Socket) {
 	const officeItemService = createOfficeItemService();
 
-	return OfficeItemSocketService(io, socket, officeItemService);
+	return new OfficeItemSocketService(io, socket, officeItemService);
 }
 
 export function createOfficeItemService() {
 	const officeItemRepository = getCustomRepository(OfficeItemRepository);
 	const officeItemValidate = createOfficeItemValidate();
-	return OfficeItemService(officeItemRepository, officeItemValidate);
+	return new OfficeItemService(officeItemRepository, officeItemValidate);
 }
 
 export function createOfficeItemValidate() {

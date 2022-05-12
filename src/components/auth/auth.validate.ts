@@ -11,67 +11,69 @@ import { LoginDto } from './@types/dto/Login.dto';
 import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
 import { IAuthTokenService } from './components/authToken/@types/IAuthTokenService';
 
-export const AuthValidate = (
-	userRepository: UserRepository,
-	authTokenService: IAuthTokenService
-): IAuthValidate => {
-	const validateUserInAccessTokenCanBeAuthenticated = async (
+export class AuthValidate implements IAuthValidate {
+	constructor(
+		private readonly userRepository: UserRepository,
+		private readonly authTokenService: IAuthTokenService
+	) {}
+
+	validateUserInAccessTokenCanBeAuthenticated = async (
 		accessToken: string
 	): Promise<User> => {
-		await authTokenService.validateAccessToken(accessToken);
+		await this.authTokenService.validateAccessToken(accessToken);
 
-		const decodedToken = await authTokenService.decodedAccessToken(
+		const decodedToken = await this.authTokenService.decodedAccessToken(
 			accessToken
 		);
 
-		const user = await userRepository.findById(decodedToken.sub!);
+		const user = await this.userRepository.findById(decodedToken.sub!);
 
-		checkUserExists(user);
-		checkUserActive(user!);
-		checkUserNotChangedPasswordAfter(user!, decodedToken.iat!);
+		this.checkUserExists(user);
+		this.checkUserActive(user!);
+		this.checkUserNotChangedPasswordAfter(user!, decodedToken.iat!);
 
 		return user!;
 	};
 
-	const validateLocalUserCanLogin = async (
+	validateLocalUserCanLogin = async (
 		loginDto: LoginDto
 	): Promise<boolean> => {
 		const { email, password } = loginDto;
 
-		const user = await userRepository.findUserByEmail(email);
+		const user = await this.userRepository.findUserByEmail(email);
 
-		checkUserExists(user);
-		checkLoginProviderMatch(user!, UserLoginProvider.LOCAL);
-		checkUserActive(user!);
-		checkPasswordMatch(user!.password!, password);
+		this.checkUserExists(user);
+		this.checkLoginProviderMatch(user!, UserLoginProvider.LOCAL);
+		this.checkUserActive(user!);
+		this.checkPasswordMatch(user!.password!, password);
 
 		return true;
 	};
 
-	const validateLocalUserCanChangePassword = async (
+	validateLocalUserCanChangePassword = async (
 		userId: number,
 		changePasswordDto: ChangePasswordDto
 	): Promise<boolean> => {
 		const { oldPassword, newPassword } = changePasswordDto;
 
-		checkOldPasswordDifferentFromNew(oldPassword, newPassword);
+		this.checkOldPasswordDifferentFromNew(oldPassword, newPassword);
 
-		const user = await userRepository.findById(userId);
+		const user = await this.userRepository.findById(userId);
 
-		checkUserExists(user);
-		checkLoginProviderMatch(user!, UserLoginProvider.LOCAL);
-		checkUserActive(user!);
-		checkPasswordMatch(user!.password!, oldPassword);
+		this.checkUserExists(user);
+		this.checkLoginProviderMatch(user!, UserLoginProvider.LOCAL);
+		this.checkUserActive(user!);
+		this.checkPasswordMatch(user!.password!, oldPassword);
 
 		return true;
 	};
 
-	const validateExternalUserCanLogin = async (
+	async validateExternalUserCanLogin(
 		profile: OAuth2ProfileDto
-	): Promise<boolean> => {
+	): Promise<boolean> {
 		const { email, provider } = profile;
 
-		const user = await userRepository.findUserByEmail(email);
+		const user = await this.userRepository.findUserByEmail(email);
 
 		if (user && user.provider === UserLoginProvider.LOCAL) {
 			throw new IllegalArgumentError(
@@ -80,23 +82,23 @@ export const AuthValidate = (
 		}
 
 		if (user) {
-			checkLoginProviderMatch(user, provider);
-			checkUserActive(user);
+			this.checkLoginProviderMatch(user, provider);
+			this.checkUserActive(user);
 		}
 
 		return true;
-	};
+	}
 
-	const validateUserForgotPassword = async (email: string) => {
-		const user = await userRepository.findUserByEmail(email);
+	async validateUserForgotPassword(email: string) {
+		const user = await this.userRepository.findUserByEmail(email);
 
-		checkUserExists(user);
-		checkUserActive(user!);
+		this.checkUserExists(user);
+		this.checkUserActive(user!);
 
 		return true;
-	};
+	}
 
-	function checkUserExists(user: User | undefined) {
+	checkUserExists(user: User | undefined) {
 		if (!user) {
 			throw new IllegalArgumentError(
 				AuthErrorMessages.UNAUTHORIZED_USER_NOT_FOUND
@@ -104,7 +106,7 @@ export const AuthValidate = (
 		}
 	}
 
-	function checkPasswordMatch(hashedPassword: string, password: string) {
+	checkPasswordMatch(hashedPassword: string, password: string) {
 		if (!compareSync(password, hashedPassword)) {
 			throw new IllegalArgumentError(
 				AuthErrorMessages.UNAUTHORIZED_INCORRECT_EMAIL_OR_PASSWORD
@@ -112,7 +114,7 @@ export const AuthValidate = (
 		}
 	}
 
-	function checkLoginProviderMatch(user: User, provider: UserLoginProvider) {
+	checkLoginProviderMatch(user: User, provider: UserLoginProvider) {
 		if (user.provider !== provider) {
 			throw new IllegalArgumentError(
 				AuthErrorMessages.UNAUTHORIZED_INCORRECT_EMAIL_OR_PASSWORD
@@ -120,7 +122,7 @@ export const AuthValidate = (
 		}
 	}
 
-	function checkUserActive(user: User) {
+	checkUserActive(user: User) {
 		if (user.status === UserStatus.BLOCKED) {
 			throw new UnauthorizedError(
 				AuthErrorMessages.UNAUTHORIZED_USER_BLOCKED
@@ -128,10 +130,7 @@ export const AuthValidate = (
 		}
 	}
 
-	function checkOldPasswordDifferentFromNew(
-		oldPassword: string,
-		newPassword: string
-	) {
+	checkOldPasswordDifferentFromNew(oldPassword: string, newPassword: string) {
 		if (oldPassword === newPassword) {
 			throw new IllegalArgumentError(
 				AuthErrorMessages.PASSWORD_MUST_BE_DIFFERENT_FROM_OLD
@@ -139,7 +138,7 @@ export const AuthValidate = (
 		}
 	}
 
-	function checkUserNotChangedPasswordAfter(user: User, time: number) {
+	checkUserNotChangedPasswordAfter(user: User, time: number) {
 		if (
 			user.passwordUpdateAt &&
 			user.passwordUpdateAt.getTime() / 1000 > time
@@ -149,12 +148,4 @@ export const AuthValidate = (
 			);
 		}
 	}
-
-	return {
-		validateLocalUserCanLogin,
-		validateExternalUserCanLogin,
-		validateUserInAccessTokenCanBeAuthenticated,
-		validateUserForgotPassword,
-		validateLocalUserCanChangePassword
-	};
-};
+}

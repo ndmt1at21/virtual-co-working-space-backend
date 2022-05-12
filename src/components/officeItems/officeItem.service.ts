@@ -12,26 +12,31 @@ import {
 } from './officeItem.mapping';
 import { OfficeItemRepository } from './officeItem.repository';
 
-export const OfficeItemService = (
-	officeItemRepository: OfficeItemRepository,
-	officeItemValidate: IOfficeItemValidate
-): IOfficeItemService => {
-	const createOfficeItem = async (
+export class OfficeItemService implements IOfficeItemService {
+	constructor(
+		private readonly officeItemRepository: OfficeItemRepository,
+		private readonly officeItemValidate: IOfficeItemValidate
+	) {}
+
+	createOfficeItem = async (
 		createOfficeItemDto: CreateOfficeItemDto
 	): Promise<OfficeItemOverviewDto> => {
-		const officeItem = await officeItemRepository.saveOfficeItem(
+		const officeItem = await this.officeItemRepository.saveOfficeItem(
 			createOfficeItemDto
 		);
 
 		return mapOfficeItemToOfficeItemOverviewDto(officeItem);
 	};
 
-	const updateOfficeItemTransform = async (
+	updateOfficeItemTransform = async (
 		id: number,
 		transform: OfficeItemTransformDto
 	): Promise<UpdateOfficeItemTransformDto> => {
-		await officeItemValidate.checkOfficeItemExistsById(id);
-		await officeItemRepository.updateOfficeItemTransformById(id, transform);
+		await this.officeItemValidate.checkOfficeItemExistsById(id);
+		await this.officeItemRepository.updateOfficeItemTransformById(
+			id,
+			transform
+		);
 
 		return {
 			id,
@@ -39,26 +44,28 @@ export const OfficeItemService = (
 		};
 	};
 
-	const findOfficeItemDetailById = async (
+	findOfficeItemDetailById = async (
 		id: number
 	): Promise<OfficeItemDetailDto> => {
-		await officeItemValidate.checkOfficeItemExistsById(id);
+		await this.officeItemValidate.checkOfficeItemExistsById(id);
 
 		const officeItem =
-			await officeItemRepository.findOfficeItemWithItemAndOfficeById(id);
+			await this.officeItemRepository.findOfficeItemWithItemAndOfficeById(
+				id
+			);
 
 		return mapOfficeItemToOfficeItemDetailDto(officeItem!);
 	};
 
-	const findOfficeItemsDetail = async (
+	findOfficeItemsDetail = async (
 		pageable: Pageable
 	): Promise<[OfficeItemDetailDto[], number]> => {
 		const items =
-			await officeItemRepository.findOfficeItemsWithItemAndOffice(
+			await this.officeItemRepository.findOfficeItemsWithItemAndOffice(
 				pageable
 			);
 
-		const total = await officeItemRepository.count();
+		const total = await this.officeItemRepository.count();
 
 		return [
 			items.map(item => mapOfficeItemToOfficeItemDetailDto(item)),
@@ -66,16 +73,8 @@ export const OfficeItemService = (
 		];
 	};
 
-	const deleteOfficeItem = async (id: number) => {
-		await officeItemValidate.checkOfficeItemExistsById(id);
-		await officeItemRepository.delete(id);
+	deleteOfficeItem = async (id: number) => {
+		await this.officeItemValidate.checkOfficeItemExistsById(id);
+		await this.officeItemRepository.delete(id);
 	};
-
-	return {
-		createOfficeItem,
-		updateOfficeItemTransform,
-		findOfficeItemDetailById,
-		findOfficeItemsDetail,
-		deleteOfficeItem
-	};
-};
+}

@@ -1,21 +1,17 @@
 import { NextFunction, Request, Response } from 'express';
 import { User } from '@components/users/user.entity';
-import { UserRepository } from '@components/users/user.repository';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
-import { IAuthTokenService } from '@src/components/auth/components/authToken/@types/IAuthTokenService';
 import { AuthErrorMessages } from './auth.error';
 import { UserRoleType } from '@components/users/@types/UserRoleType';
 import { IAuthMiddleware } from './@types/IAuthMiddleware';
 import { UnauthorizedError } from '@src/utils/appError';
-import { IAuthValidate } from './@types/IAuthValidate';
 import { UserStatus } from '../users/@types/UserStatus';
+import { IAuthValidate } from './@types/IAuthValidate';
 
-export const AuthMiddleware = (
-	userRepository: UserRepository,
-	authTokenService: IAuthTokenService,
-	authValidate: IAuthValidate
-): IAuthMiddleware => {
-	const protect = catchAsyncRequestHandler(async (req, res, next) => {
+export class AuthMiddleware implements IAuthMiddleware {
+	constructor(private readonly authValidate: IAuthValidate) {}
+
+	protect = catchAsyncRequestHandler(async (req, res, next) => {
 		const accessToken = req.headers.authorization?.split(' ')[1];
 
 		if (!accessToken) {
@@ -24,7 +20,9 @@ export const AuthMiddleware = (
 			);
 		}
 
-		const { id, type, email, status } = await deserializeUser(accessToken);
+		const { id, type, email, status } = await this.deserializeUser(
+			accessToken
+		);
 
 		req.user = {
 			id,
@@ -36,7 +34,7 @@ export const AuthMiddleware = (
 		next();
 	});
 
-	const restrictToGuest = catchAsyncRequestHandler(async (req, res, next) => {
+	restrictToGuest = catchAsyncRequestHandler(async (req, res, next) => {
 		const accessToken = req.headers.authorization?.split(' ')[1];
 
 		if (
@@ -49,7 +47,7 @@ export const AuthMiddleware = (
 		}
 
 		try {
-			const user = await deserializeUser(accessToken);
+			const user = await this.deserializeUser(accessToken);
 
 			if (user)
 				throw new UnauthorizedError(
@@ -60,7 +58,7 @@ export const AuthMiddleware = (
 		}
 	});
 
-	const restrictToEmailVerified = catchAsyncRequestHandler(
+	restrictToEmailVerified = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const isEmailVerified = req.user?.emailVerified;
 
@@ -71,7 +69,7 @@ export const AuthMiddleware = (
 		}
 	);
 
-	const restrictTo = (roles: UserRoleType[]) => {
+	restrictTo = (roles: UserRoleType[]) => {
 		return (req: Request, res: Response, next: NextFunction) => {
 			const hasPermission = roles.every(role =>
 				req.user?.roles.includes(role)
@@ -91,14 +89,12 @@ export const AuthMiddleware = (
 		};
 	};
 
-	async function deserializeUser(accessToken: string): Promise<User> {
+	async deserializeUser(accessToken: string): Promise<User> {
 		const user =
-			await authValidate.validateUserInAccessTokenCanBeAuthenticated(
+			await this.authValidate.validateUserInAccessTokenCanBeAuthenticated(
 				accessToken
 			);
 
 		return user;
 	}
-
-	return { protect, restrictTo, restrictToGuest, restrictToEmailVerified };
-};
+}

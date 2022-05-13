@@ -82,7 +82,7 @@ export class AuthController {
 	});
 
 	googleLogin = catchAsyncRequestHandler(async (req, res, next) => {
-		this.logger.info(`User with id ${req.user?.id} login with google`);
+		this.logger.info(`User starts login with google`);
 
 		passport.authenticate('google', {
 			session: false,
@@ -93,7 +93,7 @@ export class AuthController {
 	});
 
 	facebookLogin = catchAsyncRequestHandler(async (req, res, next) => {
-		this.logger.info(`User with id ${req.user?.id} login with facebook`);
+		this.logger.info(`User starts login with facebook`);
 
 		passport.authenticate('facebook', {
 			session: false,
@@ -104,7 +104,6 @@ export class AuthController {
 	});
 
 	googleLoginCallback = catchAsyncRequestHandler(async (req, res, next) => {
-		console.log(req);
 		this.oauth2LoginCallback('google', req, res, next);
 	});
 
@@ -316,8 +315,6 @@ export class AuthController {
 						res.redirect(redirectUrl);
 					})
 					.catch(err => {
-						console.log(config.auth.BASE_FRONTEND_URL);
-
 						const redirectUrl = queryString.stringifyUrl({
 							url: config.auth.BASE_FRONTEND_URL,
 							query: {

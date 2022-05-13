@@ -7,11 +7,10 @@ export const OfficeSocketHandler = (
 ) => {
 	socket.on('calling:join', (data: any) => {
 		try {
-			console.log(data);
 			socket.join(`calling/${data.officeId}`);
 			socket.to(`calling/${data.officeId}`).emit('calling:join', {
 				userId: socket.user?.id,
-				peerId: data.peerId,
+				peerId: data.peerId
 			});
 		} catch (err) {
 			socket.emit('office:error', err);

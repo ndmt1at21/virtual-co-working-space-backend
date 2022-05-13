@@ -17,23 +17,23 @@ import { NotFoundError } from '@src/utils/appError';
 import { UserErrorMessage } from './user.error';
 import { mapUserToUserDto } from './user.mapping';
 
-export const UserService = (
-	userRepository: UserRepository,
-	userValidate: IUserValidate,
-	userCreator: IUserCreator,
-	passwordEncoder: IPasswordEncoder
-): IUserService => {
-	const createLocalUser = async (
-		payload: CreateUserDto
-	): Promise<UserDto> => {
-		await userValidate.checkCreateUserData(payload);
+export class UserService implements IUserService {
+	constructor(
+		private readonly userRepository: UserRepository,
+		private readonly userValidate: IUserValidate,
+		private readonly userCreator: IUserCreator,
+		private readonly passwordEncoder: IPasswordEncoder
+	) {}
+
+	createLocalUser = async (payload: CreateUserDto): Promise<UserDto> => {
+		await this.userValidate.checkCreateUserData(payload);
 
 		const encryptedPassword = hashSync(
 			payload.password,
 			config.auth.BCRYPT_SALT_ROUNDS
 		);
 
-		const userCreated = await userRepository.save({
+		const userCreated = await this.userRepository.save({
 			...payload,
 			password: encryptedPassword
 		});
@@ -41,50 +41,51 @@ export const UserService = (
 		return mapUserToUserDto(userCreated);
 	};
 
-	const findOrCreateUserByExternal = async (
-		payload: CreateUserExternalDto
-	) => {
-		const user = await userRepository.findUserByExternalId(
+	findOrCreateUserByExternal = async (payload: CreateUserExternalDto) => {
+		const user = await this.userRepository.findUserByExternalId(
 			payload.externalId,
 			payload.provider
 		);
 
 		if (user) return mapUserToUserDto(user);
 
-		const userCreated = await userRepository.save({
-			...payload
+		const userCreated = await this.userRepository.save({
+			...payload,
+			status: UserStatus.ACTIVE
 		});
 
 		return mapUserToUserDto(userCreated);
 	};
 
-	const findUserById = async (id: number): Promise<UserDto> => {
-		await userValidate.checkUserExistsById(id);
-		return await userCreator.createUserDtoById(id);
+	findUserById = async (id: number): Promise<UserDto> => {
+		await this.userValidate.checkUserExistsById(id);
+		return await this.userCreator.createUserDtoById(id);
 	};
 
-	const findUserByEmail = async (email: string): Promise<UserDto> => {
-		await userValidate.checkUserExistsByEmail(email);
-		return await userCreator.createUserDtoByEmail(email);
+	findUserByEmail = async (email: string): Promise<UserDto> => {
+		await this.userValidate.checkUserExistsByEmail(email);
+		return await this.userCreator.createUserDtoByEmail(email);
 	};
 
-	const findAllUsers = async (
+	findAllUsers = async (
 		options: FindAllUsersOptions
 	): Promise<[UserDto[], PaginationInfo]> => {
-		const [users, pageInfo] = await userRepository.findAllUsers(options);
+		const [users, pageInfo] = await this.userRepository.findAllUsers(
+			options
+		);
 		const usersDto = users.map(user => mapUserToUserDto(user));
 
 		return [usersDto, pageInfo];
 	};
 
-	const updateUserById = async (
+	updateUserById = async (
 		id: number,
 		payload: UpdateUserDto
 	): Promise<UserDto> => {
-		await userValidate.checkUserExistsById(id);
+		await this.userValidate.checkUserExistsById(id);
 
-		const user = await userRepository.findById(id);
-		const updatedUser = await userRepository.save({
+		const user = await this.userRepository.findById(id);
+		const updatedUser = await this.userRepository.save({
 			...user!,
 			...payload
 		});
@@ -92,16 +93,18 @@ export const UserService = (
 		return mapUserToUserDto(updatedUser);
 	};
 
-	const updatePasswordById = async (
+	updatePasswordById = async (
 		id: number,
 		updatePasswordDto: UpdatePasswordDto
 	): Promise<UserDto> => {
-		await userValidate.checkUpdatePasswordData(id, updatePasswordDto);
+		await this.userValidate.checkUpdatePasswordData(id, updatePasswordDto);
 
-		const user = await userRepository.findById(id);
-		const hashPassword = passwordEncoder.encode(updatePasswordDto.password);
+		const user = await this.userRepository.findById(id);
+		const hashPassword = this.passwordEncoder.encode(
+			updatePasswordDto.password
+		);
 
-		const updatedUser = await userRepository.save({
+		const updatedUser = await this.userRepository.save({
 			...user!,
 			password: hashPassword,
 			passwordUpdateAt: new Date()
@@ -110,16 +113,16 @@ export const UserService = (
 		return mapUserToUserDto(updatedUser);
 	};
 
-	const deleteUserById = async (id: number): Promise<void> => {
-		await userValidate.checkUserExistsById(id);
-		await userRepository.softDelete(id);
+	deleteUserById = async (id: number): Promise<void> => {
+		await this.userValidate.checkUserExistsById(id);
+		await this.userRepository.softDelete(id);
 	};
 
-	const updateUserBlockStatus = async (
+	updateUserBlockStatus = async (
 		id: number,
 		status: UserStatus
 	): Promise<number> => {
-		const result = await userRepository.update(id, {
+		const result = await this.userRepository.update(id, {
 			status
 		});
 
@@ -129,25 +132,12 @@ export const UserService = (
 		return id;
 	};
 
-	const activeNewUser = async (id: number): Promise<UserDto> => {
-		const updatedUser = await userRepository.save({
+	activeNewUser = async (id: number): Promise<UserDto> => {
+		const updatedUser = await this.userRepository.save({
 			id,
 			status: UserStatus.ACTIVE
 		});
 
 		return updatedUser;
 	};
-
-	return {
-		createLocalUser,
-		findOrCreateUserByExternal,
-		findUserById,
-		findUserByEmail,
-		findAllUsers,
-		updateUserById,
-		updatePasswordById,
-		deleteUserById,
-		updateUserBlockStatus,
-		activeNewUser
-	};
-};
+}

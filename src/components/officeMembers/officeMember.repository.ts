@@ -28,8 +28,6 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 				'numberOfMembers',
 				1
 			);
-
-			console.log(updateResult);
 		});
 
 		// TODO: can throw an error ?

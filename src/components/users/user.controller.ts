@@ -10,15 +10,17 @@ import { IUserService } from './@types/IUserService';
 import { UserStatus } from './@types/UserStatus';
 import { UserErrorMessage } from './user.error';
 
-export const UserController = (userService: IUserService) => {
-	const createUser = catchAsyncRequestHandler(async (req, res, next) => {
+export class UserController {
+	constructor(private readonly userService: IUserService) {}
+
+	createUser = catchAsyncRequestHandler(async (req, res, next) => {
 		const errors = await validateRequestBody(CreateUserDto, req.body);
 		if (errors.length > 0) {
 			throw new IllegalArgumentError('Invalid user data', errors);
 		}
 
 		const createUserDto = req.body as CreateUserDto;
-		const user = await userService.createLocalUser(createUserDto);
+		const user = await this.userService.createLocalUser(createUserDto);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -27,16 +29,16 @@ export const UserController = (userService: IUserService) => {
 		});
 	});
 
-	const getProfile = catchAsyncRequestHandler(async (req, res, next) => {
+	getProfile = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = req.user!.id;
-		const user = await userService.findUserById(userId);
+		const user = await this.userService.findUserById(userId);
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
 			data: { user }
 		});
 	});
 
-	const updateProfile = catchAsyncRequestHandler(async (req, res, next) => {
+	updateProfile = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = req.user!.id;
 
 		const errors = await validateRequestBody(UpdateUserDto, req.body);
@@ -44,7 +46,7 @@ export const UserController = (userService: IUserService) => {
 			throw new IllegalArgumentError('Invalid update user data', errors);
 
 		const updateUserDto = req.body as UpdateUserDto;
-		const updatedUser = await userService.updateUserById(
+		const updatedUser = await this.userService.updateUserById(
 			userId,
 			updateUserDto
 		);
@@ -55,16 +57,16 @@ export const UserController = (userService: IUserService) => {
 		});
 	});
 
-	const getUserById = catchAsyncRequestHandler(async (req, res, next) => {
+	getUserById = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = +req.params.id;
-		const user = await userService.findUserById(userId);
+		const user = await this.userService.findUserById(userId);
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
 			data: { user }
 		});
 	});
 
-	const updateUser = catchAsyncRequestHandler(async (req, res, next) => {
+	updateUser = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = +req.params.id;
 
 		const errors = await validateRequestBody(UpdateUserDto, req.body);
@@ -72,7 +74,7 @@ export const UserController = (userService: IUserService) => {
 			throw new IllegalArgumentError('Invalid update user data', errors);
 
 		const updateUserDto = req.body as UpdateUserDto;
-		const updatedUser = await userService.updateUserById(
+		const updatedUser = await this.userService.updateUserById(
 			userId,
 			updateUserDto
 		);
@@ -83,7 +85,7 @@ export const UserController = (userService: IUserService) => {
 		});
 	});
 
-	const blockUser = catchAsyncRequestHandler(async (req, res, next) => {
+	blockUser = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = +req.params.id;
 
 		if (userId === req.user!.id) {
@@ -92,7 +94,7 @@ export const UserController = (userService: IUserService) => {
 			);
 		}
 
-		const id = await userService.updateUserBlockStatus(
+		const id = await this.userService.updateUserBlockStatus(
 			userId,
 			UserStatus.BLOCKED
 		);
@@ -106,7 +108,7 @@ export const UserController = (userService: IUserService) => {
 		});
 	});
 
-	const unblockUser = catchAsyncRequestHandler(async (req, res, next) => {
+	unblockUser = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = +req.params.id;
 
 		if (userId === req.user!.id) {
@@ -116,7 +118,7 @@ export const UserController = (userService: IUserService) => {
 		}
 
 		// TODO: If user status before blocking is inactive??? -> move confirm status to another column
-		const id = await userService.updateUserBlockStatus(
+		const id = await this.userService.updateUserBlockStatus(
 			userId,
 			UserStatus.ACTIVE
 		);
@@ -130,19 +132,19 @@ export const UserController = (userService: IUserService) => {
 		});
 	});
 
-	const deleteUser = catchAsyncRequestHandler(async (req, res, next) => {
+	deleteUser = catchAsyncRequestHandler(async (req, res, next) => {
 		const userId = +req.params.id;
-		await userService.deleteUserById(userId);
+		await this.userService.deleteUserById(userId);
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
 			message: 'User deleted successfully'
 		});
 	});
 
-	const getUsers = catchAsyncRequestHandler(async (req, res, next) => {
-		const query = extractQueryFindAllOptions(req.query);
+	getUsers = catchAsyncRequestHandler(async (req, res, next) => {
+		const query = this.extractQueryFindAllOptions(req.query);
 
-		const [users, pagination] = await userService.findAllUsers(query);
+		const [users, pagination] = await this.userService.findAllUsers(query);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -153,9 +155,7 @@ export const UserController = (userService: IUserService) => {
 		});
 	});
 
-	function extractQueryFindAllOptions(
-		originalQuery: any
-	): FindAllUsersOptions {
+	extractQueryFindAllOptions(originalQuery: any): FindAllUsersOptions {
 		const query = PaginateQueryParser.parse(originalQuery, {
 			filter: {
 				includes: [
@@ -202,16 +202,4 @@ export const UserController = (userService: IUserService) => {
 
 		return options;
 	}
-
-	return {
-		createUser,
-		getProfile,
-		updateProfile,
-		getUserById,
-		updateUser,
-		blockUser,
-		unblockUser,
-		deleteUser,
-		getUsers
-	};
-};
+}

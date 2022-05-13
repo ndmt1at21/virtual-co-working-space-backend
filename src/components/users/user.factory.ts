@@ -1,12 +1,14 @@
 import { getCustomRepository } from 'typeorm';
 import { PasswordEncoder } from './components/passwordEncoder';
+import { UserController } from './user.controller';
 import { UserCreator } from './user.creator';
 import { UserRepository } from './user.repository';
 import { UserService } from './user.service';
 import { UserValidate } from './user.validate';
 
-export function createUserRepository() {
-	return getCustomRepository(UserRepository);
+export function createUserController() {
+	const userService = createUserService();
+	return new UserController(userService);
 }
 
 export function createUserService() {
@@ -15,7 +17,7 @@ export function createUserService() {
 	const userCreator = createUserCreator();
 	const passwordEncoder = PasswordEncoder();
 
-	return UserService(
+	return new UserService(
 		userRepository,
 		userValidate,
 		userCreator,
@@ -24,10 +26,14 @@ export function createUserService() {
 }
 
 export function createUserCreator() {
-	return UserCreator(createUserRepository());
+	return new UserCreator(createUserRepository());
 }
 
 export function createUserValidate() {
 	const userRepository = createUserRepository();
-	return UserValidate(userRepository);
+	return new UserValidate(userRepository);
+}
+
+export function createUserRepository() {
+	return getCustomRepository(UserRepository);
 }

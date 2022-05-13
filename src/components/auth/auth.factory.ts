@@ -34,7 +34,7 @@ export function createAuthService() {
 	const activeUserTokenService = createActiveUserTokenService();
 	const authValidate = createAuthValidate();
 
-	return AuthService(
+	return new AuthService(
 		userService,
 		authTokenService,
 		passwordResetTokenService,

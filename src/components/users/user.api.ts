@@ -2,14 +2,13 @@ import { Router } from 'express';
 import { createAuthMiddleware } from '../auth/auth.factory';
 import { UserRoleType } from './@types/UserRoleType';
 import { UserController } from './user.controller';
-import { createUserService } from './user.factory';
+import { createUserController, createUserService } from './user.factory';
 
 export const UserRouter = (): Router => {
 	const router = Router();
 
 	const authMiddleware = createAuthMiddleware();
-	const userService = createUserService();
-	const userController = UserController(userService);
+	const userController = createUserController();
 
 	router.use('/', authMiddleware.protect);
 

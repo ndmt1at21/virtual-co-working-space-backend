@@ -56,7 +56,6 @@ export const OfficeSocketHandler = (
 		socket.on(
 			'office_member:move',
 			(transform: UpdateOfficeMemberTransformDto) => {
-				console.log('jmovvveeeee');
 				officeMemberSocketService.onMemberMove(transform);
 			}
 		);

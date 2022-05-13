@@ -18,7 +18,7 @@ export interface IOfficeItemService {
 	findOfficeItemDetailById(id: number): Promise<OfficeItemDetailDto>;
 
 	findOfficeItemsDetail(
-		pageable: Pageable
+		pageable?: Pageable
 	): Promise<[OfficeItemDetailDto[], number]>;
 
 	deleteOfficeItem(id: number): Promise<void>;

@@ -58,11 +58,11 @@ export class OfficeItemService implements IOfficeItemService {
 	};
 
 	findOfficeItemsDetail = async (
-		pageable: Pageable
+		pageable?: Pageable
 	): Promise<[OfficeItemDetailDto[], number]> => {
 		const items =
 			await this.officeItemRepository.findOfficeItemsWithItemAndOffice(
-				pageable
+				pageable || { limit: 10, page: 1 }
 			);
 
 		const total = await this.officeItemRepository.count();

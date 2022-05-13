@@ -1,5 +1,6 @@
 import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
+import { PaginateQueryParser } from '@src/utils/paginateQueryParser';
 import { IOfficeItemService } from './@types/IOfficeItemService';
 
 export class OfficeItemController {
@@ -20,15 +21,14 @@ export class OfficeItemController {
 	);
 
 	getOfficeItemsDetail = catchAsyncRequestHandler(async (req, res, next) => {
-		const [offices, total] =
-			await this.officeItemService.findOfficeItemsDetail({
-				page: 10,
-				limit: 10
-			});
+		const { pageable } = PaginateQueryParser.parse(req.query);
+
+		const [officeItems, total] =
+			await this.officeItemService.findOfficeItemsDetail(pageable);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			data: { total, offices }
+			data: { officeItems, total }
 		});
 	});
 

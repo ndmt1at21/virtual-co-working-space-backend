@@ -109,9 +109,6 @@ export class ItemController {
 			filter: { includes: ['name', 'path', 'category_id', 'created_at'] }
 		});
 
-		const filter: FindAllItemsFilter = {};
-		const sort: FindAllItemsSort = {};
-
 		const options: FindAllItemsOptions = {};
 
 		if (query.filter) {
@@ -133,10 +130,6 @@ export class ItemController {
 			};
 		}
 
-		return {
-			filter,
-			sort,
-			pageable: query.pageable
-		};
+		return options;
 	}
 }

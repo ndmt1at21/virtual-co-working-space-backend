@@ -1,6 +1,7 @@
 import { OfficeRepository } from '../offices/office.repository';
 import { OfficeInvitationDto } from './@types/dto/OfficeInvitation.dto';
 import { IOfficeInvitationCreator } from './@types/IOfficeInvitationCreator';
+import { mapOfficeInvitationToOfficeInvitationDto } from './officeInvitation.mapping';
 import { OfficeInvitationRepository } from './officeInvitation.repository';
 
 export class OfficeInvitationCreator implements IOfficeInvitationCreator {
@@ -19,24 +20,7 @@ export class OfficeInvitationCreator implements IOfficeInvitationCreator {
 			.leftJoinAndSelect('office_invitation.createdBy', 'user')
 			.getOne();
 
-		const { office, createdBy, invitedEmail } = officeInvitation!;
-
-		return {
-			id: officeInvitation!.id,
-			inviter: {
-				id: createdBy.id,
-				email: createdBy.email,
-				name: createdBy.name
-			},
-			invitedEmail,
-			token: officeInvitation!.token,
-			office: {
-				id: office.id,
-				name: office.name,
-				invitationCode: office.invitationCode,
-				createdAt: office.createdAt
-			}
-		};
+		return mapOfficeInvitationToOfficeInvitationDto(officeInvitation!);
 	};
 
 	createPublicOfficeInvitation = async (

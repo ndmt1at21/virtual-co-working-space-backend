@@ -13,6 +13,7 @@ import { IOfficeInvitationValidate } from './@types/IOfficeInvitationValidate';
 import { OfficeInvitationServiceProps } from './@types/OfficeInvitationServiceProps';
 import { IOfficeInvitationTokenGenerator } from './components/officeInvitationTokenGenerator/@types/IOfficeInvitationTokenGenerator';
 import { OfficeInvitation } from './officeInvitation.entity';
+import { mapOfficeInvitationToOfficeInvitationDto } from './officeInvitation.mapping';
 import { OfficeInvitationRepository } from './officeInvitation.repository';
 
 export class OfficeInvitationService implements IOfficeInvitationService {
@@ -157,4 +158,11 @@ export class OfficeInvitationService implements IOfficeInvitationService {
 	};
 
 	deleteInvitation = async (inviteToken: string): Promise<void> => {};
+
+	findAllPrivateInvitations = async (): Promise<OfficeInvitationDto[]> => {
+		const invitations = await this.officeInvitationRepository.find();
+		return invitations.map(ivt =>
+			mapOfficeInvitationToOfficeInvitationDto(ivt)
+		);
+	};
 }

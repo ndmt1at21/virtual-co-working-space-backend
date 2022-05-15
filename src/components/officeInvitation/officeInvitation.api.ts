@@ -1,12 +1,16 @@
 import { Router } from 'express';
 import { rateLimiting } from '../app/middleware/rateLimit';
 import { createAuthMiddleware } from '../auth/auth.factory';
-import { createOfficeInvitationController } from './officeInvitation.factory';
+import {
+	createOfficeInvitationController,
+	createOfficeInvitationReqValidation
+} from './officeInvitation.factory';
 
 export const OfficeInvitationRouter = (): Router => {
 	const router = Router();
 	const authMiddleware = createAuthMiddleware();
 	const officeController = createOfficeInvitationController();
+	const officeInvitationReqValidation = createOfficeInvitationReqValidation();
 
 	router.use(authMiddleware.protect);
 
@@ -23,7 +27,11 @@ export const OfficeInvitationRouter = (): Router => {
 
 	router
 		.use(rateLimiting({ maxPerIp: 5, timeMs: 1000 }))
-		.post('/', officeController.createOfficeInvitationByEmail);
+		.post(
+			'/',
+			officeInvitationReqValidation.validateCreatePrivateOfficeInvitation,
+			officeController.createOfficeInvitationByEmail
+		);
 
 	return router;
 };

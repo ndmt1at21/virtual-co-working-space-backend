@@ -8,122 +8,133 @@ import { CreateOfficeDto } from './@types/dto/CreateOffice.dto';
 import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
 import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
 import { IOfficeService } from './@types/IOfficeService';
+import { generateResponseData } from '@src/utils/generateResponseData';
 
-export const OfficeController = (
-	officeService: IOfficeService,
-	logger: ILogger
-) => {
-	const getOfficeDetailById = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			logger.info(`Get office detail by id ${req.params.id}`);
+export class OfficeController {
+	constructor(
+		private officeService: IOfficeService,
+		private logger: ILogger
+	) {}
 
-			const id = +req.params.id;
-			const office = await officeService.findOfficeDetailById(id);
+	getOfficeDetailById = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`Get office detail by id ${req.params.id}`);
 
-			logger.info('Get office detail successfully');
+		const id = +req.params.id;
+		const office = await this.officeService.findOfficeDetailById(id);
 
-			res.status(HttpStatusCode.OK).json({
-				status: 'success',
-				code: HttpStatusCode.OK,
-				data: { office }
-			});
-		}
-	);
+		this.logger.info('Get office detail successfully');
 
-	const updateOfficeById = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			logger.info(`Update office by id ${req.params.id}`);
+		res.status(HttpStatusCode.OK).json({
+			status: 'success',
+			code: HttpStatusCode.OK,
+			data: { office }
+		});
+	});
 
-			const errors = await validateRequestBody(UpdateOfficeDto, req.body);
-			if (errors.length > 0) {
-				logger.error(`Update office has error: ${errors}`);
-				throw new IllegalArgumentError(
-					'Invalid update office data',
-					errors
-				);
-			}
+	updateOfficeById = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`Update office by id ${req.params.id}`);
 
-			logger.info('Upload office is starting');
-
-			const id = +req.params.id;
-
-			const updateOfficeDto = req.body as UpdateOfficeDto;
-			const office = await officeService.updateOfficeById(
-				id,
-				updateOfficeDto
+		const errors = await validateRequestBody(UpdateOfficeDto, req.body);
+		if (errors.length > 0) {
+			this.logger.error(`Update office has error: ${errors}`);
+			throw new IllegalArgumentError(
+				'Invalid update office data',
+				errors
 			);
-
-			logger.info('Update office successfully');
-
-			res.status(HttpStatusCode.OK).json({
-				status: 'success',
-				code: HttpStatusCode.OK,
-				data: { office }
-			});
 		}
-	);
 
-	const deleteOfficeById = catchAsyncRequestHandler(
+		this.logger.info('Upload office is starting');
+
+		const id = +req.params.id;
+
+		const updateOfficeDto = req.body as UpdateOfficeDto;
+		const office = await this.officeService.updateOfficeById(
+			id,
+			updateOfficeDto
+		);
+
+		this.logger.info('Update office successfully');
+
+		res.status(HttpStatusCode.OK).json({
+			status: 'success',
+			code: HttpStatusCode.OK,
+			data: { office }
+		});
+	});
+
+	deleteOfficeById = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`Delete office by id ${req.params.id}`);
+
+		const id = +req.params.id;
+		await this.officeService.deleteOfficeById(id);
+
+		this.logger.info('Delete office successfully');
+
+		res.status(HttpStatusCode.OK).json({
+			status: 'success',
+			code: HttpStatusCode.OK
+		});
+	});
+
+	blockOfficeById = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`Block office by id ${req.params.id}`);
+
+		const id = +req.params.id;
+		await this.officeService.blockOfficeById(id);
+
+		const resData = generateResponseData({
+			code: HttpStatusCode.OK,
+			data: {
+				id
+			}
+		});
+
+		this.logger.info('Block office successfully');
+
+		res.status(HttpStatusCode.OK).json(resData);
+	});
+
+	getOfficeItemsById = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`Get office items by id ${req.params.id}`);
+
+		const id = +req.params.id;
+		const items = await this.officeService.findOfficeItemsById(id);
+
+		this.logger.info('Get office items successfully');
+
+		res.status(HttpStatusCode.OK).json({
+			status: 'success',
+			data: { items }
+		});
+	});
+
+	getOfficeMembersById = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`Get office members by id ${req.params.id}`);
+
+		const id = +req.params.id;
+		const members = await this.officeService.findOfficeMembersById(id);
+
+		this.logger.info('Get office members successfully');
+
+		res.status(HttpStatusCode.OK).json({
+			status: 'success',
+			data: { members }
+		});
+	});
+
+	getAllOfficesOverviewCurrentUserIsMember = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			logger.info(`Delete office by id ${req.params.id}`);
-
-			const id = +req.params.id;
-			await officeService.deleteOfficeById(id);
-
-			logger.info('Delete office successfully');
-
-			res.status(HttpStatusCode.OK).json({
-				status: 'success',
-				code: HttpStatusCode.OK
-			});
-		}
-	);
-
-	const getOfficeItemsById = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			logger.info(`Get office items by id ${req.params.id}`);
-
-			const id = +req.params.id;
-			const items = await officeService.findOfficeItemsById(id);
-
-			logger.info('Get office items successfully');
-
-			res.status(HttpStatusCode.OK).json({
-				status: 'success',
-				data: { items }
-			});
-		}
-	);
-
-	const getOfficeMembersById = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			logger.info(`Get office members by id ${req.params.id}`);
-
-			const id = +req.params.id;
-			const members = await officeService.findOfficeMembersById(id);
-
-			logger.info('Get office members successfully');
-
-			res.status(HttpStatusCode.OK).json({
-				status: 'success',
-				data: { members }
-			});
-		}
-	);
-
-	const getAllOfficesOverviewCurrentUserIsMember = catchAsyncRequestHandler(
-		async (req, res, next) => {
-			logger.info(
+			this.logger.info(
 				`Get all offices overview current user id ${req.user?.id} is member`
 			);
 
 			const [offices, total] =
-				await officeService.findAllOfficesOverviewUserIsMemberByUserId(
+				await this.officeService.findAllOfficesOverviewUserIsMemberByUserId(
 					req.user!.id,
 					{ limit: 10, page: 10 }
 				);
 
-			logger.info('Get all offices overview successfully');
+			this.logger.info('Get all offices overview successfully');
 
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
@@ -133,10 +144,10 @@ export const OfficeController = (
 		}
 	);
 
-	const getAllOffices = catchAsyncRequestHandler(async (req, res, next) => {
-		const query = extractQueryFindAllOptions(req.query);
+	getAllOffices = catchAsyncRequestHandler(async (req, res, next) => {
+		const query = this.extractQueryFindAllOptions(req.query);
 		const [offices, pagination] =
-			await officeService.findAllOfficesOverview(query);
+			await this.officeService.findAllOfficesOverview(query);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -147,13 +158,13 @@ export const OfficeController = (
 		});
 	});
 
-	const createOffice = catchAsyncRequestHandler(async (req, res, next) => {
+	createOffice = catchAsyncRequestHandler(async (req, res, next) => {
 		const errors = await validateRequestBody(CreateOfficeDto, req.body);
 		if (errors.length > 0)
 			throw new IllegalArgumentError('Invalid request body', errors);
 
 		const createOfficeDto = req.body as CreateOfficeDto;
-		const office = await officeService.createOffice(
+		const office = await this.officeService.createOffice(
 			req.user!.id,
 			createOfficeDto
 		);
@@ -165,9 +176,7 @@ export const OfficeController = (
 		});
 	});
 
-	function extractQueryFindAllOptions(
-		originalQuery: any
-	): FindAllOfficesOptions {
+	extractQueryFindAllOptions(originalQuery: any): FindAllOfficesOptions {
 		const query = PaginateQueryParser.parse(originalQuery, {
 			filter: {
 				includes: [
@@ -192,7 +201,9 @@ export const OfficeController = (
 				createdBy: queryFilter?.created_by,
 				officeItem: queryFilter?.office_item,
 				officeMember: queryFilter?.office_member,
-				createdAt: queryFilter?.created_at
+				createdAt: queryFilter?.created_at,
+				deleted: queryFilter?.deleted,
+				blocked: queryFilter?.blocked
 			};
 		}
 
@@ -215,15 +226,4 @@ export const OfficeController = (
 
 		return options;
 	}
-
-	return {
-		getOfficeDetailById,
-		getOfficeItemsById,
-		getOfficeMembersById,
-		getAllOfficesOverviewCurrentUserIsMember,
-		getAllOffices,
-		updateOfficeById,
-		deleteOfficeById,
-		createOffice
-	};
-};
+}

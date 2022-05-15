@@ -11,6 +11,7 @@ import { MessageRouter } from '@src/components/messages/message.api';
 import { ConversationRouter } from '@src/components/conversations/conversation.api';
 import { ItemCategoryRouter } from '@src/components/itemCategories/itemCategory.api';
 import { AppearanceRouter } from '@src/components/appearances/appearance.api';
+import { AdminRouter } from '@src/components/admin';
 
 export const mainRoutes = (app: Application) => {
 	const API_PREFIX = '/api/v1';
@@ -27,6 +28,7 @@ export const mainRoutes = (app: Application) => {
 	const conversationRouter = ConversationRouter();
 	const appearanceRouter = AppearanceRouter();
 	const itemCategoryRouter = ItemCategoryRouter();
+	const adminRouter = AdminRouter();
 
 	app.use(`${API_PREFIX}/auth`, authRouter);
 	app.use(`${API_PREFIX}/users`, userRouter);
@@ -40,4 +42,5 @@ export const mainRoutes = (app: Application) => {
 	app.use(`${API_PREFIX}/conversations`, conversationRouter);
 	app.use(`${API_PREFIX}/appearances`, appearanceRouter);
 	app.use(`${API_PREFIX}/item-categories`, itemCategoryRouter);
+	app.use(`${API_PREFIX}/admin`, adminRouter);
 };

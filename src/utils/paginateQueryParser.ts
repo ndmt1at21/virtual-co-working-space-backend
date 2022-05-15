@@ -21,6 +21,7 @@ const filterOperationKeys = [
 	'lte',
 	'gt',
 	'gte',
+	'in',
 	'contains',
 	'startsWith'
 ];
@@ -32,6 +33,7 @@ type FilterOperationKey =
 	| 'lte'
 	| 'gt'
 	| 'gte'
+	| 'in'
 	| 'contains'
 	| 'startsWith';
 
@@ -73,14 +75,20 @@ export class PaginateQueryParser {
 	}
 
 	private static parseOriginalQuery(query: any) {
-		const originalQuery = qs.parse(query, {
+		// By default, express uses qs.parse() to parse the query string
+		// with options = { allowDots: false, allowPrototypes: true }
+		// so we stringify the query and parse it again
+		const originalQuery = qs.parse(qs.stringify(query, { encode: false }), {
 			allowDots: false,
 			comma: true,
 			parseArrays: true,
 			strictNullHandling: true,
-			decoder(value) {
-				if (/^(\d+|\d*\.\d+)$/.test(value)) {
-					return parseFloat(value);
+			allowPrototypes: true,
+			decoder: (value, decoder) => {
+				const defaultParsed = decoder(value);
+
+				if (/^(\d+|\d*\.\d+)$/.test(defaultParsed)) {
+					return parseFloat(defaultParsed);
 				}
 
 				const keywords = {
@@ -90,12 +98,12 @@ export class PaginateQueryParser {
 					undefined: undefined
 				};
 
-				if (value in keywords) {
+				if (defaultParsed in keywords) {
 					// @ts-ignore
-					return keywords[value];
+					return keywords[a];
 				}
 
-				return value;
+				return defaultParsed;
 			}
 		});
 
@@ -116,6 +124,8 @@ export class PaginateQueryParser {
 			}
 		});
 
+		console.log('filterObject', filterObj);
+
 		// remove not permitted filter operations in each field
 		// and convert boolean values to operation equal
 		Object.keys(filterObj).forEach(field => {
@@ -123,6 +133,11 @@ export class PaginateQueryParser {
 
 			if (typeof operations === 'string') {
 				filterObj[field] = { eq: operations };
+				return undefined;
+			}
+
+			if (Array.isArray(operations)) {
+				filterObj[field] = { in: operations };
 				return undefined;
 			}
 
@@ -141,9 +156,12 @@ export class PaginateQueryParser {
 				if (typeof value === 'boolean') {
 					delete filterObj[field][validOperation];
 
-					if (filterObj[field])
+					console.log(filterObj[field]);
+					if (filterObj[field]) {
 						filterObj[field]['eq'] = validOperation;
-					else filterObj[field] = { eq: validOperation };
+					} else {
+						filterObj[field] = { eq: validOperation };
+					}
 				}
 
 				if (!filterOperationKeys.includes(operation)) {

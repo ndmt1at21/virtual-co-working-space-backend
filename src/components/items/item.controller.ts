@@ -2,14 +2,10 @@ import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { generateResponseData } from '@src/utils/generateResponseData';
 import { PaginateQueryParser } from '@src/utils/paginateQueryParser';
-import { validateRequestBody } from '@src/utils/requestValidation';
 import { ILogger } from '../logger/@types/ILogger';
 import { CreateItemDto } from './@types/dto/CreateItem.dto';
-import {
-	FindAllItemsFilter,
-	FindAllItemsOptions,
-	FindAllItemsSort
-} from './@types/filter/FindAllItemsOptions';
+import { UpdateItemDto } from './@types/dto/UpdateItem.dto';
+import { FindAllItemsOptions } from './@types/filter/FindAllItemsOptions';
 import { IItemService } from './@types/IItemService';
 
 export class ItemController {
@@ -53,9 +49,6 @@ export class ItemController {
 	});
 
 	create = catchAsyncRequestHandler(async (req, res, next) => {
-		const errs = await validateRequestBody(CreateItemDto, req.body);
-		if (errs.length > 0) throw errs;
-
 		this.logger.info(`Create item with data = ${JSON.stringify(req.body)}`);
 
 		const createItemDto = req.body as CreateItemDto;
@@ -72,10 +65,13 @@ export class ItemController {
 	});
 
 	updateById = catchAsyncRequestHandler(async (req, res, next) => {
-		const errs = await validateRequestBody(CreateItemDto, req.body);
-		if (errs.length > 0) throw errs;
+		this.logger.info(
+			`Update item with id = ${
+				req.params.id
+			} with data = ${JSON.stringify(req.body)}`
+		);
 
-		const updateItemDto = req.body as CreateItemDto;
+		const updateItemDto = req.body as UpdateItemDto;
 		const item = await this.itemService.updateItemById(
 			+req.params.id,
 			updateItemDto
@@ -86,10 +82,14 @@ export class ItemController {
 			data: { item }
 		});
 
+		this.logger.info(`Item with id = ${req.params.id} is updated`);
+
 		res.status(HttpStatusCode.OK).json(resData);
 	});
 
 	deleteById = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`Delete item with id = ${req.params.id}`);
+
 		await this.itemService.deleteItemById(+req.params.id);
 
 		const resData = generateResponseData({
@@ -99,12 +99,12 @@ export class ItemController {
 			}
 		});
 
+		this.logger.info(`Item with id = ${req.params.id} is deleted`);
+
 		res.status(HttpStatusCode.OK).json(resData);
 	});
 
-	private extractQueryFindAllOptions(
-		originalQuery: any
-	): FindAllItemsOptions {
+	extractQueryFindAllOptions(originalQuery: any): FindAllItemsOptions {
 		const query = PaginateQueryParser.parse(originalQuery, {
 			filter: { includes: ['name', 'path', 'category_id', 'created_at'] }
 		});

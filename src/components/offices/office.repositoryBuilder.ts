@@ -79,7 +79,10 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 				[`${alias}.created_by_user_id`]: filter?.createdBy,
 				[`${alias}.office_item`]: filter?.officeItem,
 				[`${alias}.office_member`]: filter?.officeMember,
-				[`${alias}.created_at`]: filter?.createdAt
+				[`${alias}.created_at`]: filter?.createdAt,
+				[`${alias}.deleted_at`]: filter?.deleted
+					? { ne: null }
+					: undefined
 			},
 			sort: {
 				[`${alias}.name`]: sort?.name,

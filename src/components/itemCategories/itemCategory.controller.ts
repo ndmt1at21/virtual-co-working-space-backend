@@ -97,4 +97,24 @@ export class ItemCategoryController {
 
 		res.status(HttpStatusCode.OK).json(resData);
 	});
+
+	deleteItemCategoryById = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			this.logger.info(`Delete item category with id = ${req.params.id}`);
+
+			const id = +req.params.id;
+			await this.itemCategoryService.deleteItemCategoryById(id);
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: { id }
+			});
+
+			this.logger.info(
+				`Item category with id = ${id} is deleted successfully`
+			);
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
 }

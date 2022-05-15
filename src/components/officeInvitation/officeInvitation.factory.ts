@@ -5,10 +5,7 @@ import { createMailService } from '../mail/mail.factory';
 import { OfficeInvitationTokenGenerator } from './components/officeInvitationTokenGenerator';
 import { createOfficeMemberRepository } from '../officeMembers/officeMember.factory';
 import { createOfficeRoleRepository } from '../officeRoles/officeRole.factory';
-import {
-	createOfficeGenerator,
-	createOfficeRepository
-} from '../offices/office.factory';
+import { createOfficeRepository } from '../offices/office.factory';
 import { createUserRepository } from '../users/user.factory';
 import { OfficeInvitationMailQueueProducer } from './jobs/mail/mail.producer';
 import { OfficeInvitationMailWorker } from './jobs/mail/mail.worker';
@@ -17,12 +14,21 @@ import { OfficeInvitationCreator } from './officeInvitation.creator';
 import { OfficeInvitationRepository } from './officeInvitation.repository';
 import { OfficeInvitationService } from './officeInvitation.service';
 import { OfficeInvitationValidate } from './officeInvitation.validate';
+import { OfficeInvitationReqValidation } from './officeInvitation.reqValidation';
 
 export function createOfficeInvitationController() {
 	const service = createOfficeInvitationService();
 	const mailProducer = createOfficeInvitationMailProducer();
 
-	return new OfficeInvitationController(service, mailProducer);
+	return new OfficeInvitationController(
+		service,
+		mailProducer,
+		officeInvitationLogger
+	);
+}
+
+export function createOfficeInvitationReqValidation() {
+	return new OfficeInvitationReqValidation();
 }
 
 export function createOfficeInvitationService() {

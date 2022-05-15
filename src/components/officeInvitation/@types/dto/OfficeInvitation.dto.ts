@@ -7,4 +7,5 @@ export type OfficeInvitationDto = {
 	inviter?: InviterOverviewDto;
 	invitedEmail?: string;
 	token?: string;
+	createdAt?: Date;
 };

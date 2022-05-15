@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { createAuthMiddleware } from '../auth/auth.factory';
 import { UserRoleType } from '../users/@types/UserRoleType';
-import { createItemController } from './item.factory';
+import { createItemController, createItemReqValidation } from './item.factory';
 
 export const ItemRouter = (): Router => {
 	const itemController = createItemController();
+	const itemReqValidation = createItemReqValidation();
 	const authMiddleware = createAuthMiddleware();
 
 	const router = Router();
@@ -13,14 +14,16 @@ export const ItemRouter = (): Router => {
 
 	router
 		.route('/:id')
+		.all(itemReqValidation.validateItemId)
 		.get(itemController.getById)
+		.patch(
+			authMiddleware.restrictTo([UserRoleType.ADMIN]),
+			itemReqValidation.validateUpdateItemData,
+			itemController.updateById
+		)
 		.delete(
 			authMiddleware.restrictTo([UserRoleType.ADMIN]),
 			itemController.deleteById
-		)
-		.patch(
-			authMiddleware.restrictTo([UserRoleType.ADMIN]),
-			itemController.updateById
 		);
 
 	router
@@ -28,6 +31,7 @@ export const ItemRouter = (): Router => {
 		.get(itemController.getAll)
 		.post(
 			authMiddleware.restrictTo([UserRoleType.ADMIN]),
+			itemReqValidation.validateCreateItemData,
 			itemController.create
 		);
 

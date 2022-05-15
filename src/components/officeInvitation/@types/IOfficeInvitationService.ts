@@ -21,4 +21,6 @@ export interface IOfficeInvitationService {
 	acceptPublicInvitation(userId: number, inviteCode: string): Promise<void>;
 
 	deleteInvitation(inviteToken: string): Promise<void>;
+
+	findAllPrivateInvitations(): Promise<OfficeInvitationDto[]>;
 }

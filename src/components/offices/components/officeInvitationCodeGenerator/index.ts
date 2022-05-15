@@ -1,3 +1,4 @@
+import config from '@src/config';
 import { customAlphabet } from 'nanoid';
 import { IOfficeInvitationCodeGenerator } from './@types/IOfficeInvitationCodeGenerator';
 
@@ -7,7 +8,7 @@ const generator: IOfficeInvitationCodeGenerator = {
 			'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 		);
 
-		return nanoid(9);
+		return nanoid(config.office.OFFICE_INVITE_CODE_LENGTH);
 	}
 };
 

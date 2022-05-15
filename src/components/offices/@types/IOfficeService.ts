@@ -14,6 +14,8 @@ export interface IOfficeService {
 		createOfficeDto: CreateOfficeDto
 	): Promise<OfficeOverviewDto>;
 
+	blockOfficeById(officeId: number): Promise<void>;
+
 	deleteOfficeById(officeId: number): Promise<void>;
 
 	findOfficeOverviewById(id: number): Promise<OfficeOverviewDto>;

@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsUrl, Length } from 'class-validator';
+import { IsNumber, IsUrl, Length } from 'class-validator';
 
 export class UpdateItemDto {
 	@Expose()
@@ -15,6 +15,6 @@ export class UpdateItemDto {
 	image?: string;
 
 	@Expose()
-	@IsUrl()
+	@IsNumber()
 	categoryId?: number;
 }

@@ -79,4 +79,16 @@ export class ItemCategoryService implements IItemCategoryService {
 
 		return [categoriesDto, pagination];
 	};
+
+	async deleteItemCategoryById(id: number): Promise<void> {
+		const itemCategory = await this.itemCategoryRepository.findById(id);
+
+		if (!itemCategory) {
+			throw new NotFoundError(
+				ItemCategoryErrorMessages.ITEM_CATEGORY_NOT_FOUND
+			);
+		}
+
+		await this.itemCategoryRepository.softDelete(id);
+	}
 }

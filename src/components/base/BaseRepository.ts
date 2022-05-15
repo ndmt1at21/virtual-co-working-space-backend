@@ -101,7 +101,7 @@ export abstract class BaseRepository<T> extends Repository<T> {
 							break;
 						case 'in':
 							const in_value = `${field}_in_value`;
-							query.andWhere(`${field} IN (:${in_value})`, {
+							query.andWhere(`${field} IN (:...${in_value})`, {
 								[in_value]: value
 							});
 							break;

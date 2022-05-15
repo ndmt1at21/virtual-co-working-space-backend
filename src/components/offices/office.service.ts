@@ -152,6 +152,14 @@ export const OfficeService = ({
 		};
 	};
 
+	const blockOfficeById = async (id: number): Promise<void> => {
+		await officeValidate.checkOfficeExistsById(id);
+		await officeRepository.save({
+			id,
+			isBlocked: true
+		});
+	};
+
 	const deleteOfficeById = async (id: number): Promise<void> => {
 		await officeValidate.checkOfficeExistsById(id);
 		await officeRepository.softDelete(id);
@@ -166,6 +174,7 @@ export const OfficeService = ({
 		findOfficeItemsById,
 		findOfficeMembersById,
 		updateOfficeById,
+		blockOfficeById,
 		deleteOfficeById
 	};
 };

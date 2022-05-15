@@ -17,4 +17,6 @@ export interface IItemCategoryService {
 	findAllItemCategories(
 		pageable?: Pageable
 	): Promise<[ItemCategoryDetailDto[], PaginationInfo]>;
+
+	deleteItemCategoryById(id: number): Promise<void>;
 }

@@ -42,6 +42,12 @@ export class Office extends BaseEntity {
 	@Column({ name: 'number_of_items', default: 0 })
 	numberOfItems: number;
 
+	@Column({ name: 'is_blocked', default: false })
+	isBlocked: boolean;
+
+	@Column({ name: 'blocked_at', nullable: true })
+	blockedAt?: Date;
+
 	@OneToMany(() => OfficeItem, officeItem => officeItem.office, {
 		cascade: true
 	})

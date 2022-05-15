@@ -9,15 +9,8 @@ declare global {
 			emailVerified: boolean;
 		}
 
-		interface Office {
-			id: number;
-			createdBy: number;
-			role: string[];
-		}
-
 		interface Request {
 			user?: User;
-			office?: Office;
 		}
 	}
 }

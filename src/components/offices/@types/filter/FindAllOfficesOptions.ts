@@ -11,6 +11,8 @@ export type FindAllOfficesFilter = {
 	createdAt?: FilterValue;
 	officeMember?: FilterValue;
 	officeItem?: FilterValue;
+	deleted?: FilterValue;
+	blocked?: FilterValue;
 };
 
 export type FindAllOfficesSort = {

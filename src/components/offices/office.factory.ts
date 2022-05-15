@@ -15,13 +15,21 @@ import { OfficeSocketHandler } from './office.socketHandler';
 import { Server, Socket } from 'socket.io';
 import { officeLogger } from '../logger';
 import { createConversationRepository } from '../conversations/conversation.factory';
+import { OfficeMiddleware } from './office.middleware';
 
 export function createOfficeController() {
-	return OfficeController(createOfficeService(), officeLogger);
+	return new OfficeController(createOfficeService(), officeLogger);
 }
 
 export function createOfficeSocketHandler(io: Server, socket: Socket) {
 	return OfficeSocketHandler(io, socket);
+}
+
+export function createOfficeMiddleware() {
+	const officeMemberRepository = createOfficeMemberRepository();
+	const officeRepository = createOfficeRepository();
+
+	return new OfficeMiddleware(officeMemberRepository, officeRepository);
 }
 
 export function createOfficeService() {

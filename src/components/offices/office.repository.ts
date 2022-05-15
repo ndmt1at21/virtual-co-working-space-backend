@@ -28,4 +28,21 @@ export class OfficeRepository extends BaseRepository<Office> {
 
 		return count === 1;
 	}
+
+	async blockOfficeById(id: number): Promise<boolean> {
+		const result = await this.createQueryBuilder('office')
+			.update()
+			.set({
+				isBlocked: true,
+				blockedAt: new Date()
+			})
+			.where('office.id = :id', { id })
+			.execute();
+
+		if (result.affected === 0) {
+			return false;
+		}
+
+		return true;
+	}
 }

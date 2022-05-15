@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { createAuthMiddleware } from '../auth/auth.factory';
 import { UserRoleType } from './@types/UserRoleType';
-import { UserController } from './user.controller';
 import { createUserController, createUserService } from './user.factory';
 
 export const UserRouter = (): Router => {

@@ -2,7 +2,9 @@ import { OfficeRoleType } from '@src/components/officeRoles/@types/OfficeRoleTyp
 import { RequestHandler } from 'express';
 
 export interface IOfficeMiddleware {
-	deserializeOfficeFromParams: RequestHandler;
+	protect: RequestHandler;
 
 	restrictTo(requiredRoles: OfficeRoleType[]): RequestHandler;
+
+	restrictToNotBlockedOffice: RequestHandler;
 }

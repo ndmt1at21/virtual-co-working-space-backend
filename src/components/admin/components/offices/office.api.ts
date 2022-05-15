@@ -10,9 +10,9 @@ export const OfficeRouter = () => {
 
 	router.route('/:id/items').get(officeController.getOfficeItemsById);
 
-	router.route('/:id/block').delete(officeController.blockOfficeById);
+	router.route('/:id/block').patch(officeController.blockOfficeById);
 
-	router.route('/:id/unblock').delete(officeController.unblockOfficeById);
+	router.route('/:id/unblock').patch(officeController.unblockOfficeById);
 
 	router.route('/:id').get(officeController.getOfficeDetailById);
 

@@ -12,15 +12,13 @@ export const ItemCategoryRouter = (): Router => {
 	const itemCategoryController = createItemCategoryController();
 	const itemCategoryReqValidation = createItemCategoryReqValidation();
 
-	router.use(
-		authMiddleware.protect,
-		authMiddleware.restrictTo([UserRoleType.ADMIN])
-	);
+	router.use(authMiddleware.protect);
 
 	router
 		.route('/:id')
 		.get(itemCategoryController.getItemCategoryById)
 		.patch(
+			authMiddleware.restrictTo([UserRoleType.ADMIN]),
 			itemCategoryReqValidation.validateUpdateItemCategoryDto,
 			itemCategoryController.updateItemCategory
 		);
@@ -28,6 +26,7 @@ export const ItemCategoryRouter = (): Router => {
 	router
 		.route('/')
 		.post(
+			authMiddleware.restrictTo([UserRoleType.ADMIN]),
 			itemCategoryReqValidation.validateCreateItemCategoryDto,
 			itemCategoryController.createItemCategory
 		)

@@ -12,6 +12,8 @@ export const OfficeRouter = () => {
 
 	router.route('/:id/block').delete(officeController.blockOfficeById);
 
+	router.route('/:id/unblock').delete(officeController.unblockOfficeById);
+
 	router.route('/:id').get(officeController.getOfficeDetailById);
 
 	router.route('/').get(officeController.getAllOffices);

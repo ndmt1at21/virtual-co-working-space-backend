@@ -80,7 +80,25 @@ export class OfficeController {
 		this.logger.info(`Block office by id ${req.params.id}`);
 
 		const id = +req.params.id;
-		await this.officeService.blockOfficeById(id);
+		await this.officeService.changeBlockStatusOfOfficeById(id, true);
+
+		const resData = generateResponseData({
+			code: HttpStatusCode.OK,
+			data: {
+				id
+			}
+		});
+
+		this.logger.info('Block office successfully');
+
+		res.status(HttpStatusCode.OK).json(resData);
+	});
+
+	unblockOfficeById = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(`Block office by id ${req.params.id}`);
+
+		const id = +req.params.id;
+		await this.officeService.changeBlockStatusOfOfficeById(id, false);
 
 		const resData = generateResponseData({
 			code: HttpStatusCode.OK,

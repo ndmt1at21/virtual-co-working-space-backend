@@ -124,14 +124,15 @@ export class PaginateQueryParser {
 			}
 		});
 
-		console.log('filterObject', filterObj);
-
 		// remove not permitted filter operations in each field
 		// and convert boolean values to operation equal
 		Object.keys(filterObj).forEach(field => {
 			const operations = filterObj[field];
 
-			if (typeof operations === 'string') {
+			if (
+				typeof operations === 'string' ||
+				typeof operations === 'number'
+			) {
 				filterObj[field] = { eq: operations };
 				return undefined;
 			}

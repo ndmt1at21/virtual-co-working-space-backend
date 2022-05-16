@@ -12,6 +12,7 @@ import { ConversationRouter } from '@src/components/conversations/conversation.a
 import { AccessoryCategoryRouter } from '@src/components/accessoryCategories/accessoryCategory.api';
 import { AccessoryRouter } from '@src/components/accessories/accessory.api';
 import { ItemCategoryRouter } from '@src/components/itemCategories/itemCategory.api';
+import { CheckInRouter } from '@src/components/checkin/checkin.api';
 
 export const mainRoutes = (app: Application) => {
 	const API_PREFIX = '/api/v1';
@@ -29,6 +30,7 @@ export const mainRoutes = (app: Application) => {
 	const accessoryRouter = AccessoryRouter();
 	const accessoryCategoryRouter = AccessoryCategoryRouter();
 	const itemCategoryRouter = ItemCategoryRouter();
+	const checkInRouter = CheckInRouter();
 
 	app.use(`${API_PREFIX}/auth`, authRouter);
 	app.use(`${API_PREFIX}/users`, userRouter);
@@ -43,4 +45,5 @@ export const mainRoutes = (app: Application) => {
 	app.use(`${API_PREFIX}/accessories`, accessoryRouter);
 	app.use(`${API_PREFIX}/accessory-categories`, accessoryCategoryRouter);
 	app.use(`${API_PREFIX}/item-categories`, itemCategoryRouter);
+	app.use(`${API_PREFIX}/checkin`, checkInRouter);
 };

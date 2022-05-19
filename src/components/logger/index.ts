@@ -131,3 +131,11 @@ export const officeInvitationLogger = createLogger({
 		new transports.Console(debugOptions)
 	]
 });
+
+export const checkinLogger = createLogger({
+	defaultMeta: {service: 'check-in-service' },
+	transports: [
+		new transports.File(commonOptions),
+		new transports.Console(debugOptions)
+	]
+})

@@ -1,6 +1,6 @@
+import { BaseEntity } from '@src/components/base/BaseEntity';
 import { User } from '@components/users/user.entity';
 import {
-	BaseEntity,
 	Column,
 	Entity,
 	JoinColumn,
@@ -19,6 +19,9 @@ export class CheckIn extends BaseEntity {
 
 	@Column({ name: 'office_id' })
 	officeId: number;
+
+	@Column({ name: 'proof' })
+	proof: string;
 
 	@ManyToOne(() => User)
 	@JoinColumn({ name: 'user_id' })

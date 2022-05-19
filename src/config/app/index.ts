@@ -7,5 +7,6 @@ export const appConfig = {
 	PORT: process.env.PORT || 8000,
 	SERVER_DOMAIN: process.env.SERVER_DOMAIN!,
 	CLIENT_DOMAIN: process.env.CLIENT_DOMAIN!,
-	CORS_ORIGIN: process.env.CORS_ORIGIN!.split(' ')
+	// CORS_ORIGIN: process.env.CORS_ORIGIN!.split(' ')
+	CORS_ORIGIN: "*"
 };

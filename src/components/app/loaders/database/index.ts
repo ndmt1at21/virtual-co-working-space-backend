@@ -22,6 +22,7 @@ import { Appearance } from '@src/components/appearances/appearance.entity';
 import { UserMessageStatus } from '@src/components/messages/components/userMessageStatus/userMessageStatus.entity';
 import { MessageReaction } from '@src/components/messages/components/messageReactions/messageReaction.entity';
 import { ItemCategory } from '@src/components/itemCategories/itemCategory.entity';
+import { CheckIn } from '@src/components/checkin/checkin.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -51,7 +52,8 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		MessageReaction,
 		UserMessageStatus,
 		Appearance,
-		ItemCategory
+		ItemCategory,
+		CheckIn
 	]
 };
 

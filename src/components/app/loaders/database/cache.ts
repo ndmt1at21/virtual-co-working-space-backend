@@ -1,4 +1,11 @@
-import { RedisClientType, createClient, RedisClientOptions } from 'redis';
+import {
+	RedisClientType,
+	createClient,
+	RedisClientOptions,
+	RedisModules,
+	RedisFunctions,
+	RedisScripts
+} from 'redis';
 
 const conn: { [key: string]: RedisClientType } = {};
 
@@ -25,9 +32,9 @@ export const createCacheConnection = async (options: CacheConnectOption[]) => {
 
 async function connectToClient(
 	connName: string,
-	options: RedisClientOptions
+	options: RedisClientOptions<RedisModules, RedisFunctions, RedisScripts>
 ): Promise<RedisClientType> {
-	const client = createClient(options);
+	const client = createClient(options) as RedisClientType;
 	await client.connect();
 
 	conn[connName] = client;

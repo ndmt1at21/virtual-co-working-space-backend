@@ -1,7 +1,4 @@
-import {
-	mapItemToItemDto,
-	mapItemToItemOverviewDto
-} from '../items/item.mapping';
+import { mapItemToItemDto } from '../items/item.mapping';
 import { mapOfficeToOfficeOverviewDto } from '../offices/office.mapping';
 import { OfficeItemDetailDto } from './@types/dto/OfficeItemDetail.dto';
 import { OfficeItemOverviewDto } from './@types/dto/OfficeItemOverviewDto';
@@ -17,7 +14,7 @@ export const mapOfficeItemToOfficeItemOverviewDto = (
 		officeId,
 		transform,
 		createdAt,
-		item: mapItemToItemOverviewDto(item)
+		item: mapItemToItemDto(item)
 	};
 };
 

@@ -26,22 +26,29 @@ export class OfficeItemSocketService {
 			...transform
 		});
 
-		this.socket.emit('office_item:created', officeItem);
+		this.socket
+			.to(`${this.socket.data.officeMember!.officeId}`)
+			.emit('office_item:created', officeItem);
 	};
 
 	onOfficeItemMove = async (data: UpdateOfficeItemTransformDto) => {
 		const { id, transform } = data;
 
-		this.socket.emit('office_item:moved', {
-			id,
-			transform
-		});
+		this.socket
+			.to(`${this.socket.data.officeMember!.officeId}`)
+			.emit('office_item:moved', {
+				id,
+				transform
+			});
 
 		await this.officeItemService.updateOfficeItemTransform(id, transform);
 	};
 
 	onOfficeItemDelete = async (id: number) => {
 		await this.officeItemService.deleteOfficeItem(id);
-		this.socket.emit('office_item:deleted', id);
+
+		this.socket
+			.to(`${this.socket.data.officeMember!.officeId}`)
+			.emit('office_item:deleted', id);
 	};
 }

@@ -47,15 +47,6 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 		await this.update(id, { ...transform });
 	}
 
-	async findOfficeItemWithItemById(
-		id: number
-	): Promise<OfficeItem | undefined> {
-		return this.createQueryBuilder('office_item')
-			.leftJoinAndSelect('office_item.item', 'item')
-			.where('office_item.id = :id', { id })
-			.getOne();
-	}
-
 	async findOfficeItemWithItemAndItemCategoryById(
 		id: number
 	): Promise<OfficeItem | undefined> {

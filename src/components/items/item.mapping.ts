@@ -9,8 +9,3 @@ export const mapItemToItemDto = (item: Item): ItemDto => {
 
 	return { id, modelPath, name, createdAt, category: categoryDto, image };
 };
-
-export const mapItemToItemOverviewDto = (item: Item): ItemOverviewDto => {
-	const { id, modelPath, name, image, createdAt } = item;
-	return { id, modelPath, name, createdAt, image };
-};

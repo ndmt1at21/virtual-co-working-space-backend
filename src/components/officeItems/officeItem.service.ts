@@ -31,7 +31,9 @@ export class OfficeItemService implements IOfficeItemService {
 		);
 
 		const createdOfficeItem =
-			await this.officeItemRepository.findOfficeItemWithItemById(id);
+			await this.officeItemRepository.findOfficeItemWithItemAndItemCategoryById(
+				id
+			);
 
 		return mapOfficeItemToOfficeItemOverviewDto(createdOfficeItem!);
 	};

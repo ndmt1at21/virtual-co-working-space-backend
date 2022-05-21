@@ -1,3 +1,4 @@
+import { IsNestedArray } from '@src/utils/classValidatorUtil';
 import { Expose, Type } from 'class-transformer';
 import {
 	IsArray,
@@ -5,7 +6,8 @@ import {
 	IsNumber,
 	Length,
 	ValidateNested,
-	ArrayMaxSize
+	ArrayMaxSize,
+	ArrayMinSize
 } from 'class-validator';
 
 export class CreateAppearanceDto {
@@ -27,10 +29,13 @@ export class CreateAppearanceDto {
 export class CreateAppearancesDto {
 	@IsDefined()
 	@IsArray()
-	// @ArrayMaxSize(20, { message: 'Appearances array must not exceed 20 items' })
-	@ValidateNested({ always: true, each: true })
+	@ArrayMinSize(1, { message: 'Appearances array must have at least 1 item' })
+	@ArrayMaxSize(20, { message: 'Appearances array must not exceed 20 items' })
+	@IsNestedArray(CreateAppearanceDto, {
+		message: 'All element in appearances array must be an appearance object'
+	})
 	@Type(() => CreateAppearanceDto)
-	// @Expose()
+	@Expose()
 	appearances: CreateAppearanceDto[];
 
 	userId: number;

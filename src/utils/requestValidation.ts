@@ -1,4 +1,8 @@
-import { plainToInstance } from 'class-transformer';
+import {
+	CreateAppearanceDto,
+	CreateAppearancesDto
+} from '@src/components/appearances/@types/dto/CreateAppearance.dto';
+import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
 type RequestBodyValidationError = {
@@ -7,10 +11,10 @@ type RequestBodyValidationError = {
 
 // validate req.body, return first constraint error or null
 export const validateRequestBody = async (
-	classToConvert: any,
+	classToConvert: ClassConstructor<unknown>,
 	body: any
 ): Promise<RequestBodyValidationError[]> => {
-	const data = plainToInstance(classToConvert, body);
+	const data = plainToInstance(classToConvert, body) as object;
 
 	const errors = await validate(data, { skipMissingProperties: true });
 

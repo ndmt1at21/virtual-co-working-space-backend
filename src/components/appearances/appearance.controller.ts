@@ -2,6 +2,7 @@ import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { generateResponseData } from '@src/utils/generateResponseData';
 import { PaginateQueryParser } from '@src/utils/paginateQueryParser';
+import { CreateAppearancesDto } from './@types/dto/CreateAppearance.dto';
 import { FindAllAccessoriesOptions } from './@types/filter/FindAllAppearancesOptions';
 import { IAppearanceService } from './@types/IAppearanceService';
 
@@ -9,16 +10,22 @@ export class AppearanceController {
 	constructor(private appearanceService: IAppearanceService) {}
 
 	createAppearance = catchAsyncRequestHandler(async (req, res, next) => {
-		const createAppearanceDto = req.body;
+		const createAppearanceDto = req.body as CreateAppearancesDto;
 
-		const appearance = await this.appearanceService.createAppearance({
-			...createAppearanceDto,
-			userId: req.user!.id
-		});
+		const changedAppearances =
+			await this.appearanceService.createAppearance({
+				appearances: createAppearanceDto.appearances.map(
+					appearance => ({
+						...appearance,
+						userId: req.user!.id
+					})
+				),
+				userId: req.user!.id
+			});
 
 		const resData = generateResponseData({
 			code: HttpStatusCode.OK,
-			data: appearance
+			data: { appearances: changedAppearances }
 		});
 
 		res.status(HttpStatusCode.OK).json(resData);

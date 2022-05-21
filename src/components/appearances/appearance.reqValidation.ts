@@ -1,13 +1,13 @@
 import { IllegalArgumentError } from '@src/utils/appError';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { validateRequestBody } from '@src/utils/requestValidation';
-import { CreateAppearanceDto } from './@types/dto/CreateAppearance.dto';
+import { CreateAppearancesDto } from './@types/dto/CreateAppearance.dto';
 
 export const AppearanceReqValidation = () => {
 	const validateCreateAppearance = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const errors = await validateRequestBody(
-				CreateAppearanceDto,
+				CreateAppearancesDto,
 				req.body
 			);
 

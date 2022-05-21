@@ -7,11 +7,11 @@ import { Appearance } from './appearance.entity';
 
 @EntityRepository(Appearance)
 export class AppearanceRepository extends BaseRepository<Appearance> {
-	async findAppearanceByKeyAndUserId(key: string, userId: number) {
+	async findAppearanceByKeysAndUserId(keys: string[], userId: number) {
 		return await this.createQueryBuilder('appearance')
-			.where('appearance.key = :key', { key })
+			.where('appearance.key IN (:...keys)', { keys })
 			.andWhere('appearance.user_id = :userId', { userId })
-			.getOne();
+			.getMany();
 	}
 
 	async findAllAccessoriesOfUser(userId: number): Promise<Appearance[]> {

@@ -10,8 +10,11 @@ export class AuthTracking extends BaseEntity {
 	@Index({ unique: true })
 	userId: number;
 
+	@Column({ name: 'ip_address' })
+	ipAddress: string;
+
 	@Column({ name: 'last_login' })
-	lastLogin?: Date;
+	lastLogin: Date;
 
 	@Column({ name: 'last_logout' })
 	lastLogout?: Date;

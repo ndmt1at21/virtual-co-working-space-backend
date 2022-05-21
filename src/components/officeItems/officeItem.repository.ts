@@ -87,6 +87,7 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 	): Promise<OfficeItem[]> {
 		return this.createQueryBuilder('office_item')
 			.leftJoinAndSelect('office_item.item', 'item')
+			.leftJoinAndSelect('item.category', 'item_category')
 			.where('office_item.officeId = :officeId', { officeId })
 			.getMany();
 	}

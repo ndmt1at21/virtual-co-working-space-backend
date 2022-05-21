@@ -82,10 +82,7 @@ export const socketServerLoader = (
 	return socketServer;
 };
 
-export const peerServerLoader = (
-	server: HttpServer,
-	app: Express
-) => {
+export const peerServerLoader = (server: HttpServer, app: Express) => {
 	const peerServer = ExpressPeerServer(server, {
 		path: '/'
 	});

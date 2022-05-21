@@ -21,11 +21,19 @@ export class OfficeItemService implements IOfficeItemService {
 	createOfficeItem = async (
 		createOfficeItemDto: CreateOfficeItemDto
 	): Promise<OfficeItemOverviewDto> => {
-		const officeItem = await this.officeItemRepository.saveOfficeItem(
+		await this.officeItemValidate.checkOfficeAndItemExists(
+			createOfficeItemDto.officeId,
+			createOfficeItemDto.itemId
+		);
+
+		const { id } = await this.officeItemRepository.saveOfficeItem(
 			createOfficeItemDto
 		);
 
-		return mapOfficeItemToOfficeItemOverviewDto(officeItem);
+		const createdOfficeItem =
+			await this.officeItemRepository.findOfficeItemWithItemById(id);
+
+		return mapOfficeItemToOfficeItemOverviewDto(createdOfficeItem!);
 	};
 
 	updateOfficeItemTransform = async (

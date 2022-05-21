@@ -15,10 +15,10 @@ export class OfficeItem extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@PrimaryColumn({ name: 'item_id' })
+	@Column({ name: 'item_id' })
 	itemId: number;
 
-	@PrimaryColumn({ name: 'office_id' })
+	@Column({ name: 'office_id' })
 	officeId: number;
 
 	@Column({ name: 'x_rotation' })

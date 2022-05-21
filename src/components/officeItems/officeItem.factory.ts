@@ -1,6 +1,10 @@
 import { Server, Socket } from 'socket.io';
 import { getCustomRepository } from 'typeorm';
-import { createOfficeService } from '../offices/office.factory';
+import { createItemRepository } from '../items/item.factory';
+import {
+	createOfficeRepository,
+	createOfficeService
+} from '../offices/office.factory';
 import { OfficeItemController } from './officeItem.controller';
 import { OfficeItemRepository } from './officeItem.repository';
 import { OfficeItemService } from './officeItem.service';
@@ -25,8 +29,15 @@ export function createOfficeItemService() {
 }
 
 export function createOfficeItemValidate() {
-	const officeItemRepository = getCustomRepository(OfficeItemRepository);
-	return OfficeItemValidate(officeItemRepository);
+	const officeRepository = createOfficeRepository();
+	const itemRepository = createItemRepository();
+	const officeItemRepository = createOfficeItemRepository();
+
+	return OfficeItemValidate(
+		officeRepository,
+		itemRepository,
+		officeItemRepository
+	);
 }
 
 export function createOfficeItemRepository() {

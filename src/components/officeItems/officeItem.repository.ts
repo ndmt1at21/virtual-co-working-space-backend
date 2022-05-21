@@ -16,24 +16,28 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 	}
 
 	async saveOfficeItem(entity: DeepPartial<OfficeItem>): Promise<OfficeItem> {
-		let createdOfficeItem: OfficeItem;
+		const officeItem = await getManager().transaction(
+			async transactionManager => {
+				const officeItem = transactionManager.create(
+					OfficeItem,
+					entity
+				);
 
-		getManager().transaction(async transactionManager => {
-			const officeItem = transactionManager.create(OfficeItem, entity);
+				const createdOfficeItem =
+					await transactionManager.save<OfficeItem>(officeItem);
 
-			createdOfficeItem = await transactionManager.save<OfficeItem>(
-				officeItem
-			);
+				await transactionManager.increment(
+					Office,
+					{ id: entity.officeId! },
+					'numberOfItems',
+					1
+				);
 
-			await transactionManager.increment(
-				Office,
-				{ id: entity.officeId! },
-				'numberOfItems',
-				1
-			);
-		});
+				return createdOfficeItem;
+			}
+		);
 
-		return createdOfficeItem!;
+		return officeItem;
 	}
 
 	async updateOfficeItemTransformById(
@@ -52,12 +56,24 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 			.getOne();
 	}
 
+	async findOfficeItemWithItemAndItemCategoryById(
+		id: number
+	): Promise<OfficeItem | undefined> {
+		return this.createQueryBuilder('office_item')
+			.leftJoinAndSelect('office_item.item', 'item')
+			.leftJoinAndSelect('item.category', 'item_category')
+			.where('office_item.id = :id', { id })
+			.getOne();
+	}
+
 	async findOfficeItemWithItemAndOfficeById(
 		id: number
 	): Promise<OfficeItem | undefined> {
 		return this.createQueryBuilder('office_item')
 			.leftJoinAndSelect('office_item.item', 'item')
+			.leftJoinAndSelect('item.category', 'item_category')
 			.leftJoinAndSelect('office_item.office', 'office')
+			.leftJoinAndSelect('office.createdBy', 'user')
 			.where('office_item.id = :id', { id })
 			.getOne();
 	}
@@ -67,7 +83,9 @@ export class OfficeItemRepository extends BaseRepository<OfficeItem> {
 
 		return this.createQueryBuilder('office_item')
 			.leftJoinAndSelect('office_item.item', 'item')
+			.leftJoinAndSelect('item.category', 'item_category')
 			.leftJoinAndSelect('office_item.office', 'office')
+			.leftJoinAndSelect('office.createdBy', 'user')
 			.skip((page - 1) * limit)
 			.limit(limit)
 			.getMany();

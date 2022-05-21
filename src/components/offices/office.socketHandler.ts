@@ -11,6 +11,7 @@ import { createMessageSocketService } from '../messages/message.factory';
 import { CreateMessageDto } from '../messages/@types/dto/CreateMessage.dto';
 import { RevokeMessageData } from '../messages/@types/dto/RevokeMessageData.dto copy';
 import { DeleteMessageData } from '../messages/@types/dto/DeleteMessageData.dto';
+import { EmojiListenerData } from './@types/dto/EmojiData';
 
 export const OfficeSocketHandler = (
 	socketNamespace: SocketServer,
@@ -43,6 +44,7 @@ export const OfficeSocketHandler = (
 			handleOfficeMemberEvents(socket);
 			handleOfficeItemsEvents(socket);
 			handleChatEvents(socket);
+			handleEmojiEvent(socket);
 		} catch (err) {
 			socket.emit('office:error', err);
 		}
@@ -105,6 +107,22 @@ export const OfficeSocketHandler = (
 
 		socket.on('message:markAsRead', () => {
 			messageSocketService.onMarkAsRead();
+		});
+	}
+
+	function handleEmojiEvent(
+		socket: Socket<
+			OfficeClientToServerEvent,
+			OfficeServerToClientEvent,
+			any,
+			OfficeSocketData
+		>
+	) {
+		socket.on('emoji', (data: EmojiListenerData) => {
+			socket.to(`${socket.data.officeMember!.officeId}`).emit('emoji', {
+				userId: socket.user!.id,
+				emojiId: data.emojiId
+			});
 		});
 	}
 };

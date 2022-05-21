@@ -12,9 +12,13 @@ export const OfficeItemRouter = () => {
 	router
 		.route('/:id')
 		.get(officeItemController.getOfficeItemDetailById)
+		.patch(officeItemController.updateTransform)
 		.delete(officeItemController.deleteOfficeItemById);
 
-	router.route('/').get(officeItemController.getOfficeItemsDetail);
+	router
+		.route('/')
+		.get(officeItemController.getOfficeItemsDetail)
+		.post(officeItemController.createOfficeItem);
 
 	return router;
 };

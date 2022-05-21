@@ -1,5 +1,5 @@
 import { mapItemCategoryToItemCategoryOverviewDto } from '../itemCategories/itemCategory.mapping';
-import { ItemDto } from './@types/dto/Item.dto';
+import { ItemDto, ItemOverviewDto } from './@types/dto/Item.dto';
 import { Item } from './item.entity';
 
 export const mapItemToItemDto = (item: Item): ItemDto => {
@@ -8,4 +8,9 @@ export const mapItemToItemDto = (item: Item): ItemDto => {
 	const categoryDto = mapItemCategoryToItemCategoryOverviewDto(category);
 
 	return { id, modelPath, name, createdAt, category: categoryDto, image };
+};
+
+export const mapItemToItemOverviewDto = (item: Item): ItemOverviewDto => {
+	const { id, modelPath, name, image, createdAt } = item;
+	return { id, modelPath, name, createdAt, image };
 };

@@ -8,3 +8,11 @@ export type ItemDto = {
 	category: ItemCategoryOverviewDto;
 	createdAt: Date;
 };
+
+export type ItemOverviewDto = {
+	id: number;
+	name: string;
+	modelPath: string;
+	image?: string;
+	createdAt: Date;
+};

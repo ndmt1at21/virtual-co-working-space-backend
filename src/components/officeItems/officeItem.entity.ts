@@ -21,22 +21,22 @@ export class OfficeItem extends BaseEntity {
 	@Column({ name: 'office_id' })
 	officeId: number;
 
-	@Column({ name: 'x_rotation' })
+	@Column({ name: 'x_rotation', type: 'float', default: 0 })
 	xRotation: number;
 
-	@Column({ name: 'y_rotation' })
+	@Column({ name: 'y_rotation', type: 'float', default: 0 })
 	yRotation: number;
 
-	@Column({ name: 'z_rotation' })
+	@Column({ name: 'z_rotation', type: 'float', default: 0 })
 	zRotation: number;
 
-	@Column({ name: 'x_position' })
+	@Column({ name: 'x_position', type: 'float', default: 0 })
 	xPosition: number;
 
-	@Column({ name: 'y_position' })
+	@Column({ name: 'y_position', type: 'float', default: 0 })
 	yPosition: number;
 
-	@Column({ name: 'z_position' })
+	@Column({ name: 'z_position', type: 'float', default: 0 })
 	zPosition: number;
 
 	@ManyToOne(() => Item)

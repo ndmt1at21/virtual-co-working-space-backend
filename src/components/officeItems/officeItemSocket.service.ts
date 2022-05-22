@@ -26,8 +26,8 @@ export class OfficeItemSocketService {
 			...transform
 		});
 
-		this.socket
-			.to(`${this.socket.data.officeMember!.officeId}`)
+		this.socketNamespace
+			.in(`${this.socket.data.officeMember!.officeId}`)
 			.emit('office_item:created', officeItem);
 	};
 

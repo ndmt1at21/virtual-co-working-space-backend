@@ -7,22 +7,22 @@ export class OfficeMemberTransform extends BaseEntity {
 	@PrimaryColumn({ name: 'office_member_id' })
 	officeMemberId: number;
 
-	@Column({ name: 'x_rotation', default: 0 })
+	@Column({ name: 'x_rotation', default: 0, type: 'float' })
 	xRotation: number;
 
-	@Column({ name: 'y_rotation', default: 0 })
+	@Column({ name: 'y_rotation', default: 0, type: 'float' })
 	yRotation: number;
 
-	@Column({ name: 'z_rotation', default: 0 })
+	@Column({ name: 'z_rotation', default: 0, type: 'float' })
 	zRotation: number;
 
-	@Column({ name: 'x_position', default: 0 })
+	@Column({ name: 'x_position', default: 0, type: 'float' })
 	xPosition: number;
 
-	@Column({ name: 'y_position', default: 0 })
+	@Column({ name: 'y_position', default: 0, type: 'float' })
 	yPosition: number;
 
-	@Column({ name: 'z_position', default: 0 })
+	@Column({ name: 'z_position', default: 0, type: 'float' })
 	zPosition: number;
 
 	@OneToOne(() => OfficeMember)

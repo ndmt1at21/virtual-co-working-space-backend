@@ -23,6 +23,7 @@ import { UserMessageStatus } from '@src/components/messages/components/userMessa
 import { MessageReaction } from '@src/components/messages/components/messageReactions/messageReaction.entity';
 import { ItemCategory } from '@src/components/itemCategories/itemCategory.entity';
 import { CheckIn } from '@src/components/checkin/checkin.entity';
+import { PushToken } from '@src/components/pushTokens/pushToken.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -53,7 +54,8 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		UserMessageStatus,
 		Appearance,
 		ItemCategory,
-		CheckIn
+		CheckIn,
+		PushToken
 	]
 };
 

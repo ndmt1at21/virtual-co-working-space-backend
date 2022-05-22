@@ -42,3 +42,5 @@ dist
 *.env
 
 dump.rdb
+
+firebase*.json

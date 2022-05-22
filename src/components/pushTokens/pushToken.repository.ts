@@ -35,7 +35,7 @@ export class PushTokenRepository extends BaseRepository<PushToken> {
 		return count === 1;
 	}
 
-	async findTokensByUserId(userId: number): Promise<PushToken[] | undefined> {
+	async findTokensByUserId(userId: number): Promise<PushToken[]> {
 		return await this.createQueryBuilder('pushToken')
 			.where('pushToken.userId = :userId', { userId })
 			.getMany();

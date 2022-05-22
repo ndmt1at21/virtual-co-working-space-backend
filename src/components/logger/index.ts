@@ -133,9 +133,17 @@ export const officeInvitationLogger = createLogger({
 });
 
 export const checkinLogger = createLogger({
-	defaultMeta: {service: 'check-in-service' },
+	defaultMeta: { service: 'check-in-service' },
 	transports: [
 		new transports.File(commonOptions),
 		new transports.Console(debugOptions)
 	]
-})
+});
+
+export const pushNotificationLogger = createLogger({
+	defaultMeta: { service: 'push-notification-service' },
+	transports: [
+		new transports.File(commonOptions),
+		new transports.Console(debugOptions)
+	]
+});

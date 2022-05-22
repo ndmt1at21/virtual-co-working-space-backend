@@ -78,34 +78,38 @@ export class PaginateQueryParser {
 		// By default, express uses qs.parse() to parse the query string
 		// with options = { allowDots: false, allowPrototypes: true }
 		// so we stringify the query and parse it again
-		const originalQuery = qs.parse(qs.stringify(query, { encode: false }), {
-			allowDots: false,
-			comma: true,
-			parseArrays: true,
-			strictNullHandling: true,
-			allowPrototypes: true,
-			decoder: (value, decoder) => {
-				const defaultParsed = decoder(value);
+		const originalQuery = qs.parse(
+			qs.stringify(query, { encode: false, skipNulls: true }),
+			{
+				allowDots: false,
+				comma: true,
+				parseArrays: true,
+				strictNullHandling: true,
+				allowPrototypes: true,
+				decoder: (value, decoder) => {
+					const defaultParsed = decoder(value);
 
-				if (/^(\d+|\d*\.\d+)$/.test(defaultParsed)) {
-					return parseFloat(defaultParsed);
+					if (/^(\d+|\d*\.\d+)$/.test(defaultParsed)) {
+						return parseFloat(defaultParsed);
+					}
+
+					const keywords = {
+						true: true,
+						false: false,
+						null: null,
+						undefined: undefined,
+						'': undefined
+					};
+
+					if (defaultParsed in keywords) {
+						// @ts-ignore
+						return keywords[defaultParsed];
+					}
+
+					return defaultParsed;
 				}
-
-				const keywords = {
-					true: true,
-					false: false,
-					null: null,
-					undefined: undefined
-				};
-
-				if (defaultParsed in keywords) {
-					// @ts-ignore
-					return keywords[a];
-				}
-
-				return defaultParsed;
 			}
-		});
+		);
 
 		return originalQuery;
 	}

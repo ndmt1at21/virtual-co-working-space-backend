@@ -7,6 +7,7 @@ import { ItemRouter } from './components/items/item.api';
 import { OfficeInvitationRouter } from './components/officeInvitations/officeInvitation.api';
 import { OfficeItemRouter } from './components/officeItems/officeItem.api';
 import { OfficeRouter } from './components/offices/office.api';
+import { PushTokenRouter } from './components/pushTokens/pushToken.api';
 import { UserRouter } from './components/users/user.api';
 
 export const AdminRouter = () => {
@@ -25,6 +26,7 @@ export const AdminRouter = () => {
 	const officeMemberRouter = OfficeMemberRouter();
 	const officeInvitationRouter = OfficeInvitationRouter();
 	const itemCategoryRouter = ItemCategoryRouter();
+	const pushTokenRouter = PushTokenRouter();
 
 	router.use(`/users`, userRouter);
 	router.use(`/items`, itemRouter);
@@ -33,6 +35,7 @@ export const AdminRouter = () => {
 	router.use(`/office-members`, officeMemberRouter);
 	router.use(`/invites`, officeInvitationRouter);
 	router.use(`/item-categories`, itemCategoryRouter);
+	router.use(`/push-tokens`, pushTokenRouter);
 
 	return router;
 };

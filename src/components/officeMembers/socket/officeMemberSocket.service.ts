@@ -50,7 +50,7 @@ export const OfficeMemberSocketService = (
 
 		// await disconnectExistSocketHasSameUserId(userId);
 		emitMemberOnlineToOffice(officeMember.memberId, officeId);
-		setMemberInOfficeOnline(officeMember.memberId);
+		setMemberInOfficeOnline(officeMember.id);
 
 		logger.info(
 			`User ${socket.user?.id} joined to office ${officeMember.officeId}`

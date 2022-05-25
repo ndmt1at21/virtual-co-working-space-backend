@@ -1,7 +1,6 @@
-import firebase, { credential } from 'firebase-admin';
-
 import fs from 'fs';
 import config from '@src/config';
+import firebase, { credential } from 'firebase-admin';
 import { Message } from 'firebase-admin/lib/messaging/messaging-api';
 import { IPushNotificationService } from './@types/IPushNotificationService';
 import { ILogger } from '../logger/@types/ILogger';
@@ -48,21 +47,47 @@ export class PushNotificationService implements IPushNotificationService {
 		userId: number,
 		message: NotificationMessage
 	): Promise<void> {
+		const { title, body, data, imageUrl } = message;
+
 		const pushTokens = await this.pushTokenRepository.findTokensByUserId(
 			userId
 		);
 
-		const pushMessages: Message[] = pushTokens?.map(pushToken => {
-			if (pushToken.deviceType === PushTokenDevice.ANDROID) {
-			}
-
-			if (pushToken.deviceType === PushTokenDevice.IOS) {
-			}
-
-			if (pushToken.deviceType === PushTokenDevice.WEB) {
-			}
+		const pushMessages: Message[] = pushTokens.map((pushToken): Message => {
+			return {
+				notification: {
+					title,
+					body,
+					imageUrl
+				},
+				data,
+				token: pushToken.token
+			};
 		});
 
-		firebase.messaging().sendAll([{}]);
+		const result = await firebase.messaging().sendAll(pushMessages);
+		console.log(result);
+	}
+
+	async pushNotifications(
+		notifications: { userId: number; message: NotificationMessage }[]
+	): Promise<void> {
+		// const { title, body, data, imageUrl } = notifications;
+		// const pushTokens = await this.pushTokenRepository.findTokensByUserId(
+		// 	userId
+		// );
+		// const pushMessages: Message[] = pushTokens.map((pushToken): Message => {
+		// 	return {
+		// 		notification: {
+		// 			title,
+		// 			body,
+		// 			imageUrl
+		// 		},
+		// 		data,
+		// 		token: pushToken.token
+		// 	};
+		// });
+		// const result = await firebase.messaging().sendAll(pushMessages);
+		// console.log(result);
 	}
 }

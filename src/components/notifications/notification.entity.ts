@@ -1,38 +1,34 @@
-import { NotificationType } from '@src/@types/NotificationType';
 import {
 	BaseEntity,
 	Column,
 	Entity,
 	JoinColumn,
+	ManyToOne,
 	OneToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { User } from '@components/users/user.entity';
+import { NotificationObject } from './components/notificationObject/notificationObject.entity';
 
 @Entity({ name: 'notification' })
 export class Notification extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column({ name: 'user_id' })
-	userId: number;
+	@Column({ name: 'notification_object_id' })
+	notificationObjectId: number;
 
-	@Column({ nullable: true })
-	image?: string;
+	@Column({ name: 'actor_id' })
+	actorId: number;
 
-	@Column()
-	title: string;
+	@Column({ name: 'notifiers', type: 'array' })
+	notifiers: number[];
 
-	@Column()
-	content: string;
+	@OneToOne(type => NotificationObject)
+	@JoinColumn({ name: 'notification_object_id' })
+	notificationObject: NotificationObject;
 
-	@Column()
-	link: string;
-
-	@Column({ type: 'enum' })
-	type: NotificationType;
-
-	@OneToOne(() => User)
-	@JoinColumn({ name: 'user_id' })
-	user: User;
+	@ManyToOne(() => User)
+	@JoinColumn({ name: 'actor_id' })
+	actor: User;
 }

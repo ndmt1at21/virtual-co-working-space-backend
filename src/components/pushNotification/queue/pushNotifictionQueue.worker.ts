@@ -1,11 +1,11 @@
 import { ILogger } from '@src/components/logger/@types/ILogger';
 import { Queue } from 'bull';
-import { PushTokenRepository } from '@src/components/pushTokens/pushToken.repository';
+import { IPushNotificationService } from '../@types/IPushNotificationService';
 
 export class PushNotificationWorker {
 	constructor(
 		private readonly queue: Queue,
-		private readonly pushTokenRepository: PushTokenRepository,
+		private readonly pushNotificationService: IPushNotificationService,
 		private readonly logger: ILogger
 	) {}
 

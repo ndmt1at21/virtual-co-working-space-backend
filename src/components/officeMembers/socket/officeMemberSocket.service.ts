@@ -1,3 +1,5 @@
+import { OfficeMember } from '@components/officeMembers/officeMember.entity';
+import { OfficeMemberDetailDto } from './../@types/dto/OfficeMemberDetail.dto';
 import { ILogger } from '@src/components/logger/@types/ILogger';
 import { UpdateOfficeMemberTransformDto } from '@src/components/officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
 import { IOfficeMemberTransformService } from '@src/components/officeMemberTransform/@types/IOfficeMemberTransformService';
@@ -49,7 +51,7 @@ export const OfficeMemberSocketService = (
 		socket.join(`${officeMember!.officeId}`);
 
 		// await disconnectExistSocketHasSameUserId(userId);
-		emitMemberOnlineToOffice(officeMember.memberId, officeId);
+		emitMemberOnlineToOffice(officeMember, officeId);
 		setMemberInOfficeOnline(officeMember.id);
 
 		logger.info(
@@ -112,10 +114,10 @@ export const OfficeMemberSocketService = (
 	}
 
 	async function emitMemberOnlineToOffice(
-		memberId: number,
+		officeMember: OfficeMember,
 		officeId: number
 	) {
-		socket.to(`${officeId}`).emit('office_member:online', memberId);
+		socket.to(`${officeId}`).emit('office_member:online', officeMember);
 	}
 
 	async function setMemberInOfficeOnline(memberId: number) {

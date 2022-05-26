@@ -12,6 +12,8 @@ import { OfficeMemberClientToServerEvent } from '../@types/socket/OfficeMemberCl
 import { OfficeMemberServerToClientEvent } from '../@types/socket/OfficeMemberServerToClientEvent';
 import { OfficeMemberSocketData } from '../@types/socket/OfficeMemberSocketData';
 import { OfficeMemberRepository } from '../officeMember.repository';
+import { OfficeMemberOverviewDto } from '../@types/dto/OfficeMemberOverview.dto';
+import { mapOfficeMemberToOfficeMemberOverviewDto } from '../officeMember.mapping';
 
 export const OfficeMemberSocketService = (
 	socketNamespace: SocketServer,
@@ -37,6 +39,8 @@ export const OfficeMemberSocketService = (
 		const officeMember = await officeMemberRepository
 			.queryBuilder()
 			.findByMemberIdAndOfficeId(userId, officeId)
+			.withMember()
+			.withTransform()
 			.build()
 			.getOne();
 
@@ -51,7 +55,10 @@ export const OfficeMemberSocketService = (
 		socket.join(`${officeMember!.officeId}`);
 
 		// await disconnectExistSocketHasSameUserId(userId);
-		emitMemberOnlineToOffice(officeMember, officeId);
+		emitMemberOnlineToOffice(
+			mapOfficeMemberToOfficeMemberOverviewDto(officeMember),
+			officeId
+		);
 		setMemberInOfficeOnline(officeMember.id);
 
 		logger.info(
@@ -114,7 +121,7 @@ export const OfficeMemberSocketService = (
 	}
 
 	async function emitMemberOnlineToOffice(
-		officeMember: OfficeMember,
+		officeMember: OfficeMemberOverviewDto,
 		officeId: number
 	) {
 		socket.to(`${officeId}`).emit('office_member:online', officeMember);

@@ -163,9 +163,15 @@ export class OfficeController {
 	);
 
 	getAllOffices = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(
+			`Get all offices with query: ${JSON.stringify(req.query)}`
+		);
+
 		const query = this.extractQueryFindAllOptions(req.query);
 		const [offices, pagination] =
 			await this.officeService.findAllOfficesOverview(query);
+
+		this.logger.info('Get all offices successfully');
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -177,15 +183,23 @@ export class OfficeController {
 	});
 
 	createOffice = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info('Create office is starting');
+
 		const errors = await validateRequestBody(CreateOfficeDto, req.body);
 		if (errors.length > 0)
 			throw new IllegalArgumentError('Invalid request body', errors);
+
+		this.logger.info(
+			`Create office with data: ${JSON.stringify(req.body)}`
+		);
 
 		const createOfficeDto = req.body as CreateOfficeDto;
 		const office = await this.officeService.createOffice(
 			req.user!.id,
 			createOfficeDto
 		);
+
+		this.logger('Create office successfully with id: ', office.id);
 
 		res.status(HttpStatusCode.OK).json({
 			status: 'success',

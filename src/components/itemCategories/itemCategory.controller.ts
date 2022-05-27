@@ -5,6 +5,7 @@ import { PaginateQueryParser } from '@src/utils/paginateQueryParser';
 import { ILogger } from '../logger/@types/ILogger';
 import { CreateItemCategoryDto } from './@types/dto/CreateItemCategory.dto';
 import { UpdateItemCategoryDto } from './@types/dto/UpdateItemCategory,dto';
+import { FindAllItemCategoriesOptions } from './@types/filter/FindAllItemCategoriesOptions';
 import { IItemCategoryService } from './@types/IItemCategoryService';
 
 export class ItemCategoryController {
@@ -81,10 +82,12 @@ export class ItemCategoryController {
 			`Get all item categories with query = ${JSON.stringify(req.query)}`
 		);
 
-		const { pageable } = PaginateQueryParser.parse(req.query);
+		const findAllOptions = this.extractQueryFindAllOptions(req.query);
 
 		const [itemCategories, paginationInfo] =
-			await this.itemCategoryService.findAllItemCategories(pageable);
+			await this.itemCategoryService.findAllItemCategories(
+				findAllOptions
+			);
 
 		const resData = generateResponseData({
 			code: HttpStatusCode.OK,
@@ -117,4 +120,33 @@ export class ItemCategoryController {
 			res.status(HttpStatusCode.OK).json(resData);
 		}
 	);
+
+	extractQueryFindAllOptions(
+		originalQuery: any
+	): FindAllItemCategoriesOptions {
+		const query = PaginateQueryParser.parse(originalQuery, {
+			filter: { includes: ['name'] }
+		});
+
+		const options: FindAllItemCategoriesOptions = {};
+
+		if (query.filter) {
+			options.filter = {
+				name: query.filter.name
+			};
+		}
+
+		if (query.sort) {
+			options.sort = {
+				id: query.sort?.id.order,
+				createdAt: query.sort.created_at?.order
+			};
+		}
+
+		if (query.pageable) {
+			options.pageable = query.pageable;
+		}
+
+		return options;
+	}
 }

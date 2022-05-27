@@ -4,6 +4,7 @@ import { PaginationInfo } from '../base/@types/PaginationInfo';
 import { CreateItemCategoryDto } from './@types/dto/CreateItemCategory.dto';
 import { ItemCategoryDetailDto } from './@types/dto/ItemCategoryDetail.dto';
 import { UpdateItemCategoryDto } from './@types/dto/UpdateItemCategory,dto';
+import { FindAllItemCategoriesOptions } from './@types/filter/FindAllItemCategoriesOptions';
 import { IItemCategoryService } from './@types/IItemCategoryService';
 import { ItemCategoryErrorMessages } from './itemCategory.error';
 import { mapItemCategoryToItemCategoryDetailDto } from './itemCategory.mapping';
@@ -68,10 +69,10 @@ export class ItemCategoryService implements IItemCategoryService {
 	};
 
 	findAllItemCategories = async (
-		pageable?: Pageable
+		options: FindAllItemCategoriesOptions
 	): Promise<[ItemCategoryDetailDto[], PaginationInfo]> => {
 		const [categories, pagination] =
-			await this.itemCategoryRepository.findAllItemCategories(pageable);
+			await this.itemCategoryRepository.findAllItemCategories(options);
 
 		const categoriesDto = categories.map(category =>
 			mapItemCategoryToItemCategoryDetailDto(category)

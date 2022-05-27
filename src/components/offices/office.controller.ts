@@ -199,7 +199,7 @@ export class OfficeController {
 			createOfficeDto
 		);
 
-		this.logger('Create office successfully with id: ', office.id);
+		this.logger.info('Create office successfully with id: ', office.id);
 
 		res.status(HttpStatusCode.OK).json({
 			status: 'success',

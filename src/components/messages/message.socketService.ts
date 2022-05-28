@@ -85,7 +85,11 @@ export class MessageSocketService implements IMessageSocketService {
 
 		this.socketNamespace
 			.in(`conversation/${conversationId}`)
-			.emit('message:revoked', messageId);
+			.emit('message:revoked', {
+				userId: this.socket.user!.id,
+				messageId: messageId,
+				conversationId: conversationId
+			});
 
 		this.logger.info(
 			`User [id = ${this.socket.user?.id}] revoked message [id = ${messageId}] in conversation [id = ${conversationId}]`

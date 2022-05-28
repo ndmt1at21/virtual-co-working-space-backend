@@ -1,3 +1,4 @@
+import { MessageStatus } from '@src/@types/MessageStatus';
 import { mapUserToUserOverviewDto } from '../users/user.mapping';
 import { MessageDto } from './@types/dto/MessageDto';
 import { MessageOverviewDto } from './@types/dto/MessageOverview.dto';
@@ -12,6 +13,7 @@ export const mapMessageToMessageDto = (message: Message): MessageDto => {
 		content,
 		createdAt,
 		type,
+		isRevoked,
 		readers,
 		status
 	} = message;
@@ -21,6 +23,16 @@ export const mapMessageToMessageDto = (message: Message): MessageDto => {
 	const readersDto = readers.map(reader =>
 		mapUserMessageStatusToUserMessageReaderStatusDto(reader)
 	);
+
+	if (isRevoked) {
+		return {
+			id,
+			conversationId,
+			sentAt: createdAt,
+			sender: senderDto,
+			status: 'revoked'
+		};
+	}
 
 	return {
 		id,

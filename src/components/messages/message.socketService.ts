@@ -83,8 +83,8 @@ export class MessageSocketService implements IMessageSocketService {
 			this.socket.user!.id
 		);
 
-		this.socket
-			.to(`conversation/${conversationId}`)
+		this.socketNamespace
+			.in(`conversation/${conversationId}`)
 			.emit('message:revoked', messageId);
 
 		this.logger.info(

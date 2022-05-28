@@ -37,6 +37,12 @@ export class MessageService implements IMessageService {
 			throw new NotFoundError(MessageErrorMessages.MESSAGE_NOT_FOUND);
 		}
 
+		if (message.senderId !== senderId) {
+			throw new IllegalArgumentError(
+				MessageErrorMessages.MESSAGE_SENDER_ID_NOT_MATCH
+			);
+		}
+
 		if (message.isRevoked) {
 			throw new IllegalArgumentError(
 				MessageErrorMessages.MESSAGE_ALREADY_REVOKED

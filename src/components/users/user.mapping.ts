@@ -3,7 +3,8 @@ import { UserOverviewDto } from './@types/dto/UserOverviewDto';
 import { User } from './user.entity';
 
 export const mapUserToUserDto = (user: User): UserDto => {
-	const { password, ...userDto } = user;
+	const { password, passwordUpdateAt, deletedAt, updatedAt, ...userDto } =
+		user;
 	return userDto;
 };
 

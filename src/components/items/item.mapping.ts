@@ -9,5 +9,5 @@ export const mapItemToItemDto = (item: Item): ItemDto => {
 		? mapItemCategoryToItemCategoryOverviewDto(category)
 		: undefined;
 
-	return { id, modelPath, name, createdAt, category: categoryDto, image };
+	return { id, modelPath, name, image, category: categoryDto, createdAt };
 };

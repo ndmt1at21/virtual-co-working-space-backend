@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
-import { IsDefined, IsIn, MaxLength } from 'class-validator';
+import { IsDefined, IsEnum, IsOptional, MaxLength } from 'class-validator';
+import { MessageType } from '../MessageType';
 
 export class CreateMessageDto {
 	@IsDefined()
@@ -13,4 +14,9 @@ export class CreateMessageDto {
 	@MaxLength(20000)
 	@Expose()
 	content: string;
+
+	@IsOptional()
+	@IsEnum(MessageType)
+	@Expose()
+	type?: MessageType;
 }

@@ -2,6 +2,7 @@ import { IllegalArgumentError, NotFoundError } from '@src/utils/appError';
 import { CreateMessageDto } from './@types/dto/CreateMessage.dto';
 import { MessageOverviewDto } from './@types/dto/MessageOverview.dto';
 import { IMessageService } from './@types/IMessageService';
+import { MessageType } from './@types/MessageType';
 import { UserMessageStatusType } from './@types/UserMessageStatusType';
 import { UserMessageStatusRepository } from './components/userMessageStatus/userMessageStatus.repository';
 import { MessageErrorMessages } from './message.error';
@@ -17,9 +18,10 @@ export class MessageService implements IMessageService {
 	createMessage = async (
 		createMessageDto: CreateMessageDto
 	): Promise<MessageOverviewDto> => {
-		const createdMessage = await this.messageRepository.createMessage(
-			createMessageDto
-		);
+		const createdMessage = await this.messageRepository.createMessage({
+			...createMessageDto,
+			type: createMessageDto.type || MessageType.TEXT
+		});
 
 		return mapMessageToMessageOverviewDto(createdMessage);
 	};

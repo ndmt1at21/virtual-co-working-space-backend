@@ -16,11 +16,13 @@ export function createMessageController() {
 
 export function createMessageSocketService(io: Server, socket: Socket) {
 	const messageService = createMessageService();
+	const conversationService = createConversationService();
 
 	return new MessageSocketService(
 		io,
 		socket,
 		messageService,
+		conversationService,
 		messageSocketLogger
 	);
 }

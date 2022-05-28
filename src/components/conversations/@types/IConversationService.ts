@@ -3,6 +3,7 @@ import { ConversationOfUserDetailDto } from './dto/ConversationOfUserDetail.dto'
 import { ConversationOfUserOverviewDto } from './dto/ConversationOfUserOverview.dto';
 import { ConversationOverviewDto } from './dto/ConversationOverview.dto';
 import { CreateConversationDto } from './dto/CreateConversation.dto';
+import { ReadConversationDto } from './dto/ReadConversation.dto';
 import { RecentMessagesDto } from './dto/RecentMessages.dto';
 
 export interface IConversationService {
@@ -29,5 +30,5 @@ export interface IConversationService {
 	markAsReadByConversationIdAndUserId(
 		conversationId: number,
 		userId: number
-	): Promise<void>;
+	): Promise<ReadConversationDto>;
 }

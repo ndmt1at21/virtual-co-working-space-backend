@@ -1,8 +1,10 @@
 import { Server, Socket } from 'socket.io';
+import { IConversationService } from '../conversations/@types/IConversationService';
 import { ILogger } from '../logger/@types/ILogger';
 import { CreateMessageDto } from './@types/dto/CreateMessage.dto';
 import { DeleteMessageData } from './@types/dto/DeleteMessageData.dto';
-import { RevokeMessageData } from './@types/dto/RevokeMessageData.dto copy';
+import { MarkMessagesAsReadDto } from './@types/dto/MarkMessagesAsReadData.dto';
+import { RevokeMessageData } from './@types/dto/RevokeMessageData.dto';
 import { IMessageService } from './@types/IMessageService';
 import { IMessageSocketService } from './@types/IMessageSocketService';
 
@@ -11,6 +13,7 @@ export class MessageSocketService implements IMessageSocketService {
 		private readonly socketNamespace: Server,
 		private readonly socket: Socket,
 		private readonly messageService: IMessageService,
+		private readonly conversationService: IConversationService,
 		private readonly logger: ILogger
 	) {}
 
@@ -102,14 +105,22 @@ export class MessageSocketService implements IMessageSocketService {
 			this.socket.user!.id
 		);
 
-		this.socket
-			.to(`conversation/${conversationId}`)
-			.emit('message:deleted', messageId);
+		this.socket.emit('message:deleted', messageId);
 
 		this.logger.info(
 			`User [id = ${this.socket.user?.id}] deleted message [id = ${messageId}] in conversation [id = ${conversationId}]`
 		);
 	}
 
-	async onMarkAsRead() {}
+	async onMarkAsRead({ conversationId, readerId }: MarkMessagesAsReadDto) {
+		const result =
+			await this.conversationService.markAsReadByConversationIdAndUserId(
+				conversationId,
+				readerId
+			);
+
+		this.socket
+			.to(`conversation/${conversationId}`)
+			.emit('message:read', result);
+	}
 }

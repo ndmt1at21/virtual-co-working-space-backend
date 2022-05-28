@@ -9,9 +9,10 @@ import { UpdateOfficeItemTransformDto } from '../officeItems/@types/dto/UpdateOf
 import { UpdateOfficeMemberTransformDto } from '../officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
 import { createMessageSocketService } from '../messages/message.factory';
 import { CreateMessageDto } from '../messages/@types/dto/CreateMessage.dto';
-import { RevokeMessageData } from '../messages/@types/dto/RevokeMessageData.dto copy';
+import { RevokeMessageData } from '../messages/@types/dto/RevokeMessageData.dto';
 import { DeleteMessageData } from '../messages/@types/dto/DeleteMessageData.dto';
 import { EmojiListenerData } from './@types/dto/EmojiData';
+import { MarkAsReadData } from '../messages/@types/dto/MarkAsReadData.dto';
 
 export const OfficeSocketHandler = (
 	socketNamespace: SocketServer,
@@ -105,9 +106,15 @@ export const OfficeSocketHandler = (
 			messageSocketService.onSelfDeleteMessage(data);
 		});
 
-		socket.on('message:markAsRead', () => {
-			messageSocketService.onMarkAsRead();
-		});
+		socket.on(
+			'message:markAsRead',
+			function ({ conversationId }: MarkAsReadData) {
+				messageSocketService.onMarkAsRead({
+					conversationId,
+					readerId: socket.data.officeMember!.memberId
+				});
+			}
+		);
 	}
 
 	function handleEmojiEvent(

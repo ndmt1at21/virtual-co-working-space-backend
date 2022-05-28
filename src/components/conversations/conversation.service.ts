@@ -19,6 +19,7 @@ import { ConversationRepository } from './conversation.repository';
 import { ConversationMemberRepository } from '../conversationMembers/conversationMember.repository';
 import { MessageRepository } from '../messages/message.repository';
 import { UserMessageStatusRepository } from '../messages/components/userMessageStatus/userMessageStatus.repository';
+import { ReadConversationDto } from './@types/dto/ReadConversation.dto';
 
 export class ConversationService implements IConversationService {
 	constructor(
@@ -128,7 +129,7 @@ export class ConversationService implements IConversationService {
 	markAsReadByConversationIdAndUserId = async (
 		conversationId: number,
 		userId: number
-	): Promise<void> => {
+	): Promise<ReadConversationDto> => {
 		const conversationMember =
 			await this.conversationMemberRepository.findConversationMemberByConversationIdAndUserId(
 				conversationId,
@@ -148,7 +149,13 @@ export class ConversationService implements IConversationService {
 			)
 		).map(message => message.id);
 
-		if (messagesUnreadIds.length == 0) return;
+		if (messagesUnreadIds.length == 0) {
+			return {
+				conversationId,
+				readerId: userId,
+				readMessagesId: []
+			};
+		}
 
 		const messageReaders = messagesUnreadIds.map(messageId =>
 			this.userMessageStatusRepository.create({
@@ -172,5 +179,11 @@ export class ConversationService implements IConversationService {
 				);
 			}
 		);
+
+		return {
+			conversationId,
+			readerId: userId,
+			readMessagesId: messagesUnreadIds
+		};
 	};
 }

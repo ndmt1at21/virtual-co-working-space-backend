@@ -1,11 +1,11 @@
-import { MessageDto } from './dto/MessageDto';
+import { ReadConversationDto } from '@src/components/conversations/@types/dto/ReadConversation.dto';
 import { MessageOverviewDto } from './dto/MessageOverview.dto';
 
 export interface MessageServerToClientEvent {
 	'message:sent': (message: MessageOverviewDto) => void;
 	'message:revoked': (messageId: number) => void;
 	'message:deleted': (messageId: number) => void;
-	'message:read': (toMessageId: number) => void;
+	'message:read': (data: ReadConversationDto) => void;
 
 	'conversation:joined': (data: {
 		userId: number;

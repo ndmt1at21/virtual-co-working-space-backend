@@ -139,7 +139,6 @@ export class ConversationService implements IConversationService {
 				memberId
 			);
 
-		console.log(conversationMember);
 		if (!conversationMember) {
 			throw new NotFoundError(
 				ConversationErrorMessages.CONVERSATION_NOT_FOUND
@@ -170,8 +169,6 @@ export class ConversationService implements IConversationService {
 				userId,
 				pageable
 			);
-
-		console.log(conversationId);
 
 		const messagesDto = recentMessages.map(message =>
 			mapMessageToMessageDto(message)

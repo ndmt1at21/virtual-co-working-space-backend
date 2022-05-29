@@ -77,8 +77,6 @@ export class MessageRepository extends BaseRepository<Message> {
 	): Promise<[Message[], RecentMessagePaginationInfo]> {
 		const { limit = 10, nextCursor } = pageable;
 
-		console.log(conversationId, userId, limit, nextCursor);
-
 		const query = this.createQueryBuilder('message')
 			.leftJoinAndSelect('message.sender', 'user')
 			.leftJoinAndSelect(

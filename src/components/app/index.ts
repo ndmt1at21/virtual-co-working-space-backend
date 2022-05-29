@@ -71,7 +71,7 @@ export const socketServerLoader = (
 		cors: {
 			origin: config.app.CORS_ORIGIN
 		},
-		transports: ['polling', 'websocket'],
+		transports: ['websocket'],
 		path: '/socket.io'
 	});
 	logger.info(`Socket server is initialized.`);

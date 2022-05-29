@@ -11,7 +11,6 @@ export const socketEventHandlers = (socketServer: Server, logger: ILogger) => {
 	socketServer.use(socketAuthMiddleware.protect);
 
 	socketServer.on('connection', socket => {
-		console.log("Connected nhaaa");
 		createOfficeSocketHandler(socketServer, socket);
 		createCallingSocketHandler(socketServer, socket);
 	});

@@ -29,7 +29,7 @@ export const mapMessageToMessageDto = (message: Message): MessageDto => {
 			id,
 			conversationId,
 			sentAt: createdAt,
-			sender: senderDto,
+			senderId: senderDto.id,
 			status: 'revoked'
 		};
 	}
@@ -40,7 +40,7 @@ export const mapMessageToMessageDto = (message: Message): MessageDto => {
 		content,
 		type,
 		sentAt: createdAt,
-		sender: senderDto,
+		senderId: senderDto.id,
 		readers: readersDto,
 		reactions: [],
 		status

@@ -55,7 +55,7 @@ export class MessageSocketController {
 			);
 
 			io.to(rooms).emit('message:sent', {
-				createdMessage,
+				...createdMessage,
 				tempId: message.tempId
 			});
 

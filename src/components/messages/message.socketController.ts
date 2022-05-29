@@ -54,7 +54,10 @@ export class MessageSocketController {
 				`Start emitting event 'message:sent' to rooms [${rooms}]`
 			);
 
-			io.to(rooms).emit('message:sent', createdMessage);
+			io.to(rooms).emit('message:sent', {
+				createdMessage,
+				tempId: message.tempId
+			});
 
 			this.logger.info(`Finish emitting event 'message:sent' to rooms`);
 		}

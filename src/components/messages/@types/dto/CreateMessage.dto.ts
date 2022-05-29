@@ -4,6 +4,7 @@ import {
 	IsEnum,
 	IsNumber,
 	IsOptional,
+	IsString,
 	MaxLength
 } from 'class-validator';
 import { MessageType } from '../MessageType';
@@ -14,7 +15,10 @@ export class CreateMessageDto {
 	@Expose()
 	conversationId: number;
 
-	senderId: number;
+	@IsDefined()
+	@IsString()
+	@Expose()
+	tempId: string;
 
 	@IsDefined()
 	@MaxLength(20000)
@@ -25,4 +29,6 @@ export class CreateMessageDto {
 	@IsEnum(MessageType)
 	@Expose()
 	type?: MessageType;
+
+	senderId: number;
 }

@@ -43,7 +43,7 @@ export class ConversationMemberRepository extends BaseRepository<ConversationMem
 				userId
 			})
 			.leftJoinAndSelect('conversation_member.member', 'user_1')
-			.leftJoinAndSelect(
+			.innerJoinAndSelect(
 				'conversation_member.conversation',
 				'conversation',
 				'conversation.office_id = :officeId',

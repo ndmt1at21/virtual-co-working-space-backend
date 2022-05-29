@@ -3,7 +3,7 @@ import { MessageOverviewDto } from './dto/MessageOverview.dto';
 import { RevokedMessageData } from './dto/RevokedMessageData.dto';
 
 export interface MessageServerToClientEvent {
-	'message:sent': (message: MessageOverviewDto) => void;
+	'message:sent': (message: { tempId: string } & MessageOverviewDto) => void;
 	'message:revoked': (data: RevokedMessageData) => void;
 	'message:deleted': (messageId: number) => void;
 	'message:read': (data: ReadConversationDto) => void;

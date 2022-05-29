@@ -42,7 +42,7 @@ export const MessageSocketHandler = () => {
 
 		socket.on('message:delete', (data: DeleteMessageData) => {
 			const fn = socketMiddleware(
-				messageSocketController.onRevokeMessage
+				messageSocketController.onSelfDeleteMessage
 			);
 
 			fn.use(handleError);

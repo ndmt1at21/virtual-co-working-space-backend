@@ -41,7 +41,7 @@ export class ConversationController {
 
 			const resData = generateResponseData({
 				code: HttpStatusCode.OK,
-				data: { conversation }
+				data: { ...conversation }
 			});
 
 			res.status(HttpStatusCode.OK).json(resData);

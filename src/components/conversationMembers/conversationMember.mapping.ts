@@ -5,11 +5,15 @@ import { ConversationMember } from './conversationMember.entity';
 export const mapConversationMemberToConversationMemberOverviewDto = (
 	conversationMember: ConversationMember
 ): ConversationMemberOverviewDto => {
-	const { id, member, createdAt } = conversationMember;
+	const { id, conversationId, memberId, member, createdAt } =
+		conversationMember;
 
-	const userDto = mapUserToUserOverviewDto(member);
+	const userDto = member ? mapUserToUserOverviewDto(member) : undefined;
 
 	return {
+		id,
+		conversationId,
+		userId: member ? undefined : memberId,
 		user: userDto,
 		joinedAt: createdAt
 	};

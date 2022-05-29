@@ -31,6 +31,10 @@ export const OfficeRouter = () => {
 	router.route('/:id/items').get(officeController.getOfficeItemsById);
 
 	router
+		.route('/:id/conversations')
+		.get(officeController.getConversationOfUserInOfficeByOfficeId);
+
+	router
 		.route('/:id/block')
 		.delete(
 			authMiddleware.restrictTo([UserRoleType.ADMIN]),

@@ -93,7 +93,7 @@ export const cloudLogger = createLogger({
 });
 
 export const messageSocketLogger = createLogger({
-	defaultMeta: { service: 'message-socket-logger' },
+	defaultMeta: { service: 'message-socket-service' },
 	transports: [
 		new transports.File(commonOptions),
 		new transports.Console(debugOptions)
@@ -101,7 +101,7 @@ export const messageSocketLogger = createLogger({
 });
 
 export const officeMemberSocketLogger = createLogger({
-	defaultMeta: { service: 'office-member-socket-logger' },
+	defaultMeta: { service: 'office-member-socket-service' },
 	transports: [
 		new transports.File(commonOptions),
 		new transports.Console(debugOptions)
@@ -109,7 +109,7 @@ export const officeMemberSocketLogger = createLogger({
 });
 
 export const itemLogger = createLogger({
-	defaultMeta: { service: 'item-logger' },
+	defaultMeta: { service: 'item-service' },
 	transports: [
 		new transports.File(commonOptions),
 		new transports.Console(debugOptions)
@@ -117,7 +117,7 @@ export const itemLogger = createLogger({
 });
 
 export const itemCategoryLogger = createLogger({
-	defaultMeta: { service: 'item-category-logger' },
+	defaultMeta: { service: 'item-category-service' },
 	transports: [
 		new transports.File(commonOptions),
 		new transports.Console(debugOptions)
@@ -133,9 +133,17 @@ export const officeInvitationLogger = createLogger({
 });
 
 export const checkinLogger = createLogger({
-	defaultMeta: {service: 'check-in-service' },
+	defaultMeta: { service: 'check-in-service' },
 	transports: [
 		new transports.File(commonOptions),
 		new transports.Console(debugOptions)
 	]
-})
+});
+
+export const conversationSocketLogger = createLogger({
+	defaultMeta: { service: 'conversation-socket-service' },
+	transports: [
+		new transports.File(commonOptions),
+		new transports.Console(debugOptions)
+	]
+});

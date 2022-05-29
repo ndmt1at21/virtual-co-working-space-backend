@@ -24,7 +24,7 @@ export const OfficeItemSocketHandler = () => {
 			);
 
 			fn.use(handleError);
-			fn.execute(io, socket, { params: { id: data.conversationId } });
+			fn.execute(io, socket, { body: data });
 		});
 
 		socket.on('office_item:move', data => {
@@ -43,8 +43,7 @@ export const OfficeItemSocketHandler = () => {
 
 			fn.use(handleError);
 			fn.execute(io, socket, {
-				params: { id: data.conversationId },
-				body: data.userIds
+				body: { id: data.id }
 			});
 		});
 	};

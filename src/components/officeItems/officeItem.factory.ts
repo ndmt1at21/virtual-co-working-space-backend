@@ -1,14 +1,12 @@
 import { Server, Socket } from 'socket.io';
 import { getCustomRepository } from 'typeorm';
 import { createItemRepository } from '../items/item.factory';
-import {
-	createOfficeRepository,
-	createOfficeService
-} from '../offices/office.factory';
+import { officeItemLogger } from '../logger';
+import { createOfficeRepository } from '../offices/office.factory';
 import { OfficeItemController } from './officeItem.controller';
 import { OfficeItemRepository } from './officeItem.repository';
 import { OfficeItemService } from './officeItem.service';
-import { OfficeItemSocketService } from './officeItemSocket.service';
+import { OfficeItemSocketController } from './officeItem.socketController';
 import { OfficeItemValidate } from './officeItemValidate';
 
 export function createOfficeItemController() {
@@ -16,10 +14,10 @@ export function createOfficeItemController() {
 	return new OfficeItemController(officeItemService);
 }
 
-export function createOfficeItemSocketService(io: Server, socket: Socket) {
+export function createOfficeItemSocketController() {
 	const officeItemService = createOfficeItemService();
 
-	return new OfficeItemSocketService(io, socket, officeItemService);
+	return new OfficeItemSocketController(officeItemService, officeItemLogger);
 }
 
 export function createOfficeItemService() {

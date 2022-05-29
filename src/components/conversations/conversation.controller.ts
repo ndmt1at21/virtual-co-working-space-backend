@@ -2,6 +2,7 @@ import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { generateResponseData } from '@src/utils/generateResponseData';
 import { RecentMessagePageable } from '../messages/@types/RecentMessagePaginate';
+import { CreateConversationDto } from './@types/dto/CreateConversation.dto';
 import { IConversationService } from './@types/IConversationService';
 
 export class ConversationController {
@@ -9,13 +10,13 @@ export class ConversationController {
 
 	createConversationInOffice = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			const officeId = req.body.officeId;
+			const body = req.body as CreateConversationDto;
 			const userId = req.user!.id;
 
 			const conversation =
 				await this.conversationService.createConversation({
-					creatorId: userId,
-					officeId
+					...body,
+					creatorId: userId
 				});
 
 			const resData = generateResponseData({
@@ -82,7 +83,10 @@ export class ConversationController {
 
 			const resData = generateResponseData({
 				code: HttpStatusCode.OK,
-				data: { messages: recentMessages }
+				data: {
+					messages: recentMessages.messages,
+					pagination: recentMessages.pagination
+				}
 			});
 
 			res.status(HttpStatusCode.OK).json(resData);

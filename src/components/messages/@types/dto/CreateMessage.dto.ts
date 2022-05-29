@@ -1,13 +1,19 @@
 import { Expose } from 'class-transformer';
-import { IsDefined, IsEnum, IsOptional, MaxLength } from 'class-validator';
+import {
+	IsDefined,
+	IsEnum,
+	IsNumber,
+	IsOptional,
+	MaxLength
+} from 'class-validator';
 import { MessageType } from '../MessageType';
 
 export class CreateMessageDto {
 	@IsDefined()
+	@IsNumber()
 	@Expose()
 	conversationId: number;
 
-	@Expose()
 	senderId: number;
 
 	@IsDefined()

@@ -6,5 +6,5 @@ export interface OfficeItemClientToServerEvent {
 
 	'office_item:create': (data: CreateOfficeItemDto) => void;
 
-	'office_item:delete': (id: number) => void;
+	'office_item:delete': (data: { id: number }) => void;
 }

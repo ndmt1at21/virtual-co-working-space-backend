@@ -1,6 +1,7 @@
 import {
 	Column,
 	Entity,
+	Index,
 	JoinColumn,
 	ManyToOne,
 	OneToMany,
@@ -20,6 +21,7 @@ export class Message extends BaseEntity {
 	id: number;
 
 	@Column({ name: 'conversation_id' })
+	@Index()
 	conversationId: number;
 
 	@Column({ name: 'sender_id' })

@@ -5,36 +5,27 @@ import {
 	SocketMiddlewareFunction
 } from './@types/socketMiddleware';
 
-export const socketMiddleware = (
-	fns: (SocketMiddlewareFunction | SocketMiddlewareErrorFunction)[]
-) => {
+export const socketMiddleware = (...fns: SocketMiddlewareFunction[]) => {
 	const middlewares: SocketMiddlewareFunction[] = [];
 	const middlewaresError: SocketMiddlewareErrorFunction[] = [];
-	let data: SocketContext | null = null;
 
 	fns.forEach(fn => {
-		if (fn.length === 3) {
-			middlewares.push(fn as SocketMiddlewareFunction);
-		}
-
-		if (fn.length === 4) {
-			middlewaresError.push(fn as SocketMiddlewareErrorFunction);
-		}
+		middlewares.push(fn as SocketMiddlewareFunction);
 	});
 
 	const use = (
 		middleware: SocketMiddlewareFunction | SocketMiddlewareErrorFunction
 	) => {
-		if (middleware.length === 3) {
+		if (middleware.length === 4) {
 			middlewares.push(middleware as SocketMiddlewareFunction);
 		}
 
-		if (middleware.length === 4) {
+		if (middleware.length === 5) {
 			middlewaresError.push(middleware as SocketMiddlewareErrorFunction);
 		}
 	};
 
-	const execute = (io: Server, socket: Socket) => {
+	const execute = (io: Server, socket: Socket, context: any) => {
 		let index = 0;
 		let indexError = -1;
 
@@ -50,13 +41,7 @@ export const socketMiddleware = (
 
 				if (indexError < middlewaresError.length) {
 					const nextMiddlewareError = middlewaresError[indexError];
-					nextMiddlewareError(
-						err,
-						data!.io,
-						data!.socket,
-						data!.context,
-						next
-					);
+					nextMiddlewareError(err, io, socket, context, next);
 				}
 			}
 
@@ -65,12 +50,12 @@ export const socketMiddleware = (
 
 				if (index < middlewares.length) {
 					const nextMiddleware = middlewares[index];
-					nextMiddleware(data!.io, data!.socket, data!.context, next);
+					nextMiddleware(io, socket, context, next);
 				}
 			}
 		};
 
-		firstMiddleware(data!.io, data!.socket, data!.context, next);
+		firstMiddleware(io, socket, context, next);
 	};
 
 	return { use, execute };

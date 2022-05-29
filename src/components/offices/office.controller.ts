@@ -9,10 +9,12 @@ import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
 import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
 import { IOfficeService } from './@types/IOfficeService';
 import { generateResponseData } from '@src/utils/generateResponseData';
+import { IConversationService } from '../conversations/@types/IConversationService';
 
 export class OfficeController {
 	constructor(
 		private officeService: IOfficeService,
+		private conversationService: IConversationService,
 		private logger: ILogger
 	) {}
 
@@ -139,6 +141,34 @@ export class OfficeController {
 			data: { members }
 		});
 	});
+
+	getConversationOfUserInOfficeByOfficeId = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			this.logger.info(
+				`Get conversation of user in office by office id ${req.params.id}`
+			);
+
+			const officeId = +req.params.id;
+			const userId = +req.user!.id;
+
+			const conversations =
+				await this.conversationService.findConversationsOverviewsOfUserInOffice(
+					userId,
+					officeId
+				);
+
+			this.logger.info('Get conversation of user in office successfully');
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: {
+					conversations
+				}
+			});
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
 
 	getAllOfficesOverviewCurrentUserIsMember = catchAsyncRequestHandler(
 		async (req, res, next) => {

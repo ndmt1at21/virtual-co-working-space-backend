@@ -77,10 +77,9 @@ export class MessageRepository extends BaseRepository<Message> {
 	): Promise<[Message[], RecentMessagePaginationInfo]> {
 		const { limit = 10, nextCursor } = pageable;
 
+		console.log(conversationId, userId, limit, nextCursor);
+
 		const query = this.createQueryBuilder('message')
-			.where('message.conversation_id = :conversationId', {
-				conversationId
-			})
 			.leftJoinAndSelect('message.sender', 'user')
 			.leftJoinAndSelect(
 				'message.userMessageStatuses',
@@ -88,8 +87,11 @@ export class MessageRepository extends BaseRepository<Message> {
 				'user_message_status.user_id = :userId',
 				{ userId }
 			)
+			.where('message.conversation_id = :conversationId', {
+				conversationId
+			})
 			.andWhere(
-				'user_message_status.is_self_deleted = false OR user_message_status.is_self_deleted IS NULL'
+				'(user_message_status.is_self_deleted = false OR user_message_status.is_self_deleted IS NULL)'
 			)
 			.addOrderBy('message.createdAt', 'DESC')
 			.limit(limit);

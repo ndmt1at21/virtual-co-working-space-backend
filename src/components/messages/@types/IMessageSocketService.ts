@@ -1,3 +1,4 @@
+import { Server, Socket } from 'socket.io';
 import { CreateMessageDto } from './dto/CreateMessage.dto';
 import { DeleteMessageData } from './dto/DeleteMessageData.dto';
 import { MarkMessagesAsReadDto } from './dto/MarkMessagesAsReadData.dto';
@@ -15,7 +16,11 @@ export interface IMessageSocketService {
 		readerId
 	}: MarkMessagesAsReadDto): Promise<void>;
 
-	onJoinToConversation(conversationId: number): Promise<void>;
+	onJoinToConversation(
+		socketNamespace: Server,
+		socket: Socket,
+		conversationId: number
+	): Promise<void>;
 
 	onLeaveFromConversation(conversationId: number): Promise<void>;
 }

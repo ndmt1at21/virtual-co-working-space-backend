@@ -3,13 +3,15 @@ import {
 	Entity,
 	JoinColumn,
 	ManyToOne,
-	PrimaryGeneratedColumn
+	PrimaryGeneratedColumn,
+	Unique
 } from 'typeorm';
 import { Conversation } from '@src/components/conversations/conversation.entity';
 import { User } from '@components/users/user.entity';
 import { BaseEntity } from '../base/BaseEntity';
 
 @Entity({ name: 'conversation_member' })
+@Unique(['conversationId', 'memberId'])
 export class ConversationMember extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;

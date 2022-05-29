@@ -4,6 +4,16 @@ import { BaseRepository } from '../base/BaseRepository';
 
 @EntityRepository(Conversation)
 export class ConversationRepository extends BaseRepository<Conversation> {
+	async existsByConversationId(conversationId: number): Promise<boolean> {
+		const count = await this.createQueryBuilder('conversation')
+			.where('conversation.id = :conversationId', {
+				conversationId
+			})
+			.getCount();
+
+		return count === 1;
+	}
+
 	async findConversationByIdWithMembers(
 		id: number
 	): Promise<Conversation | undefined> {

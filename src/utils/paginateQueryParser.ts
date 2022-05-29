@@ -157,7 +157,6 @@ export class PaginateQueryParser {
 				if (typeof value === 'boolean') {
 					delete filterObj[field][validOperation];
 
-					console.log(filterObj[field]);
 					if (filterObj[field]) {
 						filterObj[field]['eq'] = validOperation;
 					} else {

@@ -59,7 +59,7 @@ export class MessageController {
 			);
 
 		res.status(200).json({
-			messages
+			...messages
 		});
 	});
 

@@ -14,11 +14,21 @@ import generator from '@src/components/offices/components/officeInvitationCodeGe
 import { OfficeSocketHandler } from './office.socketHandler';
 import { Server, Socket } from 'socket.io';
 import { officeLogger } from '../logger';
-import { createConversationRepository } from '../conversations/conversation.factory';
+import {
+	createConversationRepository,
+	createConversationService
+} from '../conversations/conversation.factory';
 import { OfficeMiddleware } from './office.middleware';
 
 export function createOfficeController() {
-	return new OfficeController(createOfficeService(), officeLogger);
+	const officeService = createOfficeService();
+	const conversationService = createConversationService();
+
+	return new OfficeController(
+		officeService,
+		conversationService,
+		officeLogger
+	);
 }
 
 export function createOfficeSocketHandler(io: Server, socket: Socket) {

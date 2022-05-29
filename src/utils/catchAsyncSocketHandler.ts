@@ -1,16 +1,21 @@
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import {
+	NextFunction,
+	SocketMiddlewareFunction
+} from './@types/socketMiddleware';
+import { AppError } from './appError';
 
-export type AsyncSocketHandler = (...args: any[]) => Promise<void>;
-
-export type SocketHandler = (...args: any[]) => void;
+type AsyncRequestHandler = (
+	io: Server,
+	socket: Socket,
+	context: any,
+	next: NextFunction
+) => Promise<AppError | void>;
 
 export const catchAsyncSocketHandler = (
-	socket: Socket,
-	fn: AsyncSocketHandler
-): SocketHandler => {
-	return (...args) => {
-		fn(args).catch(err => {
-			socket.emit('error', err);
-		});
+	fn: AsyncRequestHandler
+): SocketMiddlewareFunction => {
+	return (io, socket, context, next) => {
+		fn(io, socket, context, next).catch(err => next(err));
 	};
 };

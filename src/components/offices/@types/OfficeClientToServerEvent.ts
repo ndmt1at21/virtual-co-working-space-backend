@@ -2,10 +2,12 @@ import { MessageClientToServerEvent } from '@src/components/messages/@types/Mess
 import { OfficeItemClientToServerEvent } from '@src/components/officeItems/@types/OfficeItemClientToServerEvent';
 import { OfficeMemberClientToServerEvent } from '@src/components/officeMembers/@types/socket/OfficeMemberClientToServerEvent';
 import { EmojiListenerData } from './dto/EmojiData';
+import { GestureListenerData } from './dto/GestureData';
 
 export interface OfficeClientToServerEvent
 	extends OfficeMemberClientToServerEvent,
 		OfficeItemClientToServerEvent,
 		MessageClientToServerEvent {
-	emoji: (data: EmojiListenerData) => void;
+	emoji: (data: EmojiListenerData) => void,
+	gesture: (data: GestureListenerData) => void;
 }

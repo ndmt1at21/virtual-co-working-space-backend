@@ -53,6 +53,7 @@ export const OfficeService = ({
 			name: createOfficeDto.name,
 			officeMembers: [officeMember],
 			conversations: [conversation],
+			description: createOfficeDto.description,
 			numberOfMembers: 1
 		});
 

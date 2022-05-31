@@ -1,3 +1,4 @@
+import { GestureResponseData } from './dto/GestureData';
 import { MessageServerToClientEvent } from '@src/components/messages/@types/MessageServerToClientEvent';
 import { OfficeItemServerToClientEvent } from '@src/components/officeItems/@types/OfficeItemServerToClientEvent';
 import { OfficeMemberServerToClientEvent } from '@src/components/officeMembers/@types/socket/OfficeMemberServerToClientEvent';
@@ -9,4 +10,5 @@ export interface OfficeServerToClientEvent
 		MessageServerToClientEvent {
 	'office:error': (err: any) => void;
 	emoji: (data: EmojiResponseData) => void;
+	gesture: (data: GestureResponseData) => void;
 }

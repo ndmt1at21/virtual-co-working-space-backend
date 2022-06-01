@@ -1,4 +1,4 @@
-import { NotFoundError } from '@src/utils/appError';
+import { IllegalArgumentError, NotFoundError } from '@src/utils/appError';
 import { OfficeMemberDetailDto } from './@types/dto/OfficeMemberDetail.dto';
 import { OfficeMemberOverviewDto } from './@types/dto/OfficeMemberOverview.dto';
 import { OfficeMemberRepository } from './officeMember.repository';
@@ -11,6 +11,8 @@ import { OfficeMemberOnlineStatus } from './@types/OfficeMemberOnlineStatus';
 import { mapOfficeMemberToOfficeMemberDetailDto } from './officeMember.mapping';
 import { IOfficeMemberValidate } from './@types/IOfficeMemberValidate';
 import { Pageable } from '../base/@types/FindAllOptions';
+import { OfficeRoleType } from '../officeRoles/@types/OfficeRoleType';
+import { OfficeMemberStatus } from './@types/OfficeMemberStatus';
 
 export class OfficeMemberService implements IOfficeMemberService {
 	constructor(
@@ -41,17 +43,29 @@ export class OfficeMemberService implements IOfficeMemberService {
 		);
 	};
 
-	deleteOfficeMemberById = async (id: number): Promise<void> => {
-		await this.officeMemberValidate.checkExistsOfficeMemberById(id);
-		await this.officeMemberRepository.delete(id);
-	};
+	async removeOfficeMemberById(id: number): Promise<void> {
+		const officeMember = await this.officeMemberRepository
+			.queryBuilder()
+			.findById(id)
+			.withRoles()
+			.build()
+			.getOne();
 
-	updateOfficeMemberTransformById = async (
+		if (officeMember?.status === OfficeMemberStatus.REMOVED) {
+			throw new IllegalArgumentError(
+				OfficeMemberErrorMessages.OFFICE_MEMBER_REMOVED
+			);
+		}
+
+		await this.officeMemberRepository.removeOfficeMemberById(id);
+	}
+
+	async updateOfficeMemberTransformById(
 		id: number,
 		transform: UpdateOfficeMemberTransformDto
-	): Promise<void> => {
+	): Promise<void> {
 		// await officeMemberTransformService.updateTransform(id, transform);
-	};
+	}
 
 	findOfficeMemberOverviewById = async (
 		id: number

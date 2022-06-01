@@ -10,7 +10,7 @@ export interface IOfficeMemberService {
 		createOfficeMemberDto: CreateOfficeMemberDto
 	): Promise<OfficeMemberOverviewDto>;
 
-	deleteOfficeMemberById(id: number): Promise<void>;
+	removeOfficeMemberById(id: number): Promise<void>;
 
 	updateOfficeMemberTransformById(
 		id: number,

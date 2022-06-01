@@ -36,6 +36,9 @@ export class Office extends BaseEntity {
 	@Column({ name: 'description', nullable: true })
 	description?: string;
 
+	@Column({ name: 'default_conversation_id', nullable: true })
+	defaultConversationId?: number;
+
 	@Column({ name: 'number_of_members', default: 0 })
 	numberOfMembers: number;
 

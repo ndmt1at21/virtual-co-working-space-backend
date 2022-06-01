@@ -2,7 +2,8 @@ import { getCustomRepository } from 'typeorm';
 import { createOfficeItemRepository } from '@components/officeItems/officeItem.factory';
 import {
 	createOfficeMemberCreator,
-	createOfficeMemberRepository
+	createOfficeMemberRepository,
+	createOfficeMemberService
 } from '@components/officeMembers/officeMember.factory';
 import { OfficeController } from './office.controller';
 import { OfficeCreator } from './office.creator';
@@ -22,10 +23,12 @@ import { OfficeMiddleware } from './office.middleware';
 
 export function createOfficeController() {
 	const officeService = createOfficeService();
+	const officeMemberService = createOfficeMemberService();
 	const conversationService = createConversationService();
 
 	return new OfficeController(
 		officeService,
+		officeMemberService,
 		conversationService,
 		officeLogger
 	);

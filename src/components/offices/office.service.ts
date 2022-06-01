@@ -1,6 +1,5 @@
 import { Pageable } from '../base/@types/FindAllOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
-import { ConversationType } from '../conversations/@types/ConversationType';
 import { mapOfficeItemToOfficeItemOverviewDto } from '../officeItems/officeItem.mapping';
 import { OfficeRoleType } from '../officeRoles/@types/OfficeRoleType';
 import { CreateOfficeDto } from './@types/dto/CreateOffice.dto';
@@ -34,31 +33,19 @@ export const OfficeService = ({
 			OfficeRoleType.OWNER
 		);
 
-		const officeMember = officeMemberRepository.create({
-			memberId: createdUserId,
-			roles: [{ officeRole: ownerRole }],
-			transform: {}
-		});
-
-		const conversation = conversationRepository.create({
-			type: ConversationType.OFFICE_LEVEL,
-			name: 'general',
-			creatorId: createdUserId,
-			conversationMembers: [{ memberId: createdUserId }]
-		});
-
-		const office = await officeRepository.save({
-			invitationCode,
-			createdByUserId: createdUserId,
-			name: createOfficeDto.name,
-			officeMembers: [officeMember],
-			conversations: [conversation],
-			description: createOfficeDto.description,
-			numberOfMembers: 1
-		});
+		const createdOffice = await officeRepository.saveOffice(
+			{
+				invitationCode,
+				createdByUserId: createdUserId,
+				name: createOfficeDto.name,
+				description: createOfficeDto.description
+			},
+			[ownerRole!],
+			'general'
+		);
 
 		const officeDto = await officeCreator.createOfficeOverviewById(
-			office.id
+			createdOffice.id
 		);
 
 		return officeDto;

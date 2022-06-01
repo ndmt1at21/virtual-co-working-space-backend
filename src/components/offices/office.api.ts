@@ -23,8 +23,16 @@ export const OfficeRouter = () => {
 	router.use(
 		'/:id',
 		officeMiddleware.protect,
-		officeMiddleware.restrictToNotBlockedOffice
+		officeMiddleware.restrictToNotBlockedOffice,
+		officeMiddleware.restrictToNotBlockedMember
 	);
+
+	router
+		.route('/:id/members/:memberId')
+		.delete(
+			officeMiddleware.restrictTo([OfficeRoleType.OWNER]),
+			officeController.removeMemberFromOffice
+		);
 
 	router.route('/:id/members').get(officeController.getOfficeMembersById);
 

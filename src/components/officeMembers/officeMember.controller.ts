@@ -36,10 +36,10 @@ export class OfficeMemberController {
 		}
 	);
 
-	deleteOfficeMember = catchAsyncRequestHandler(async (req, res, next) => {
+	removeOfficeMember = catchAsyncRequestHandler(async (req, res, next) => {
 		const id = +req.params.id;
 
-		await this.officeMemberService.deleteOfficeMemberById(id);
+		// await this.officeMemberService.removeOfficeMemberById(id);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK

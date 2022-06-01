@@ -9,6 +9,7 @@ import {
 import { Conversation } from '@src/components/conversations/conversation.entity';
 import { User } from '@components/users/user.entity';
 import { BaseEntity } from '../base/BaseEntity';
+import { ConversationMemberStatus } from './@types/ConversationMemberStatus';
 
 @Entity({ name: 'conversation_member' })
 @Unique(['conversationId', 'memberId'])
@@ -27,6 +28,14 @@ export class ConversationMember extends BaseEntity {
 
 	@Column({ name: 'is_typing', default: false })
 	isTyping: boolean;
+
+	@Column({
+		name: 'status',
+		type: 'enum',
+		enum: ConversationMemberStatus,
+		default: ConversationMemberStatus.ACTIVE
+	})
+	status: ConversationMemberStatus;
 
 	@ManyToOne(() => Conversation, conversation => conversation.id)
 	@JoinColumn({ name: 'conversation_id' })

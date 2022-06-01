@@ -1,5 +1,11 @@
-import { EntityRepository } from 'typeorm';
+import { DeepPartial, EntityRepository } from 'typeorm';
 import { BaseRepository } from '../base/BaseRepository';
+import { ConversationType } from '../conversations/@types/ConversationType';
+import { Conversation } from '../conversations/conversation.entity';
+import { OfficeMemberRole } from '../officeMemberRole/officeMemberRole.entity';
+import { OfficeMember } from '../officeMembers/officeMember.entity';
+import { OfficeMemberTransform } from '../officeMemberTransform/officeMemberTransform.entity';
+import { OfficeRole } from '../officeRoles/officeRole.entity';
 import { Office } from './office.entity';
 import { OfficeRepositoryQueryBuilder } from './office.repositoryBuilder';
 
@@ -7,6 +13,59 @@ import { OfficeRepositoryQueryBuilder } from './office.repositoryBuilder';
 export class OfficeRepository extends BaseRepository<Office> {
 	queryBuilder(): OfficeRepositoryQueryBuilder {
 		return new OfficeRepositoryQueryBuilder(this);
+	}
+
+	async saveOffice(
+		entity: DeepPartial<Office>,
+		defaultCreatorRoles: OfficeRole[],
+		defaultConversationName: string
+	): Promise<Office> {
+		const office = await this.manager.transaction(
+			async transactionEntityManager => {
+				const savedOffice = await transactionEntityManager.save(
+					Office,
+					{
+						...entity,
+						numberOfMembers: 1
+					}
+				);
+
+				const createdDefaultConversation =
+					await transactionEntityManager.save(Conversation, {
+						type: ConversationType.OFFICE_LEVEL,
+						officeId: savedOffice.id,
+						name: defaultConversationName,
+						creatorId: savedOffice.createdByUserId,
+						conversationMembers: [
+							{ memberId: entity.createdByUserId }
+						]
+					});
+
+				await transactionEntityManager.save(OfficeMember, {
+					officeId: savedOffice.id,
+					memberId: savedOffice.createdByUserId,
+					roles: defaultCreatorRoles.map(role => ({
+						officeRole: role
+					})),
+					transform: {}
+				});
+
+				await transactionEntityManager.update(
+					Office,
+					{ id: savedOffice.id },
+					{
+						defaultConversationId: createdDefaultConversation.id
+					}
+				);
+
+				return {
+					...savedOffice,
+					defaultConversationId: createdDefaultConversation.id
+				};
+			}
+		);
+
+		return office;
 	}
 
 	async existsOfficeByInvitationCode(

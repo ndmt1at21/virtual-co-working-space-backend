@@ -10,10 +10,13 @@ import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
 import { IOfficeService } from './@types/IOfficeService';
 import { generateResponseData } from '@src/utils/generateResponseData';
 import { IConversationService } from '../conversations/@types/IConversationService';
+import { IOfficeMemberService } from '../officeMembers/@types/IOfficeMemberService';
+import { OfficeMemberErrorMessages } from '../officeMembers/officeMember.error';
 
 export class OfficeController {
 	constructor(
 		private officeService: IOfficeService,
+		private officeMemberService: IOfficeMemberService,
 		private conversationService: IConversationService,
 		private logger: ILogger
 	) {}
@@ -237,6 +240,39 @@ export class OfficeController {
 			data: { office }
 		});
 	});
+
+	removeMemberFromOffice = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			this.logger.info(
+				`Delete member from office by office id ${req.params.id} and user id ${req.params.memberId}`
+			);
+
+			const officeId = +req.params.id;
+			const officeMemberId = +req.params.memberId;
+
+			if (officeMemberId === req.user?.id) {
+				throw new IllegalArgumentError(
+					OfficeMemberErrorMessages.CANNOT_SELF_REMOVE
+				);
+			}
+
+			await this.officeMemberService.removeOfficeMemberById(
+				officeMemberId
+			);
+
+			this.logger.info('Delete member from office successfully');
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: {
+					officeId,
+					officeMemberId
+				}
+			});
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
 
 	extractQueryFindAllOptions(originalQuery: any): FindAllOfficesOptions {
 		const query = PaginateQueryParser.parse(originalQuery, {

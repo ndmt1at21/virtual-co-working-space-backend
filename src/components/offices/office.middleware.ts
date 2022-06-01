@@ -11,6 +11,7 @@ import {
 import { OfficeRepository } from './office.repository';
 import { OfficeErrorMessages } from './office.error';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
+import { OfficeMemberStatus } from '../officeMembers/@types/OfficeMemberStatus';
 
 export class OfficeMiddleware implements IOfficeMiddleware {
 	constructor(
@@ -37,7 +38,8 @@ export class OfficeMiddleware implements IOfficeMiddleware {
 			id: officeId,
 			isBlocked: office.isBlocked,
 			createdBy: userId,
-			roles: officeMember.roles.map(role => role.officeRole.name)
+			roles: officeMember.roles.map(role => role.officeRole.name),
+			isMemberRemoved: officeMember.status === OfficeMemberStatus.REMOVED
 		};
 
 		next();
@@ -47,6 +49,18 @@ export class OfficeMiddleware implements IOfficeMiddleware {
 		async (req: Request, res: Response, next: NextFunction) => {
 			if (req.office?.isBlocked) {
 				throw new UnauthorizedError(OfficeErrorMessages.OFFICE_BLOCKED);
+			}
+
+			next();
+		}
+	);
+
+	restrictToNotBlockedMember = catchAsyncRequestHandler(
+		async (req: Request, res: Response, next: NextFunction) => {
+			if (req.office?.isMemberRemoved) {
+				throw new UnauthorizedError(
+					OfficeMemberErrorMessages.OFFICE_MEMBER_REMOVED
+				);
 			}
 
 			next();

@@ -4,6 +4,10 @@ import { BaseRepository } from '../base/BaseRepository';
 import { OfficeMemberOnlineStatus } from './@types/OfficeMemberOnlineStatus';
 import { OfficeMemberRepositoryQueryBuilder } from './officeMember.repositoryBuilder';
 import { Office } from '../offices/office.entity';
+import { Conversation } from '../conversations/conversation.entity';
+import { ConversationMember } from '../conversationMembers/conversationMember.entity';
+import { OfficeMemberStatus } from './@types/OfficeMemberStatus';
+import { ConversationMemberStatus } from '../conversationMembers/@types/ConversationMemberStatus';
 
 @EntityRepository(OfficeMember)
 export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
@@ -14,24 +18,77 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 	async saveOfficeMember(
 		entity: DeepPartial<OfficeMember>
 	): Promise<OfficeMember> {
-		let createdOfficeMember: OfficeMember;
+		const officeMember = await getManager().transaction(
+			async transactionEntityManager => {
+				const office = await transactionEntityManager.findOne(
+					Office,
+					entity.officeId!
+				);
 
-		getManager().transaction(async transactionEntityManager => {
-			const officeMember = this.create(entity);
+				const createdOfficeMember =
+					await transactionEntityManager.save<OfficeMember>(
+						this.create(entity)
+					);
 
-			createdOfficeMember =
-				await transactionEntityManager.save<OfficeMember>(officeMember);
+				await transactionEntityManager.increment(
+					Office,
+					{ id: entity.officeId! },
+					'numberOfMembers',
+					1
+				);
 
-			const updateResult = await transactionEntityManager.increment(
+				await transactionEntityManager.save<ConversationMember>(
+					transactionEntityManager.create(ConversationMember, {
+						conversationId: office?.defaultConversationId,
+						memberId: entity.memberId
+					})
+				);
+
+				return createdOfficeMember;
+			}
+		);
+
+		return officeMember;
+	}
+
+	async removeOfficeMemberById(id: number): Promise<void> {
+		await getManager().transaction(async transactionEntityManager => {
+			const officeMember = await transactionEntityManager.findOne(
+				OfficeMember,
+				id
+			);
+
+			const office = await transactionEntityManager.findOne(
 				Office,
-				{ id: entity.officeId! },
+				officeMember!.officeId
+			);
+
+			// block office member
+			await transactionEntityManager.save(OfficeMember, {
+				...officeMember,
+				status: OfficeMemberStatus.REMOVED
+			});
+
+			// reduce number of members in office
+			await transactionEntityManager.decrement(
+				Office,
+				{ id: office!.id },
 				'numberOfMembers',
 				1
 			);
-		});
 
-		// TODO: can throw an error ?
-		return createdOfficeMember!;
+			// block conversation member
+			await transactionEntityManager.update<ConversationMember>(
+				ConversationMember,
+				{
+					conversationId: office!.defaultConversationId,
+					memberId: officeMember!.memberId
+				},
+				{
+					status: ConversationMemberStatus.BANNED
+				}
+			);
+		});
 	}
 
 	async existsOfficeMemberById(id: number): Promise<boolean> {

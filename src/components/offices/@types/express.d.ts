@@ -5,6 +5,7 @@ declare global {
 		interface Office {
 			id: number;
 			isBlocked?: boolean;
+			isMemberRemoved: boolean;
 			createdBy: number;
 			roles: string[];
 		}

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { createAuthMiddleware } from '../auth/auth.factory';
 import { UserRoleType } from '../users/@types/UserRoleType';
 import { ItemCategoryRouter } from './components/itemCategories/itemCategories.api';
-import { OfficeMemberRouter } from './components/itemMembers/itemMember.api';
+import { OfficeMemberRouter } from './components/officeMembers/officeMember.api';
 import { ItemRouter } from './components/items/item.api';
 import { OfficeInvitationRouter } from './components/officeInvitations/officeInvitation.api';
 import { OfficeItemRouter } from './components/officeItems/officeItem.api';

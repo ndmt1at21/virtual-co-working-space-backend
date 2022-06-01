@@ -93,6 +93,7 @@ export const OfficeMemberSocketService = (
 	}
 
 	async function onMemberDisconnect() {
+		console.log('starararat');
 		if (socket.data.officeMember) {
 			logger.info(
 				`User ${socket.user?.id} is disconnecting from office ${
@@ -110,8 +111,9 @@ export const OfficeMemberSocketService = (
 			socket.leave(`u/${memberId}`);
 			// remove listener
 
+			console.log('set officeline');
 			await officeMemberRepository.setOfficeMemberOnlineStatusById(
-				memberId,
+				id,
 				OfficeMemberOnlineStatus.OFFLINE
 			);
 

@@ -28,7 +28,7 @@ export const OfficeMemberSocketService = (
 ): IOfficeMemberSocketService => {
 	async function onJoinToOfficeRoom(data: JoinToOfficeRoomDto) {
 		logger.info(
-			`User ${socket.user?.id} joined to office ${data.officeId}`
+			`User ${socket.user?.id} start joining to office ${data.officeId}`
 		);
 
 		const { officeId } = data;
@@ -50,7 +50,16 @@ export const OfficeMemberSocketService = (
 			officeId: officeMember.officeId
 		};
 
+		logger.info(
+			`User ${socket.user?.id} is joining to room '${data.officeId}'`
+		);
 		socket.join(`${officeMember!.officeId}`);
+
+		logger.info(
+			`User ${socket.user?.id} is joining to room 'u/${
+				officeMember!.memberId
+			}'`
+		);
 		socket.join(`u/${officeMember!.memberId}`);
 
 		// await disconnectExistSocketHasSameUserId(userId);

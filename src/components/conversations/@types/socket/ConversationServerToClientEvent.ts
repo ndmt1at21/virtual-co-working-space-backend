@@ -13,9 +13,7 @@ export interface ConversationServerToClientEvent {
 		conversationId: number;
 	}) => void;
 
-	'conversation:created': (data: {
-		conversation: ConversationOfUserDetailDto;
-	}) => void;
+	'conversation:created': (data: ConversationOfUserDetailDto) => void;
 
 	'conversation:updated': (data: {
 		conversation: ConversationOverviewDto;

@@ -2,8 +2,6 @@ import { Expose } from 'class-transformer';
 import { IsArray, IsDefined, Length } from 'class-validator';
 
 export class CreateConversationDto {
-	@IsDefined()
-	@Expose()
 	officeId: number;
 
 	@IsDefined()
@@ -12,10 +10,9 @@ export class CreateConversationDto {
 	name: string;
 
 	@IsDefined()
-	@IsArray({ each: true })
+	@IsArray()
 	@Expose()
 	memberIds: number[];
 
-	@Expose()
 	creatorId: number;
 }

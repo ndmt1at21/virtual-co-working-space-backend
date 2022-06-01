@@ -12,7 +12,6 @@ import { BaseEntity } from '../base/BaseEntity';
 import { ConversationMemberStatus } from './@types/ConversationMemberStatus';
 
 @Entity({ name: 'conversation_member' })
-@Unique(['conversationId', 'memberId'])
 export class ConversationMember extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;

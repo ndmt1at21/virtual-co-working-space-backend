@@ -43,10 +43,11 @@ export class ConversationService implements IConversationService {
 			creatorId,
 			name,
 			type: ConversationType.GROUP_LEVEL,
-			conversationMembers: [{ memberId: creatorId }]
+			conversationMembers: [
+				...memberIds.map(id => ({ memberId: id })),
+				{ memberId: creatorId }
+			]
 		});
-
-		await this.addMembersToConversation(conversation.id, memberIds);
 
 		return await this.findConversationDetailByConversationIdAndUserId(
 			conversation.id,

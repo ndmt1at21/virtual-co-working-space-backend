@@ -107,9 +107,11 @@ export class ConversationSocketController {
 			const createConversationDto = context.body as CreateConversationDto;
 
 			const createdConversation =
-				await this.conversationService.createConversation(
-					createConversationDto
-				);
+				await this.conversationService.createConversation({
+					...createConversationDto,
+					officeId: socket.data.officeMember!.officeId,
+					creatorId: socket.user!.id
+				});
 
 			this.logger.info(
 				`User ${socket.user!.id} created conversation [id = ${
@@ -118,16 +120,14 @@ export class ConversationSocketController {
 			);
 
 			const rooms = createdConversation.conversation.members.map(
-				member => `u/${member.userId}`
+				member => `u/${member.user?.id || member.userId}`
 			);
 
 			this.logger.info(
 				`Start emitting event 'conversation:created' to rooms: ${rooms}`
 			);
 
-			socket.to(rooms).emit('conversation:created', {
-				conversation: createdConversation
-			});
+			io.to(rooms).emit('conversation:created', createdConversation);
 
 			this.logger.info(
 				`End emitting event 'conversation:created' to rooms`
@@ -261,8 +261,7 @@ export class ConversationSocketController {
 			return;
 		}
 
-		this.logger.error(`${err.message}`);
-		this.logger.error(`${err.stack}`);
+		this.logger.error(`${JSON.stringify(err)}`);
 
 		socket.emit('conversation:error', {
 			code: HttpStatusCode.INTERNAL_SERVER_ERROR,

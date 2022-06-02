@@ -138,7 +138,7 @@ export class ItemCategoryController {
 
 		if (query.sort) {
 			options.sort = {
-				id: query.sort?.id.order,
+				id: query.sort.id?.order,
 				createdAt: query.sort.created_at?.order
 			};
 		}

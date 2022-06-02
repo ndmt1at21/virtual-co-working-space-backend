@@ -50,6 +50,8 @@ export const OfficeMemberSocketService = (
 			officeId: officeMember.officeId
 		};
 
+		await disconnectExistSocketHasSameUserId(userId);
+
 		logger.info(
 			`User ${socket.user?.id} is joining to room '${data.officeId}'`
 		);
@@ -62,7 +64,11 @@ export const OfficeMemberSocketService = (
 		);
 		socket.join(`u/${officeMember!.memberId}`);
 
-		// await disconnectExistSocketHasSameUserId(userId);
+		await officeMemberSocketCacheService.setUserSocket(
+			`${userId}`,
+			socket.id
+		);
+
 		emitMemberOnlineToOffice(
 			mapOfficeMemberToOfficeMemberOverviewDto(officeMember),
 			officeId
@@ -102,7 +108,6 @@ export const OfficeMemberSocketService = (
 	}
 
 	async function onMemberDisconnect() {
-		console.log('starararat');
 		if (socket.data.officeMember) {
 			logger.info(
 				`User ${socket.user?.id} is disconnecting from office ${
@@ -139,16 +144,30 @@ export const OfficeMemberSocketService = (
 	async function disconnectExistSocketHasSameUserId(
 		userId: number
 	): Promise<void> {
-		const socketWithSameUserId =
+		logger.info(
+			`Start disconnecting exists sockets of user [id = ${userId}]`
+		);
+
+		const existsSocketOfUser =
 			await officeMemberSocketCacheService.getUserSocket(`${userId}`);
 
-		if (!socketWithSameUserId) return;
+		logger.info(
+			`Start disconnecting exists socket [socketId = ${existsSocketOfUser}]`
+		);
+
+		if (!existsSocketOfUser) return;
 
 		const existSocket =
-			socketNamespace.sockets.sockets.get(socketWithSameUserId);
+			socketNamespace.sockets.sockets.get(existsSocketOfUser);
+
+		console.log(existSocket);
 
 		existSocket?.emit('office_member:error', 'Multiple socket connection');
 		existSocket?.disconnect();
+
+		logger.info(
+			`Exists socket [socketId = ${existsSocketOfUser} disconnected`
+		);
 
 		await officeMemberSocketCacheService.deleteUserSocket(`${userId}`);
 	}

@@ -8,6 +8,7 @@ export type OfficeOverviewDto = {
 	description?: string;
 	createdAt: Date;
 	createdBy: UserOverviewDto;
+	status: string;
 	numberOfMembers: number;
 	numberOfItems: number;
 };

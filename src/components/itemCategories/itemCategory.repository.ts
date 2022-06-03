@@ -7,6 +7,14 @@ import { FindAllItemCategoriesOptions } from './@types/filter/FindAllItemCategor
 
 @EntityRepository(ItemCategory)
 export class ItemCategoryRepository extends BaseRepository<ItemCategory> {
+	async existsById(id: number): Promise<boolean> {
+		const itemCategory = await this.createQueryBuilder('item_category')
+			.where('item_category.id = :id', { id })
+			.getCount();
+
+		return itemCategory === 1;
+	}
+
 	async findItemCategoryById(id: number): Promise<ItemCategory | undefined> {
 		const itemCategory = await this.createQueryBuilder('item_category')
 			.where('item_category.id = :id', { id })

@@ -33,6 +33,8 @@ export class ItemService implements IItemService {
 	};
 
 	createItem = async (dto: CreateItemDto): Promise<ItemDto> => {
+		await this.itemValidate.checkItemCategoryExists(dto.categoryId);
+
 		const item = await this.itemRepository.save(dto);
 		const itemDto = await this.itemCreator.createItemDetail(item.id);
 		return itemDto;
@@ -47,6 +49,10 @@ export class ItemService implements IItemService {
 		id: number,
 		item: UpdateItemDto
 	): Promise<ItemDto> => {
+		if (item.categoryId) {
+			await this.itemValidate.checkItemCategoryExists(item.categoryId);
+		}
+
 		await this.itemValidate.checkItemExists(id);
 		await this.itemRepository.update(id, item);
 		return this.itemCreator.createItemDetail(id);

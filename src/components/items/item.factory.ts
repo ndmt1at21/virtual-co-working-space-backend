@@ -1,4 +1,5 @@
 import { getCustomRepository } from 'typeorm';
+import { createItemCategoryRepository } from '../itemCategories/itemCategory.factory';
 import { itemLogger } from '../logger';
 import { ItemController } from './item.controller';
 import { ItemCreator } from './item.creator';
@@ -26,7 +27,9 @@ export function createItemService() {
 
 export function createItemValidate() {
 	const itemRepository = createItemRepository();
-	return new ItemValidate(itemRepository);
+	const itemCategoryRepository = createItemCategoryRepository();
+
+	return new ItemValidate(itemRepository, itemCategoryRepository);
 }
 
 export function createItemCreator() {

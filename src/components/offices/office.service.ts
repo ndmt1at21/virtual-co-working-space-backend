@@ -60,7 +60,8 @@ export const OfficeService = ({
 		await officeRepository.save({
 			id,
 			name: payload.name,
-			avatarUrl: payload.avatar
+			avatarUrl: payload.avatar,
+			description: payload.description
 		});
 
 		return officeCreator.createOfficeOverviewById(id);

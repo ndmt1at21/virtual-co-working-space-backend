@@ -3,10 +3,15 @@ import { Server, Socket } from 'socket.io';
 import { OfficeMemberSocketData } from '../officeMembers/@types/socket/OfficeMemberSocketData';
 import { OfficeItemClientToServerEvent } from './@types/OfficeItemClientToServerEvent';
 import { OfficeItemServerToClientEvent } from './@types/OfficeItemServerToClientEvent';
-import { createOfficeItemSocketController } from './officeItem.factory';
+import {
+	createOfficeItemReqValidation,
+	createOfficeItemSocketController
+} from './officeItem.factory';
 
 export const OfficeItemSocketHandler = () => {
 	const officeItemSocketController = createOfficeItemSocketController();
+	const officeItemSocketReqValidation = createOfficeItemReqValidation();
+
 	const handleError = officeItemSocketController.handleError;
 
 	const listen = (
@@ -20,6 +25,7 @@ export const OfficeItemSocketHandler = () => {
 	) => {
 		socket.on('office_item:create', data => {
 			const fn = socketMiddleware(
+				officeItemSocketReqValidation.validateCreateOfficeItemData,
 				officeItemSocketController.onOfficeItemCreate
 			);
 
@@ -38,12 +44,13 @@ export const OfficeItemSocketHandler = () => {
 
 		socket.on('office_item:delete', data => {
 			const fn = socketMiddleware(
+				officeItemSocketReqValidation.validateOfficeItemIdParams,
 				officeItemSocketController.onOfficeItemDelete
 			);
 
 			fn.use(handleError);
 			fn.execute(io, socket, {
-				body: { id: data.id }
+				params: { id: data.id }
 			});
 		});
 	};

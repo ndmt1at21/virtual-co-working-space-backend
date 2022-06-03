@@ -25,54 +25,55 @@ export class OfficeItemSocketController {
 	) {}
 
 	onOfficeItemCreate = catchAsyncSocketHandler(
-		async (io, socket, context, next) => {
+		async (io, socket: OfficeItemSocket, context, next) => {
+			const officeId = socket.data.officeMember!.officeId;
+
 			this.logger.info(
 				`Start creating office item for office ${
-					context.data.officeId
-				} with data: ${JSON.stringify(context.data)}`
+					socket.data.officeMember?.officeId
+				} with data: ${JSON.stringify(context.body)}`
 			);
 
-			const { itemId, officeId, ...transform } =
+			const { itemId, ...transform } =
 				context.body as CreateOfficeItemDto;
 
 			const officeItem = await this.officeItemService.createOfficeItem({
+				...transform,
 				itemId,
-				officeId,
-				...transform
+				officeId
 			});
 
 			this.logger.info(
-				`Finished creating office item [id = ${officeItem.id}] for office ${context.data.officeId}`
+				`Finished creating office item [id = ${officeItem.id}] for office ${officeId}`
 			);
 
 			this.logger.info(
-				`Start emitting event 'office_item:created' to room ${context.data.officeId}`
+				`Start emitting event 'office_item:created' to room ${officeId}`
 			);
 
-			io.in(`${socket.data.officeMember!.officeId}`).emit(
-				'office_item:created',
-				officeItem
-			);
+			io.in(`${officeId}`).emit('office_item:created', officeItem);
 
 			this.logger.info(
-				`Finished emitting event 'office_item:created' to room ${context.data.officeId}`
+				`Finished emitting event 'office_item:created' to room ${officeId}`
 			);
 		}
 	);
 
 	onOfficeItemMove = catchAsyncSocketHandler(
-		async (io, socket, context, next) => {
+		async (io, socket: OfficeItemSocket, context, next) => {
+			const officeId = socket.data.officeMember!.officeId;
+
 			this.logger.info(
-				`Start moving office item in office ${
-					context.data.officeId
-				} with data: ${JSON.stringify(context.data)}`
+				`Start moving office item in office ${officeId} with data: ${JSON.stringify(
+					context.body
+				)}`
 			);
 
 			const { id, transform } =
 				context.body as UpdateOfficeItemTransformDto;
 
 			this.logger.info(
-				`Start emitting event 'office_item:moved' to room: ${context.data.officeId}`
+				`Start emitting event 'office_item:moved' to room: ${officeId}`
 			);
 
 			socket
@@ -83,7 +84,7 @@ export class OfficeItemSocketController {
 				});
 
 			this.logger.info(
-				`Finished emitting event 'office_item:moved' to room: ${context.data.officeId}`
+				`Finished emitting event 'office_item:moved' to room: ${officeId}`
 			);
 
 			await this.officeItemService.updateOfficeItemTransform(
@@ -92,21 +93,22 @@ export class OfficeItemSocketController {
 			);
 
 			this.logger.info(
-				`Finished moving office item in office ${context.data.officeId}`
+				`Finished moving office item in office ${officeId}`
 			);
 		}
 	);
 
 	onOfficeItemDelete = catchAsyncSocketHandler(
-		async (io, socket, context, next) => {
+		async (io, socket: OfficeItemSocket, context, next) => {
+			const officeId = socket.data.officeMember!.officeId;
+
 			this.logger.info(
-				`Start deleting office item in office ${
-					context.data.officeId
-				} with data: ${JSON.stringify(context.data)}`
+				`Start deleting office item in office ${officeId} with params: ${JSON.stringify(
+					context.params
+				)}`
 			);
 
 			const id = context.body.id as number;
-			const officeId = socket.data.officeMember!.officeId;
 			await this.officeItemService.deleteOfficeItem(id);
 
 			this.logger.info(
@@ -128,7 +130,7 @@ export class OfficeItemSocketController {
 	handleError: SocketMiddlewareErrorFunction = (
 		err,
 		io,
-		socket,
+		socket: OfficeItemSocket,
 		context,
 		next
 	) => {

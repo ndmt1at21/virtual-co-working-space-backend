@@ -7,6 +7,7 @@ import { OfficeItemController } from './officeItem.controller';
 import { OfficeItemRepository } from './officeItem.repository';
 import { OfficeItemService } from './officeItem.service';
 import { OfficeItemSocketController } from './officeItem.socketController';
+import { OfficeItemSocketReqValidation } from './officeItem.socketReqValidation';
 import { OfficeItemValidate } from './officeItemValidate';
 
 export function createOfficeItemController() {
@@ -18,6 +19,10 @@ export function createOfficeItemSocketController() {
 	const officeItemService = createOfficeItemService();
 
 	return new OfficeItemSocketController(officeItemService, officeItemLogger);
+}
+
+export function createOfficeItemReqValidation() {
+	return new OfficeItemSocketReqValidation();
 }
 
 export function createOfficeItemService() {

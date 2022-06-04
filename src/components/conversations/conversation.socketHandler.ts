@@ -97,6 +97,7 @@ export const ConversationSocketHandler = () => {
 				conversationSocketReqValidation.validateConversationIdParams,
 				conversationSocketReqValidation.validateRemoveUserFromConversationData,
 				conversationSocketMiddleware.protect,
+				conversationSocketMiddleware.restrictToOwner,
 				conversationSocketController.onRemoveMemberFromConversation
 			);
 

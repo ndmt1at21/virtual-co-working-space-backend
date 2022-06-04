@@ -1,0 +1,7 @@
+{
+	"verbose": false,
+	"watch": ["src/**/*.ts"],
+	"ignore": ["src/**/*.test.ts", "README"],
+	"pollingInterval": 100,
+	"legacyWatch": true
+}

@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import http from 'http';
+import path from 'path';
 import express from 'express';
 import { appConfig } from '@src/config/app';
 import { serverLogger } from '@components/logger';
@@ -9,6 +10,8 @@ import {
 	socketServerLoader,
 	peerServerLoader
 } from './components/app';
+
+global.__basedir = path.resolve('./');
 
 const startServer = async () => {
 	const app = express();

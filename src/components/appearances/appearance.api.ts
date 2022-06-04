@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { createAuthMiddleware } from '../auth/auth.factory';
-import { UserRoleType } from '../users/@types/UserRoleType';
 import {
 	createAppearanceController,
 	createAppearanceReqValidation

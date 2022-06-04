@@ -12,7 +12,7 @@ export class CreateConversationDto {
 	@IsDefined()
 	@IsArray()
 	@Expose()
-	memberIds: number[];
+	userIds: number[];
 
 	creatorId: number;
 }

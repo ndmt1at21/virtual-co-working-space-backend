@@ -1,6 +1,7 @@
-import { EntityRepository } from 'typeorm';
+import { EntityRepository, UpdateResult } from 'typeorm';
 import { ConversationMember } from '@src/components/conversationMembers/conversationMember.entity';
 import { BaseRepository } from '@src/components/base/BaseRepository';
+import { ConversationMemberStatus } from './@types/ConversationMemberStatus';
 
 @EntityRepository(ConversationMember)
 export class ConversationMemberRepository extends BaseRepository<ConversationMember> {
@@ -98,5 +99,19 @@ export class ConversationMemberRepository extends BaseRepository<ConversationMem
 				conversationId
 			})
 			.getMany();
+	}
+
+	async updateConversationMemberStatus(
+		id: number,
+		status: ConversationMemberStatus
+	): Promise<UpdateResult> {
+		return await this.createQueryBuilder('conversation_member')
+			.where('conversation_member.id = :id', {
+				id
+			})
+			.update({
+				status
+			})
+			.execute();
 	}
 }

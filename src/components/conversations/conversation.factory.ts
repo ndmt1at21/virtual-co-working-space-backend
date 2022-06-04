@@ -9,6 +9,7 @@ import { ConversationService } from './conversation.service';
 import { ConversationSocketController } from './conversation.socketController';
 import { ConversationSocketReqValidation } from './conversation.socketReqValidate';
 import { ConversationValidate } from './conversation.validate';
+import { ConversationSocketMiddleware } from './conversation.socketMiddleware';
 
 export function createConversationController() {
 	return new ConversationController(createConversationService());
@@ -19,6 +20,16 @@ export function createConversationValidate() {
 	const conversationMemberRepository = createConversationMemberRepository();
 
 	return new ConversationValidate(
+		conversationRepository,
+		conversationMemberRepository
+	);
+}
+
+export function createConversationSocketMiddleware() {
+	const conversationRepository = createConversationRepository();
+	const conversationMemberRepository = createConversationMemberRepository();
+
+	return new ConversationSocketMiddleware(
 		conversationRepository,
 		conversationMemberRepository
 	);

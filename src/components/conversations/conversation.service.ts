@@ -23,6 +23,7 @@ import { UpdateConversationDto } from './@types/dto/UpdateConversation.dto';
 import { mapConversationMemberToConversationMemberOverviewDto } from '../conversationMembers/conversationMember.mapping';
 import { ConversationMemberOverviewDto } from '../conversationMembers/@types/dto/ConversationMemberOverview.dto';
 import { IConversationValidate } from './@types/IConversationValidate';
+import { ConversationMemberStatus } from '../conversationMembers/@types/ConversationMemberStatus';
 
 export class ConversationService implements IConversationService {
 	constructor(
@@ -36,7 +37,7 @@ export class ConversationService implements IConversationService {
 	async createConversation(
 		createConversationDto: CreateConversationDto
 	): Promise<ConversationOfUserDetailDto> {
-		const { creatorId, officeId, name, memberIds } = createConversationDto;
+		const { creatorId, officeId, name, userIds } = createConversationDto;
 
 		const conversation = await this.conversationRepository.save({
 			officeId,
@@ -44,7 +45,7 @@ export class ConversationService implements IConversationService {
 			name,
 			type: ConversationType.GROUP_LEVEL,
 			conversationMembers: [
-				...memberIds.map(id => ({ memberId: id })),
+				...userIds.map(id => ({ memberId: id })),
 				{ memberId: creatorId }
 			]
 		});
@@ -253,5 +254,24 @@ export class ConversationService implements IConversationService {
 			);
 
 		return conversationMembers.map(cm => cm.memberId);
+	}
+
+	async deleteConversationById(id: number): Promise<void> {
+		await this.conversationValidate.checkConversationExists(id);
+		await this.conversationRepository.softDelete(id);
+	}
+
+	async removeConversationMemberById(id: number): Promise<void> {
+		const conversationMember =
+			await this.conversationMemberRepository.updateConversationMemberStatus(
+				id,
+				ConversationMemberStatus.BANNED
+			);
+
+		if (conversationMember?.affected === 0) {
+			throw new NotFoundError(
+				ConversationErrorMessages.USER_NOT_FOUND_IN_CONVERSATION
+			);
+		}
 	}
 }

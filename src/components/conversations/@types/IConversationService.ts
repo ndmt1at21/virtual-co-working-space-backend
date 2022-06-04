@@ -45,4 +45,8 @@ export interface IConversationService {
 	): Promise<ConversationMemberOverviewDto[]>;
 
 	findAllMemberIdsByConversationId(conversationId: number): Promise<number[]>;
+
+	deleteConversationById(id: number): Promise<void>;
+
+	removeConversationMemberById(id: number): Promise<void>;
 }

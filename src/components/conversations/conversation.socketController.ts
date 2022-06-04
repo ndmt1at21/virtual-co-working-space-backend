@@ -2,23 +2,13 @@ import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { SocketMiddlewareErrorFunction } from '@src/utils/@types/socketMiddleware';
 import { AppError } from '@src/utils/appError';
 import { catchAsyncSocketHandler } from '@src/utils/catchAsyncSocketHandler';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { ILogger } from '../logger/@types/ILogger';
-import { OfficeMemberSocketData } from '../officeMembers/@types/socket/OfficeMemberSocketData';
 import { AddUsersToConversationDto } from './@types/dto/AddUsersToConversation.dto';
 import { CreateConversationDto } from './@types/dto/CreateConversation.dto';
-import { JoinOrLeaveConversationDto } from './@types/dto/JoinOrLeaveConversation.dto';
 import { UpdateConversationDto } from './@types/dto/UpdateConversation.dto';
 import { IConversationService } from './@types/IConversationService';
-import { ConversationClientToServerEvent } from './@types/socket/ConversationClientToServerEvent';
-import { ConversationServerToClientEvent } from './@types/socket/ConversationServerToClientEvent';
-
-export type ConversationSocket = Socket<
-	ConversationClientToServerEvent,
-	ConversationServerToClientEvent,
-	any,
-	OfficeMemberSocketData
->;
+import { ConversationSocket } from './@types/socket/ConversationSocket';
 
 export class ConversationSocketController {
 	constructor(
@@ -242,10 +232,87 @@ export class ConversationSocketController {
 		}
 	);
 
+	onDeleteConversation = catchAsyncSocketHandler(
+		async (io: Server, socket: ConversationSocket, context: any, next) => {
+			this.logger.info(
+				`User ${socket.user!.id} starts deleting conversation ${
+					context.params.id
+				}`
+			);
+
+			const conversationId = +context.params.id;
+
+			const memberIds =
+				await this.conversationService.findAllMemberIdsByConversationId(
+					conversationId
+				);
+
+			await this.conversationService.deleteConversationById(
+				conversationId
+			);
+
+			this.logger.info(
+				`User ${socket.user!.id} deleted ${conversationId} successfully`
+			);
+
+			const rooms = memberIds.map(id => `u/${id}`);
+
+			// emit
+			this.logger.info(
+				`Start emitting event 'conversation:delete' to rooms: ${rooms}`
+			);
+
+			socket.to(rooms).emit('conversation:deleted', {
+				conversationId: conversationId
+			});
+
+			this.logger.info(
+				`End emitting event 'conversation:delete' to rooms: ${rooms}`
+			);
+		}
+	);
+
+	onRemoveMemberFromConversation = catchAsyncSocketHandler(
+		async (io: Server, socket: ConversationSocket, context: any, next) => {
+			this.logger.info(
+				`User ${socket.user!.id} start deleting user ${
+					context.body.userId
+				} from conversation ${context.params.id}`
+			);
+
+			const conversationId = +context.params.id;
+			await this.conversationService.removeConversationMemberById(
+				context.body.userId
+			);
+
+			this.logger.info(
+				`User ${socket.user!.id} deleted user ${
+					context.body.userId
+				} from conversation ${context.params.id} successfully`
+			);
+
+			const memberIds =
+				await this.conversationService.findAllMemberIdsByConversationId(
+					conversationId
+				);
+
+			const rooms = memberIds.map(id => `u/${id}`);
+
+			// emit
+			this.logger.info(
+				`Start emitting event 'conversation:delete' to rooms: ${rooms}`
+			);
+
+			this.logger.info(
+				`End emitting event 'conversation:delete' to rooms: ${rooms}`
+			);
+		}
+	);
+
 	handleError: SocketMiddlewareErrorFunction = (
 		err,
 		io,
-		socket,
+		socket: ConversationSocket,
 		context,
 		next
 	) => {

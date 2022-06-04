@@ -28,4 +28,13 @@ export interface ConversationServerToClientEvent {
 					conversation: ConversationOfUserDetailDto;
 			  }
 	) => void;
+
+	'conversation:member_removed': (data: {
+		conversationId: number;
+		userId: number;
+	}) => void;
+
+	'conversation:deleted': (data: { conversationId: number }) => void;
+
+	'conversation:error': (data: any) => void;
 }

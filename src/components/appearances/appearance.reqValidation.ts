@@ -2,9 +2,10 @@ import { IllegalArgumentError } from '@src/utils/appError';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { validateRequestBody } from '@src/utils/requestValidation';
 import { CreateAppearancesDto } from './@types/dto/CreateAppearance.dto';
+import { IAppearanceValidation } from './@types/IAppearanceReqValidation';
 
-export const AppearanceReqValidation = () => {
-	const validateCreateAppearance = catchAsyncRequestHandler(
+export class AppearanceReqValidation implements IAppearanceValidation {
+	validateCreateAppearance = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const errors = await validateRequestBody(
 				CreateAppearancesDto,
@@ -20,6 +21,4 @@ export const AppearanceReqValidation = () => {
 			next();
 		}
 	);
-
-	return { validateCreateAppearance };
-};
+}

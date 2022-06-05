@@ -1,22 +1,21 @@
 import { Router } from 'express';
-import { createAuthMiddleware } from '../auth/auth.factory';
-import {
-	createAppearanceController,
-	createAppearanceReqValidation
-} from './appearance.factory';
+import { IAuthMiddleware } from '../auth/@types/IAuthMiddleware';
+import { IAppearanceController } from './@types/IAppearanceController';
+import { IAppearanceValidation } from './@types/IAppearanceReqValidation';
 
-export const AppearanceRouter = (): Router => {
+export const AppearanceRouter = (
+	authMiddleware: IAuthMiddleware,
+	appearanceController: IAppearanceController,
+	appearanceReqValidation: IAppearanceValidation
+): Router => {
 	const router = Router();
-	const authMiddleware = createAuthMiddleware();
-	const appearanceController = createAppearanceController();
-	const reqValidation = createAppearanceReqValidation();
 
 	router.use(authMiddleware.protect);
 
 	router
 		.route('/')
 		.post(
-			reqValidation.validateCreateAppearance,
+			appearanceReqValidation.validateCreateAppearance,
 			appearanceController.createAppearance
 		)
 		.get(appearanceController.getAllAccessoriesOfUser);

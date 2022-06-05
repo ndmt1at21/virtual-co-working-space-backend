@@ -16,7 +16,7 @@ export class ConversationSocketMiddleware
 
 	protect = catchAsyncSocketHandler(
 		async (io, socket: ConversationSocket, context, next) => {
-			const conversationId = +context.params.conversationId;
+			const conversationId = +context.params.id;
 
 			if (!conversationId) {
 				throw new IllegalArgumentError(

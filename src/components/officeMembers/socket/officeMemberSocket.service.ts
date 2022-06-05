@@ -125,7 +125,6 @@ export const OfficeMemberSocketService = (
 			socket.leave(`u/${memberId}`);
 			// remove listener
 
-			console.log('set officeline');
 			await officeMemberRepository.setOfficeMemberOnlineStatusById(
 				id,
 				OfficeMemberOnlineStatus.OFFLINE
@@ -159,8 +158,6 @@ export const OfficeMemberSocketService = (
 
 		const existSocket =
 			socketNamespace.sockets.sockets.get(existsSocketOfUser);
-
-		console.log(existSocket);
 
 		existSocket?.emit('office_member:error', 'Multiple socket connection');
 		existSocket?.disconnect();

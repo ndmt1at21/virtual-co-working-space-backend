@@ -10,9 +10,9 @@ import { OfficeInvitationRouter } from '@src/components/officeInvitation/officeI
 import { MessageRouter } from '@src/components/messages/message.api';
 import { ConversationRouter } from '@src/components/conversations/conversation.api';
 import { ItemCategoryRouter } from '@src/components/itemCategories/itemCategory.api';
-import { AppearanceRouter } from '@src/components/appearances/appearance.api';
 import { AdminRouter } from '@src/components/admin';
 import { CheckInRouter } from '@src/components/checkin/checkin.api';
+import { createAppearanceRouter } from '@src/components/appearances/appearance.factory';
 
 export const mainRoutes = (app: Application) => {
 	const API_PREFIX = '/api/v1';
@@ -27,7 +27,7 @@ export const mainRoutes = (app: Application) => {
 	const officeInvitationRouter = OfficeInvitationRouter();
 	const messageRouter = MessageRouter();
 	const conversationRouter = ConversationRouter();
-	const appearanceRouter = AppearanceRouter();
+	const appearanceRouter = createAppearanceRouter();
 	const itemCategoryRouter = ItemCategoryRouter();
 	const adminRouter = AdminRouter();
 	const checkInRouter = CheckInRouter();

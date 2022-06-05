@@ -20,6 +20,8 @@ export class ConversationSocketReqValidation {
 					ConversationErrorMessages.INVALID_CONVERSATION_ID
 				);
 			}
+
+			next();
 		}
 	);
 

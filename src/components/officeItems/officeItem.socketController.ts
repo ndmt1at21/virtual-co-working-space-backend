@@ -108,7 +108,7 @@ export class OfficeItemSocketController {
 				)}`
 			);
 
-			const id = context.body.id as number;
+			const id = context.params.id as number;
 			await this.officeItemService.deleteOfficeItem(id);
 
 			this.logger.info(

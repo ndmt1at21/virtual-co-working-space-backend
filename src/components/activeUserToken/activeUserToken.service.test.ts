@@ -3,7 +3,6 @@ import { ActiveUserTokenRepository } from './activeUserToken.repository';
 import { ActiveUserTokenService } from './activeUserToken.service';
 import crypto from 'crypto';
 import { IllegalArgumentError } from '@src/utils/appError';
-import { ActiveTokenErrorMessages } from './activeUserToken.error';
 
 jest.mock('./activeUserToken.repository');
 jest.mock('crypto');

@@ -16,6 +16,8 @@ export class OfficeItemSocketReqValidation
 			if (!id) {
 				throw new IllegalArgumentError('OfficeItem id is required');
 			}
+
+			next();
 		}
 	);
 

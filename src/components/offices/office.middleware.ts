@@ -48,7 +48,9 @@ export class OfficeMiddleware implements IOfficeMiddleware {
 	restrictToNotBlockedOffice = catchAsyncRequestHandler(
 		async (req: Request, res: Response, next: NextFunction) => {
 			if (req.office?.isBlocked) {
-				throw new UnauthorizedError(OfficeErrorMessages.OFFICE_BLOCKED);
+				throw new IllegalArgumentError(
+					OfficeErrorMessages.OFFICE_BLOCKED
+				);
 			}
 
 			next();

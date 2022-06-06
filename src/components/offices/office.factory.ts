@@ -20,16 +20,19 @@ import {
 	createConversationService
 } from '../conversations/conversation.factory';
 import { OfficeMiddleware } from './office.middleware';
+import { createAppearanceService } from '../appearances/appearance.factory';
 
 export function createOfficeController() {
 	const officeService = createOfficeService();
 	const officeMemberService = createOfficeMemberService();
 	const conversationService = createConversationService();
+	const appearanceService = createAppearanceService();
 
 	return new OfficeController(
 		officeService,
 		officeMemberService,
 		conversationService,
+		appearanceService,
 		officeLogger
 	);
 }

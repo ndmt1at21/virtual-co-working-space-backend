@@ -12,12 +12,14 @@ import { generateResponseData } from '@src/utils/generateResponseData';
 import { IConversationService } from '../conversations/@types/IConversationService';
 import { IOfficeMemberService } from '../officeMembers/@types/IOfficeMemberService';
 import { OfficeMemberErrorMessages } from '../officeMembers/officeMember.error';
+import { IAppearanceService } from '../appearances/@types/IAppearanceService';
 
 export class OfficeController {
 	constructor(
 		private officeService: IOfficeService,
 		private officeMemberService: IOfficeMemberService,
 		private conversationService: IConversationService,
+		private appearanceService: IAppearanceService,
 		private logger: ILogger
 	) {}
 
@@ -271,6 +273,29 @@ export class OfficeController {
 			});
 
 			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
+
+	getAllAppearancesInOffice = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			this.logger.info(
+				`Get all appearances in office by office id ${req.params.id}`
+			);
+
+			const officeId = +req.params.id;
+
+			const appearances =
+				await this.appearanceService.findAllAccessoriesInOffice(
+					officeId
+				);
+
+			this.logger.info('Get all appearances in office successfully');
+
+			res.status(HttpStatusCode.OK).json({
+				status: 'success',
+				code: HttpStatusCode.OK,
+				data: { appearances }
+			});
 		}
 	);
 

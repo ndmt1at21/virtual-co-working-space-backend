@@ -39,6 +39,10 @@ export const OfficeRouter = () => {
 	router.route('/:id/items').get(officeController.getOfficeItemsById);
 
 	router
+		.route('/:id/appearances')
+		.get(officeController.getAllAppearancesInOffice);
+
+	router
 		.route('/:id/conversations')
 		.get(officeController.getConversationOfUserInOfficeByOfficeId);
 

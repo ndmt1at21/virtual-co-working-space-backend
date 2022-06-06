@@ -4,12 +4,13 @@ import { Appearance } from './appearance.entity';
 export const mapAppearanceToAppearanceDto = (
 	appearance: Appearance
 ): AppearanceDto => {
-	const { id, key, value, createdAt, updatedAt } = appearance;
+	const { id, key, value, userId, createdAt, updatedAt } = appearance;
 
 	return {
 		id,
 		key,
 		value,
+		userId,
 		createdAt,
 		updatedAt
 	};

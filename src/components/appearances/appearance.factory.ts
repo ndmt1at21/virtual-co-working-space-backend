@@ -1,5 +1,6 @@
 import { getCustomRepository } from 'typeorm';
 import { createAuthMiddleware } from '../auth/auth.factory';
+import { createOfficeMemberRepository } from '../officeMembers/officeMember.factory';
 import { AppearanceRouter } from './appearance.api';
 import { AppearanceController } from './appearance.controller';
 import { AppearanceRepository } from './appearance.repository';
@@ -29,7 +30,9 @@ export const createAppearanceReqValidation = () => {
 
 export const createAppearanceService = () => {
 	const appearanceRepository = createAppearanceRepository();
-	return new AppearanceService(appearanceRepository);
+	const officeMemberRepository = createOfficeMemberRepository();
+
+	return new AppearanceService(appearanceRepository, officeMemberRepository);
 };
 
 export const createAppearanceRepository = () => {

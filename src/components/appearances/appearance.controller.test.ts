@@ -14,7 +14,8 @@ describe('AppearanceController', () => {
 			createAppearance: jest.fn(),
 			deleteAppearanceById: jest.fn(),
 			findAccessories: jest.fn(),
-			findAllAccessoriesOfUser: jest.fn()
+			findAllAccessoriesOfUser: jest.fn(),
+			findAllAccessoriesInOffice: jest.fn()
 		};
 
 		appearanceController = new AppearanceController(

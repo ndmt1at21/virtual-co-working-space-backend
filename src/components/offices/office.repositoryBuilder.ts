@@ -15,7 +15,8 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 	}
 
 	findByIds(ids: number[]): OfficeRepositoryQueryBuilder {
-		this.query.where(`${this.tableAlias}.id IN (:...ids)`, { ids });
+		const conditionArr = ids.join(",")
+		this.query.where(`${this.tableAlias}.id IN (${conditionArr})`);
 
 		return this;
 	}

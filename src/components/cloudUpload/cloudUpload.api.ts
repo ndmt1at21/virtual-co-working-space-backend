@@ -3,20 +3,31 @@ import {
 	createCloudUploadController,
 	createCloudUploadMiddleware
 } from './cloudUpload.factory';
+import multer from 'multer';
 
 export const CloudUploadRouter = () => {
 	const router = Router();
 	const cloudUploadController = createCloudUploadController();
 	const cloudUploadMiddleware = createCloudUploadMiddleware();
 
+	const storage = multer.memoryStorage();
+	const multerUpload = multer({
+		storage,
+		limits: { fieldSize: 100000000000000 }
+	});
 	router.post(
 		'/avatar',
-		cloudUploadMiddleware.avatarUpload.single('avatar'),
+		multerUpload.single('avatar'),
 		cloudUploadController.uploadAvatar
 	);
 
 	router.post(
 		'/image',
+		(req, res, next) => {
+			console.log('Mamp');
+			console.log(req);
+			next();
+		},
 		cloudUploadMiddleware.imageUpload.single('image'),
 		cloudUploadController.uploadImage
 	);

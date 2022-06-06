@@ -7,7 +7,7 @@ import { FindAllOfficesOptions } from './filter/FindAllOfficesOptions';
 export interface IOfficeCreator {
 	createOfficeOverviewById(id: number): Promise<OfficeOverviewDto>;
 
-	createOfficesOverviewsByIds(ids: number[]): Promise<OfficeOverviewDto[]>;
+	createOfficesOverviewsByIds(ids: number[], pageable?: Pageable): Promise<OfficeOverviewDto[]>;
 
 	createOfficeDetailById(id: number): Promise<OfficeDetailDto>;
 

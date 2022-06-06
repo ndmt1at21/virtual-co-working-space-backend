@@ -95,12 +95,12 @@ export const OfficeService = ({
 	): Promise<[OfficeOverviewDto[], PaginationInfo]> => {
 		const [officeMembers, pagination] =
 			await officeMemberRepository.findOfficeMembersByMemberId(
-				userId,
-				pageable
+				userId
 			);
 
 		const offices = await officeCreator.createOfficesOverviewsByIds(
-			officeMembers.map(om => om.officeId)
+			officeMembers.map(om => om.officeId),
+			pageable
 		);
 
 		return [offices, pagination];

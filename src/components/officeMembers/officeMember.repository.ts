@@ -54,12 +54,8 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 	}
 
 	async findOfficeMembersByMemberId(
-		memberId: number,
-		pageable?: Pageable
+		memberId: number
 	): Promise<[OfficeMember[], PaginationInfo]> {
-		const page = pageable?.page || 1;
-		const limit = pageable?.limit || 10;
-
 		const [result, total] = await this.createQueryBuilder('office_member')
 			.where(`office_member.member_id = :memberId`, {
 				memberId
@@ -67,13 +63,10 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 			.andWhere(`office_member.status = :status`, {
 				status: OfficeMemberStatus.ACTIVE
 			})
-			.take(limit)
-			.skip((page - 1) * limit)
 			.getManyAndCount();
-
 		return [
 			result,
-			{ count: result.length, page: page, totalCount: total }
+			{ count: result.length, page: 0, totalCount: total }
 		];
 	}
 

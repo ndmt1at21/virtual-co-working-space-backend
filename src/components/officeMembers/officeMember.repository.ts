@@ -8,6 +8,8 @@ import { Conversation } from '../conversations/conversation.entity';
 import { ConversationMember } from '../conversationMembers/conversationMember.entity';
 import { OfficeMemberStatus } from './@types/OfficeMemberStatus';
 import { ConversationMemberStatus } from '../conversationMembers/@types/ConversationMemberStatus';
+import { PaginationInfo } from '../base/@types/PaginationInfo';
+import { Pageable } from '../base/@types/FindAllOptions';
 
 @EntityRepository(OfficeMember)
 export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
@@ -49,6 +51,30 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 		);
 
 		return officeMember;
+	}
+
+	async findOfficeMembersByMemberId(
+		memberId: number,
+		pageable?: Pageable
+	): Promise<[OfficeMember[], PaginationInfo]> {
+		const page = pageable?.page || 1;
+		const limit = pageable?.limit || 10;
+
+		const [result, total] = await this.createQueryBuilder('office_member')
+			.where(`office_member.member_id = :memberId`, {
+				memberId
+			})
+			.andWhere(`office_member.status = :status`, {
+				status: OfficeMemberStatus.ACTIVE
+			})
+			.take(limit)
+			.skip((page - 1) * limit)
+			.getManyAndCount();
+
+		return [
+			result,
+			{ count: result.length, page: page, totalCount: total }
+		];
 	}
 
 	async removeOfficeMemberById(id: number): Promise<void> {

@@ -92,24 +92,18 @@ export const OfficeService = ({
 	const findAllOfficesOverviewUserIsMemberByUserId = async (
 		userId: number,
 		pageable: Pageable
-	): Promise<[OfficeOverviewDto[], number]> => {
-		const officeMembers = await officeMemberRepository
-			.queryBuilder()
-			.findByMemberId(userId)
-			.build()
-			.getMany();
-
-		const totalOfficeMembers = await officeMemberRepository
-			.queryBuilder()
-			.findByMemberId(userId)
-			.build()
-			.getCount();
+	): Promise<[OfficeOverviewDto[], PaginationInfo]> => {
+		const [officeMembers, pagination] =
+			await officeMemberRepository.findOfficeMembersByMemberId(
+				userId,
+				pageable
+			);
 
 		const offices = await officeCreator.createOfficesOverviewsByIds(
 			officeMembers.map(om => om.officeId)
 		);
 
-		return [offices, totalOfficeMembers];
+		return [offices, pagination];
 	};
 
 	const findOfficeItemsById = async (

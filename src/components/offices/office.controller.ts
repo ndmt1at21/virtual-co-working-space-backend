@@ -181,10 +181,12 @@ export class OfficeController {
 				`Get all offices overview current user id ${req.user?.id} is member`
 			);
 
+			const { pageable } = PaginateQueryParser.parse(req.query);
+
 			const [offices, total] =
 				await this.officeService.findAllOfficesOverviewUserIsMemberByUserId(
 					req.user!.id,
-					{ limit: 10, page: 10 }
+					pageable || { page: 1, limit: 10 }
 				);
 
 			this.logger.info('Get all offices overview successfully');

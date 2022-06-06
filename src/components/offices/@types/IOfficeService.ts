@@ -32,7 +32,7 @@ export interface IOfficeService {
 	findAllOfficesOverviewUserIsMemberByUserId(
 		userId: number,
 		pageable: Pageable
-	): Promise<[OfficeOverviewDto[], number]>;
+	): Promise<[OfficeOverviewDto[], PaginationInfo]>;
 
 	findOfficeItemsById(officeId: number): Promise<OfficeWithItemsDto>;
 

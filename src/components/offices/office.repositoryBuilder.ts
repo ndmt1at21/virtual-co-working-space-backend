@@ -16,6 +16,7 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 
 	findByIds(ids: number[]): OfficeRepositoryQueryBuilder {
 		this.query.where(`${this.tableAlias}.id IN (:...ids)`, { ids });
+
 		return this;
 	}
 
@@ -49,6 +50,13 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 			optionsWithDbField
 		);
 
+		return this;
+	}
+
+	withoutBlocked(): OfficeRepositoryQueryBuilder {
+		this.query.andWhere(`${this.tableAlias}.is_blocked = :isBlocked`, {
+			isBlocked: false
+		});
 		return this;
 	}
 

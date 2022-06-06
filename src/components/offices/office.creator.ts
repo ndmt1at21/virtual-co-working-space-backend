@@ -67,6 +67,7 @@ export const OfficeCreator = (
 		const offices = await officeRepository
 			.queryBuilder()
 			.findByIds(ids)
+			.withoutBlocked()
 			.withCreator()
 			.build()
 			.getMany();

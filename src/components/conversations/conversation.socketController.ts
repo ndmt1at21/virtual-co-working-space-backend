@@ -159,7 +159,7 @@ export class ConversationSocketController {
 				`Start emitting event 'conversation:updated' to rooms: ${rooms}`
 			);
 
-			socket.to(rooms).emit('conversation:updated', {
+			io.to(rooms).emit('conversation:updated', {
 				conversation: updatedConversation
 			});
 
@@ -218,11 +218,11 @@ export class ConversationSocketController {
 				`Start emitting event 'conversation:members_added' to rooms: ${newMemberRooms} and ${existsMemberRooms}`
 			);
 
-			socket.to(newMemberRooms).emit('conversation:members_added', {
+			io.to(newMemberRooms).emit('conversation:members_added', {
 				conversation
 			});
 
-			socket.to(existsMemberRooms).emit('conversation:members_added', {
+			io.to(existsMemberRooms).emit('conversation:members_added', {
 				newMembers: newConversationMembers
 			});
 
@@ -262,7 +262,7 @@ export class ConversationSocketController {
 				`Start emitting event 'conversation:delete' to rooms: ${rooms}`
 			);
 
-			socket.to(rooms).emit('conversation:deleted', {
+			io.to(rooms).emit('conversation:deleted', {
 				conversationId: conversationId
 			});
 

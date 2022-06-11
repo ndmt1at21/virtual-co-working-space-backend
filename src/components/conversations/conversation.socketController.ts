@@ -332,7 +332,7 @@ export class ConversationSocketController {
 
 		socket.emit('conversation:error', {
 			code: HttpStatusCode.INTERNAL_SERVER_ERROR,
-			message: 'Something went wrong'
+			message: 'something_went_wrong'
 		});
 	};
 }

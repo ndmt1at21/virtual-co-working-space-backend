@@ -74,7 +74,7 @@ export class AuthController {
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			message: 'User created successfully',
+			message: 'user_created_successfully',
 			data: {
 				user
 			}
@@ -127,7 +127,7 @@ export class AuthController {
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			message: 'User logged out successfully'
+			message: 'user_logged_out_successfully'
 		});
 	});
 
@@ -150,7 +150,7 @@ export class AuthController {
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			message: 'Access token renew successfully',
+			message: 'access_token_renew_successfully',
 			data: {
 				accessToken,
 				refreshToken
@@ -186,7 +186,7 @@ export class AuthController {
 		);
 
 		res.status(HttpStatusCode.OK).json({
-			message: 'Password reset token created successfully'
+			message: 'password_reset_token_created_successfully'
 		});
 	});
 
@@ -220,7 +220,7 @@ export class AuthController {
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			message: 'Password reset successfully'
+			message: 'password_reset_successfully'
 		});
 	});
 
@@ -232,7 +232,7 @@ export class AuthController {
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			message: 'User activated successfully'
+			message: 'user_activated_successfully'
 		});
 	});
 
@@ -258,7 +258,7 @@ export class AuthController {
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			message: 'Password changed successfully'
+			message: 'password_changed_successfully'
 		});
 	});
 

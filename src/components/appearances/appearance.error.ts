@@ -1,3 +1,3 @@
 export const AppearanceErrorMessages = {
-	ACCESSORY_NOT_FOUND: 'Appearance not found'
+	ACCESSORY_NOT_FOUND: 'appearance_not_found'
 };

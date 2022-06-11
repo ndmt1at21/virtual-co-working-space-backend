@@ -1,8 +1,8 @@
 export const UserErrorMessage = {
 	REGISTRATION_MISMATCH_PASSWORD:
-		'Password and confirm password do not match',
-	REGISTRATION_EMAIL_EXISTED: 'Email already exists',
-	USER_NOT_FOUND: 'User not found',
-	USER_CANNOT_BLOCK_SELF: 'User cannot block self',
-	USER_CANNOT_UNBLOCK_SELF: 'User cannot unblock self'
+		'password_and_confirm_password_do_not_match',
+	REGISTRATION_EMAIL_EXISTED: 'email_already_exists',
+	USER_NOT_FOUND: 'user_not_found',
+	USER_CANNOT_BLOCK_SELF: 'user_cannot_block_self',
+	USER_CANNOT_UNBLOCK_SELF: 'user_cannot_unblock_self'
 };

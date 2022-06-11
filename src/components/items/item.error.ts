@@ -1,3 +1,3 @@
 export const ItemErrorMessages = {
-	ITEM_NOT_FOUND: 'Item not found'
+	ITEM_NOT_FOUND: 'item_not_found'
 };

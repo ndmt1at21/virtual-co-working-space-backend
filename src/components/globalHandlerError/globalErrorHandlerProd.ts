@@ -23,6 +23,6 @@ export const globalErrorHandlerProd: ErrorRequestHandler = (
 	}
 
 	res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
-		message: 'Something went wrong'
+		message: 'something_went_wrong'
 	});
 };

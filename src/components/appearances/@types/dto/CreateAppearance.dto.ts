@@ -29,10 +29,10 @@ export class CreateAppearanceDto {
 export class CreateAppearancesDto {
 	@IsDefined()
 	@IsArray()
-	@ArrayMinSize(1, { message: 'Appearances array must have at least 1 item' })
-	@ArrayMaxSize(20, { message: 'Appearances array must not exceed 20 items' })
+	@ArrayMinSize(1, { message: 'appearances_array_must_have_at_least_1_item' })
+	@ArrayMaxSize(20, { message: 'appearances_array_must_not_exceed_20_items' })
 	@IsNestedArray(CreateAppearanceDto, {
-		message: 'All element in appearances array must be an appearance object'
+		message: 'all_element_in_appearances_array_must_be_an_appearance_object'
 	})
 	@Type(() => CreateAppearanceDto)
 	@Expose()

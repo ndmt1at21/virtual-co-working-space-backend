@@ -1,5 +1,6 @@
 import { FindAllOptions, Pageable } from '../base/@types/FindAllOptions';
 import { RepositoryQueryBuilder } from '../base/RepositoryQueryBuilder';
+import { OfficeMemberStatus } from '../officeMembers/@types/OfficeMemberStatus';
 import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
 import { Office } from './office.entity';
 import { OfficeRepository } from './office.repository';
@@ -15,8 +16,7 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 	}
 
 	findByIds(ids: number[]): OfficeRepositoryQueryBuilder {
-		const conditionArr = ids.join(",")
-		this.query.where(`${this.tableAlias}.id IN (${conditionArr})`);
+		this.query.where(`${this.tableAlias}.id IN (:...ids)`, { ids });
 
 		return this;
 	}
@@ -54,10 +54,22 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 		return this;
 	}
 
-	withoutBlocked(): OfficeRepositoryQueryBuilder {
-		this.query.andWhere(`${this.tableAlias}.is_blocked = :isBlocked`, {
-			isBlocked: false
-		});
+	findOfficeOverviewsUserIsMemberByUserId(
+		userId: number
+	): OfficeRepositoryQueryBuilder {
+		this.query
+			.where('office.is_blocked = :isBlocked', { isBlocked: false })
+			.innerJoinAndSelect(
+				'office.officeMembers',
+				'office_member',
+				'(office_member.member_id = :userId AND office_member.status = :status)',
+				{
+					userId,
+					status: OfficeMemberStatus.ACTIVE
+				}
+			)
+			.orderBy('office_member.lastActiveAt', 'DESC');
+
 		return this;
 	}
 
@@ -72,6 +84,14 @@ export class OfficeRepositoryQueryBuilder extends RepositoryQueryBuilder<Office>
 			'conversations'
 		);
 
+		return this;
+	}
+
+	withPageable(pageable: Pageable): OfficeRepositoryQueryBuilder {
+		const limit = pageable.limit || 10;
+		const page = pageable.page || 1;
+
+		this.query.skip((page - 1) * limit).take(limit);
 		return this;
 	}
 

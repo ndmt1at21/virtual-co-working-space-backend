@@ -1,4 +1,3 @@
-import { Pageable } from '../base/@types/FindAllOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
 import { OfficeItemRepository } from '../officeItems/officeItem.repository';
 import { OfficeMemberRepository } from '../officeMembers/officeMember.repository';
@@ -60,25 +59,6 @@ export const OfficeCreator = (
 		});
 	};
 
-	const createOfficesOverviewsByIds = async (
-		ids: number[],
-		pageable?: Pageable,
-	): Promise<OfficeOverviewDto[]> => {
-		if (ids.length === 0) return [];
-		const {limit = 10, page = 1} = pageable || {};
-		const offices = await officeRepository
-			.queryBuilder()
-			.findByIds(ids)
-			.withoutBlocked()
-			.withCreator()
-			.build()
-			.take(limit)
-			.skip((page - 1) * limit)
-			.getMany();
-
-		return offices.map(office => mapOfficeToOfficeOverviewDto(office));
-	};
-
 	const createOfficesOverview = async (
 		options: FindAllOfficesOptions
 	): Promise<[OfficeOverviewDto[], PaginationInfo]> => {
@@ -105,7 +85,6 @@ export const OfficeCreator = (
 
 	return {
 		createOfficeOverviewById,
-		createOfficesOverviewsByIds,
 		createOfficeDetailById,
 		createOfficesOverview
 	};

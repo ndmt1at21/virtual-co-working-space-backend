@@ -21,6 +21,7 @@ import {
 } from '../conversations/conversation.factory';
 import { OfficeMiddleware } from './office.middleware';
 import { createAppearanceService } from '../appearances/appearance.factory';
+import { OfficeReqValidation } from './office.reqValidation';
 
 export function createOfficeController() {
 	const officeService = createOfficeService();
@@ -39,6 +40,10 @@ export function createOfficeController() {
 
 export function createOfficeSocketHandler(io: Server, socket: Socket) {
 	return OfficeSocketHandler(io, socket);
+}
+
+export function createOfficeReqValidation() {
+	return new OfficeReqValidation();
 }
 
 export function createOfficeMiddleware() {

@@ -11,4 +11,5 @@ export type OfficeOverviewDto = {
 	status: string;
 	numberOfMembers: number;
 	numberOfItems: number;
+	lastActiveAt?: Date;
 };

@@ -4,13 +4,15 @@ import { OfficeRoleType } from '../officeRoles/@types/OfficeRoleType';
 import { UserRoleType } from '../users/@types/UserRoleType';
 import {
 	createOfficeController,
-	createOfficeMiddleware
+	createOfficeMiddleware,
+	createOfficeReqValidation
 } from './office.factory';
 
 export const OfficeRouter = () => {
 	const officeController = createOfficeController();
 	const officeMiddleware = createOfficeMiddleware();
 	const authMiddleware = createAuthMiddleware();
+	const officeReqValidation = createOfficeReqValidation();
 
 	const router = Router();
 
@@ -61,6 +63,7 @@ export const OfficeRouter = () => {
 			officeController.deleteOfficeById
 		)
 		.patch(
+			officeReqValidation.validateUpdateOffice,
 			officeMiddleware.restrictTo([
 				OfficeRoleType.OWNER,
 				OfficeRoleType.ADMIN
@@ -74,7 +77,10 @@ export const OfficeRouter = () => {
 			authMiddleware.restrictTo([UserRoleType.ADMIN]),
 			officeController.getAllOffices
 		)
-		.post(officeController.createOffice);
+		.post(
+			officeReqValidation.validateCreateOffice,
+			officeController.createOffice
+		);
 
 	return router;
 };

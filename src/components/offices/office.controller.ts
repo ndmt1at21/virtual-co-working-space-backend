@@ -183,7 +183,7 @@ export class OfficeController {
 
 			const { pageable } = PaginateQueryParser.parse(req.query);
 
-			const [offices, total] =
+			const [offices, pagination] =
 				await this.officeService.findAllOfficesOverviewUserIsMemberByUserId(
 					req.user!.id,
 					pageable || { page: 1, limit: 10 }
@@ -194,7 +194,7 @@ export class OfficeController {
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
 				code: HttpStatusCode.OK,
-				data: { total, offices }
+				data: { pagination, offices }
 			});
 		}
 	);
@@ -220,12 +220,6 @@ export class OfficeController {
 	});
 
 	createOffice = catchAsyncRequestHandler(async (req, res, next) => {
-		this.logger.info('Create office is starting');
-
-		const errors = await validateRequestBody(CreateOfficeDto, req.body);
-		if (errors.length > 0)
-			throw new IllegalArgumentError('Invalid request body', errors);
-
 		this.logger.info(
 			`Create office with data: ${JSON.stringify(req.body)}`
 		);
@@ -238,11 +232,12 @@ export class OfficeController {
 
 		this.logger.info(`Create office successfully with id: ${office.id}`);
 
-		res.status(HttpStatusCode.OK).json({
-			status: 'success',
+		const resData = generateResponseData({
 			code: HttpStatusCode.OK,
 			data: { office }
 		});
+
+		res.status(HttpStatusCode.OK).json(resData);
 	});
 
 	removeMemberFromOffice = catchAsyncRequestHandler(

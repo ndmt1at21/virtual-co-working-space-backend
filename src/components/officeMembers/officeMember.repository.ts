@@ -4,12 +4,10 @@ import { BaseRepository } from '../base/BaseRepository';
 import { OfficeMemberOnlineStatus } from './@types/OfficeMemberOnlineStatus';
 import { OfficeMemberRepositoryQueryBuilder } from './officeMember.repositoryBuilder';
 import { Office } from '../offices/office.entity';
-import { Conversation } from '../conversations/conversation.entity';
 import { ConversationMember } from '../conversationMembers/conversationMember.entity';
 import { OfficeMemberStatus } from './@types/OfficeMemberStatus';
 import { ConversationMemberStatus } from '../conversationMembers/@types/ConversationMemberStatus';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
-import { Pageable } from '../base/@types/FindAllOptions';
 
 @EntityRepository(OfficeMember)
 export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
@@ -64,10 +62,7 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 				status: OfficeMemberStatus.ACTIVE
 			})
 			.getManyAndCount();
-		return [
-			result,
-			{ count: result.length, page: 0, totalCount: total }
-		];
+		return [result, { count: result.length, page: 0, totalCount: total }];
 	}
 
 	async removeOfficeMemberById(id: number): Promise<void> {
@@ -108,6 +103,14 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 				}
 			);
 		});
+	}
+
+	async updateLastActiveDateByOfficeId(officeId: number): Promise<void> {
+		await this.createQueryBuilder('officeId_member')
+			.update()
+			.where('office_member.office_id = :officeId', { officeId })
+			.set({ lastActiveAt: () => 'NOW()' })
+			.execute();
 	}
 
 	async existsOfficeMemberById(id: number): Promise<boolean> {

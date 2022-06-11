@@ -42,6 +42,9 @@ export class OfficeMember extends BaseEntity {
 	})
 	status: OfficeMemberStatus;
 
+	@Column({ name: 'last_active_at', default: () => 'NOW()' })
+	lastActiveAt: Date;
+
 	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'member_id' })
 	member: User;

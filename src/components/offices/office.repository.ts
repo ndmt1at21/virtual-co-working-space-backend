@@ -3,6 +3,7 @@ import { BaseRepository } from '../base/BaseRepository';
 import { ConversationType } from '../conversations/@types/ConversationType';
 import { Conversation } from '../conversations/conversation.entity';
 import { OfficeMemberRole } from '../officeMemberRole/officeMemberRole.entity';
+import { OfficeMemberStatus } from '../officeMembers/@types/OfficeMemberStatus';
 import { OfficeMember } from '../officeMembers/officeMember.entity';
 import { OfficeMemberTransform } from '../officeMemberTransform/officeMemberTransform.entity';
 import { OfficeRole } from '../officeRoles/officeRole.entity';

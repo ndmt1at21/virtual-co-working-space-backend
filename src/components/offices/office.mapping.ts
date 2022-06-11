@@ -29,7 +29,8 @@ export const mapOfficeToOfficeOverviewDto = (
 		numberOfItems,
 		numberOfMembers,
 		isBlocked,
-		description
+		description,
+		officeMembers
 	} = office;
 
 	return {
@@ -42,6 +43,7 @@ export const mapOfficeToOfficeOverviewDto = (
 		createdAt,
 		numberOfItems,
 		numberOfMembers,
+		lastActiveAt: officeMembers ? officeMembers[0].lastActiveAt : undefined,
 		status: isBlocked ? 'blocked' : 'active'
 	};
 };

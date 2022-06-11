@@ -11,6 +11,7 @@ import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
 import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
 import { IOfficeService } from './@types/IOfficeService';
 import { OfficeServiceParams } from './@types/OfficeServiceParams';
+import { mapOfficeToOfficeOverviewDto } from './office.mapping';
 
 export const OfficeService = ({
 	officeRepository,
@@ -72,6 +73,7 @@ export const OfficeService = ({
 	): Promise<OfficeOverviewDto> => {
 		await officeValidate.checkOfficeExistsById(id);
 		const officeOverview = await officeCreator.createOfficeOverviewById(id);
+
 		return officeOverview;
 	};
 
@@ -80,6 +82,8 @@ export const OfficeService = ({
 	): Promise<OfficeDetailDto> => {
 		await officeValidate.checkOfficeExistsById(id);
 		const officeDetail = await officeCreator.createOfficeDetailById(id);
+		await officeMemberRepository.updateLastActiveDateByOfficeId(id);
+
 		return officeDetail;
 	};
 
@@ -91,19 +95,24 @@ export const OfficeService = ({
 
 	const findAllOfficesOverviewUserIsMemberByUserId = async (
 		userId: number,
-		pageable: Pageable
+		pageable?: Pageable
 	): Promise<[OfficeOverviewDto[], PaginationInfo]> => {
-		const [officeMembers, pagination] =
-			await officeMemberRepository.findOfficeMembersByMemberId(
-				userId
-			);
+		const limit = pageable?.limit || 10;
+		const page = pageable?.page || 1;
 
-		const offices = await officeCreator.createOfficesOverviewsByIds(
-			officeMembers.map(om => om.officeId),
-			pageable
+		const [offices, totalCount] = await officeRepository
+			.queryBuilder()
+			.findOfficeOverviewsUserIsMemberByUserId(userId)
+			.withCreator()
+			.withPageable({ limit, page })
+			.build()
+			.getManyAndCount();
+
+		const officesDto = offices.map(office =>
+			mapOfficeToOfficeOverviewDto(office)
 		);
 
-		return [offices, pagination];
+		return [officesDto, { page, count: offices.length, totalCount }];
 	};
 
 	const findOfficeItemsById = async (

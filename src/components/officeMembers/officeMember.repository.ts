@@ -161,7 +161,7 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 		email: string,
 		officeId: number
 	): Promise<OfficeMember | undefined> {
-		return this.createQueryBuilder('office_member')
+		return await this.createQueryBuilder('office_member')
 			.where('office_member.office_id = :officeId', { officeId })
 			.leftJoin('office_member.member', 'user')
 			.where('user.email = :email', { email })
@@ -172,7 +172,7 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 		memberId: number,
 		officeId: number
 	): Promise<OfficeMember | undefined> {
-		return this.createQueryBuilder('office_member')
+		return await this.createQueryBuilder('office_member')
 			.where('office_member.office_id = :officeId', { officeId })
 			.andWhere('office_member.member_id = :memberId', { memberId })
 			.getOne();

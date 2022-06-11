@@ -1,4 +1,5 @@
 import { mapOfficeMemberTransformToTransform3D } from '../officeMemberTransform/officeMemberTransform.mapping';
+import { mapOfficeRoleToOfficeRoleDto } from '../officeRoles/officeRole.mapping';
 import { mapOfficeToOfficeOverviewDto } from '../offices/office.mapping';
 import { mapUserToUserOverviewDto } from '../users/user.mapping';
 import { OfficeMemberDetailDto } from './@types/dto/OfficeMemberDetail.dto';
@@ -13,13 +14,17 @@ export const mapOfficeMemberToOfficeMemberOverviewDto = (
 
 	const memberDto = mapUserToUserOverviewDto(member);
 	const transformDto = mapOfficeMemberTransformToTransform3D(transform);
+	const rolesDto = roles.map(memberRole =>
+		mapOfficeRoleToOfficeRoleDto(memberRole.officeRole)
+	);
 
 	return {
 		id,
 		officeId,
 		member: memberDto,
 		onlineStatus,
-		transform: transformDto
+		transform: transformDto,
+		roles: rolesDto
 	};
 };
 

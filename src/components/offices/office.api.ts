@@ -16,11 +16,13 @@ export const OfficeRouter = () => {
 
 	const router = Router();
 
-	router.use(authMiddleware.protect);
+	router.use(authMiddleware.protect, authMiddleware.restrictToEmailVerified);
 
 	router
 		.route('/in-offices')
 		.get(officeController.getAllOfficesOverviewCurrentUserIsMember);
+
+	router.route('/roles').get(officeController.getAllOfficeRoles);
 
 	router.use(
 		'/:id',
@@ -28,6 +30,17 @@ export const OfficeRouter = () => {
 		officeMiddleware.restrictToNotBlockedOffice,
 		officeMiddleware.restrictToNotBlockedMember
 	);
+
+	router
+		.route('/:id/members/roles')
+		.all(
+			officeMiddleware.restrictTo([
+				OfficeRoleType.ADMIN,
+				OfficeRoleType.OWNER
+			])
+		)
+		.post(officeController.addRoleToOfficeMember)
+		.delete(officeController.removeRoleFromOfficeMember);
 
 	router
 		.route('/:id/members/:memberId')

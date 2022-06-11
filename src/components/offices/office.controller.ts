@@ -13,6 +13,10 @@ import { IConversationService } from '../conversations/@types/IConversationServi
 import { IOfficeMemberService } from '../officeMembers/@types/IOfficeMemberService';
 import { OfficeMemberErrorMessages } from '../officeMembers/officeMember.error';
 import { IAppearanceService } from '../appearances/@types/IAppearanceService';
+import {
+	AddOfficeMemberRole,
+	RemoveOfficeMemberRole
+} from './@types/dto/ChangeOfficeMemberRole.dto';
 
 export class OfficeController {
 	constructor(
@@ -288,11 +292,95 @@ export class OfficeController {
 
 			this.logger.info('Get all appearances in office successfully');
 
-			res.status(HttpStatusCode.OK).json({
-				status: 'success',
+			const resData = generateResponseData({
 				code: HttpStatusCode.OK,
-				data: { appearances }
+				data: {
+					appearances
+				}
 			});
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
+
+	addRoleToOfficeMember = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(
+			`Add role to office member by [officeId = ${
+				req.params.id
+			}], [body =  ${JSON.stringify(req.body)}]`
+		);
+
+		const officeId = +req.params.id;
+		const { officeMemberId, officeRoleId } =
+			req.body as AddOfficeMemberRole;
+
+		await this.officeMemberService.addRoleToOfficeMember(
+			officeMemberId,
+			officeRoleId
+		);
+
+		this.logger.info('Add role to office member successfully');
+
+		const resData = generateResponseData({
+			code: HttpStatusCode.OK,
+			data: {
+				officeId,
+				officeMemberId,
+				officeRoleId
+			}
+		});
+
+		res.status(HttpStatusCode.OK).json(resData);
+	});
+
+	getAllOfficeRoles = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(
+			`Get all exists office member roles by [officeId = ${req.params.id}]`
+		);
+
+		const allRoles = await this.officeService.findAllOfficeRoles();
+
+		const resData = generateResponseData({
+			code: HttpStatusCode.OK,
+			data: {
+				roles: allRoles
+			}
+		});
+
+		this.logger.info('Get all exists office member roles successfully');
+
+		res.status(HttpStatusCode.OK).json(resData);
+	});
+
+	removeRoleFromOfficeMember = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			this.logger.info(
+				`Remove role from office member by [officeId = ${
+					req.params.id
+				}], [body =  ${JSON.stringify(req.body)}]`
+			);
+
+			const officeId = +req.params.id;
+			const { officeMemberId, officeRoleId } =
+				req.body as RemoveOfficeMemberRole;
+
+			await this.officeMemberService.removeRoleFromOfficeMember(
+				officeMemberId,
+				officeRoleId
+			);
+
+			this.logger.info('Remove role from office member successfully');
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: {
+					officeId,
+					officeMemberId,
+					officeRoleId
+				}
+			});
+
+			res.status(HttpStatusCode.OK).json(resData);
 		}
 	);
 

@@ -66,6 +66,8 @@ export class AuthMiddleware implements IAuthMiddleware {
 				throw new UnauthorizedError(
 					AuthErrorMessages.UNAUTHORIZED_EMAIL_NOT_VERIFIED
 				);
+
+			next();
 		}
 	);
 

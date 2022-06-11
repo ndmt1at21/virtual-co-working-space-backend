@@ -1,3 +1,4 @@
+import { OfficeRoleDto } from '@src/components/officeRoles/@types/OfficeRole.dto';
 import { UserOverviewDto } from '@src/components/users/@types/dto/UserOverviewDto';
 import { Transform3dDto } from './Transform3D.dto';
 
@@ -7,4 +8,5 @@ export type OfficeMemberOverviewDto = {
 	officeId: number;
 	transform: Transform3dDto;
 	onlineStatus: string;
+	roles: OfficeRoleDto[];
 };

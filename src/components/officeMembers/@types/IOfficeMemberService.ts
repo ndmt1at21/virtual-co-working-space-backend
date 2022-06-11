@@ -29,4 +29,14 @@ export interface IOfficeMemberService {
 		id: number,
 		status: OfficeMemberOnlineStatus
 	): Promise<void>;
+
+	addRoleToOfficeMember(
+		officeMemberId: number,
+		officeRoleId: number
+	): Promise<void>;
+
+	removeRoleFromOfficeMember(
+		officeMemberId: number,
+		officeRoleId: number
+	): Promise<void>;
 }

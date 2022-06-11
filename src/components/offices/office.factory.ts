@@ -62,9 +62,8 @@ export function createOfficeService() {
 	const officeMemberCreator = createOfficeMemberCreator();
 	const officeValidate = createOfficeValidate();
 	const generator = createOfficeGenerator();
-	const conversationRepository = createConversationRepository();
 
-	return OfficeService({
+	return new OfficeService(
 		officeRepository,
 		officeItemRepository,
 		officeMemberRepository,
@@ -72,9 +71,8 @@ export function createOfficeService() {
 		officeCreator,
 		officeMemberCreator,
 		officeValidate,
-		officeInvitationCodeGenerator: generator,
-		conversationRepository
-	});
+		generator
+	);
 }
 
 export function createOfficeGenerator() {

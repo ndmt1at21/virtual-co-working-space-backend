@@ -44,6 +44,7 @@ export const OfficeCreator = (
 			.queryBuilder()
 			.findByOfficeId(id)
 			.withMember()
+			.withRoles()
 			.withTransform()
 			.build()
 			.getMany();

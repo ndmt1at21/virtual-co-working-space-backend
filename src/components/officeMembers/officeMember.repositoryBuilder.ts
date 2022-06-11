@@ -84,6 +84,7 @@ export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<O
 		this.query
 			.leftJoinAndSelect(`${this.tableAlias}.roles`, 'office_member_role')
 			.leftJoinAndSelect('office_member_role.officeRole', 'office_role');
+
 		return this;
 	}
 

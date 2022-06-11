@@ -1,5 +1,6 @@
 import { Pageable } from '@src/components/base/@types/FindAllOptions';
 import { PaginationInfo } from '@src/components/base/@types/PaginationInfo';
+import { OfficeRoleDto } from '@src/components/officeRoles/@types/OfficeRole.dto';
 import { CreateOfficeDto } from './dto/CreateOffice.dto';
 import { OfficeDetailDto } from './dto/OfficeDetail.dto';
 import { OfficeOverviewDto } from './dto/OfficeOverview.dto';
@@ -42,4 +43,6 @@ export interface IOfficeService {
 		officeId: number,
 		updateOfficeDto: UpdateOfficeDto
 	): Promise<OfficeOverviewDto>;
+
+	findAllOfficeRoles(): Promise<OfficeRoleDto[]>;
 }

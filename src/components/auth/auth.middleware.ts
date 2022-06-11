@@ -4,7 +4,7 @@ import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { AuthErrorMessages } from './auth.error';
 import { UserRoleType } from '@components/users/@types/UserRoleType';
 import { IAuthMiddleware } from './@types/IAuthMiddleware';
-import { UnauthorizedError } from '@src/utils/appError';
+import { IllegalArgumentError, UnauthorizedError } from '@src/utils/appError';
 import { UserStatus } from '../users/@types/UserStatus';
 import { IAuthValidate } from './@types/IAuthValidate';
 
@@ -28,7 +28,7 @@ export class AuthMiddleware implements IAuthMiddleware {
 			id,
 			roles: [type],
 			email,
-			emailVerified: status === UserStatus.INACTIVE
+			emailVerified: status === UserStatus.ACTIVE
 		};
 
 		next();
@@ -63,7 +63,7 @@ export class AuthMiddleware implements IAuthMiddleware {
 			const isEmailVerified = req.user?.emailVerified;
 
 			if (!isEmailVerified)
-				throw new UnauthorizedError(
+				throw new IllegalArgumentError(
 					AuthErrorMessages.UNAUTHORIZED_EMAIL_NOT_VERIFIED
 				);
 

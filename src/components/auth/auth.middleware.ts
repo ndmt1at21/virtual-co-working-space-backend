@@ -24,6 +24,12 @@ export class AuthMiddleware implements IAuthMiddleware {
 			accessToken
 		);
 
+		if (status !== UserStatus.ACTIVE) {
+			throw new IllegalArgumentError(
+				AuthErrorMessages.UNAUTHORIZED_EMAIL_NOT_VERIFIED
+			);
+		}
+
 		req.user = {
 			id,
 			roles: [type],

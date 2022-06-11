@@ -12,7 +12,7 @@ export const OfficeInvitationRouter = (): Router => {
 	const officeController = createOfficeInvitationController();
 	const officeInvitationReqValidation = createOfficeInvitationReqValidation();
 
-	router.use(authMiddleware.protect, authMiddleware.restrictToEmailVerified);
+	router.use(authMiddleware.protect);
 
 	router.post(
 		'/token/:inviteToken/join',

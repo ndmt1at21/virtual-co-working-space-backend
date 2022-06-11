@@ -16,7 +16,7 @@ export const OfficeRouter = () => {
 
 	const router = Router();
 
-	router.use(authMiddleware.protect, authMiddleware.restrictToEmailVerified);
+	router.use(authMiddleware.protect);
 
 	router
 		.route('/in-offices')

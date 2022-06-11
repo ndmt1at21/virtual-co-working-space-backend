@@ -50,7 +50,7 @@ export const OfficeMemberSocketService = (
 			officeId: officeMember.officeId
 		};
 
-		await disconnectExistSocketHasSameUserId(userId);
+		// await disconnectExistSocketHasSameUserId(userId);
 
 		logger.info(
 			`User ${socket.user?.id} is joining to room '${data.officeId}'`

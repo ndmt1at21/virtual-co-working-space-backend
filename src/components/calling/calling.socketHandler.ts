@@ -7,6 +7,7 @@ export const OfficeSocketHandler = (
 ) => {
 	socket.on('calling:join', (data: any) => {
 		try {
+			console.log(`User Joined ${data.officeId}: `, socket.user)
 			socket.join(`calling/${data.officeId}`);
 			socket.to(`calling/${data.officeId}`).emit('calling:join', {
 				userId: socket.user?.id,

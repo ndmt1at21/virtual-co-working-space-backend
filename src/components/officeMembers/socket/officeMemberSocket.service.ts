@@ -64,19 +64,12 @@ export const OfficeMemberSocketService = (
 			}'`
 		);
 		socket.join(`u/${officeMember!.memberId}`);
-		console.log('fgkfjgjkgjkfjk');
-		try {
-			await officeMemberSocketCacheService.setUserSocket(
-				`${userId}`,
-				socket.id
-			);
-		} catch (err) {
-			console.log(err);
-		}
 
-		console.log(mapOfficeMemberToOfficeMemberOverviewDto(officeMember));
+		await officeMemberSocketCacheService.setUserSocket(
+			`${userId}`,
+			socket.id
+		);
 
-		console.log('5656');
 		emitMemberOnlineToOffice(
 			mapOfficeMemberToOfficeMemberOverviewDto(officeMember),
 			officeId

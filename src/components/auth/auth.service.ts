@@ -15,6 +15,9 @@ import { PasswordResetTokenDto } from './components/passwordResetToken/@types/dt
 import { IPasswordResetTokenService } from './components/passwordResetToken/@types/IPasswordService';
 import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
 import config from '@src/config';
+import { UserStatus } from '../users/@types/UserStatus';
+import { IllegalArgumentError } from '@src/utils/appError';
+import { AuthErrorMessages } from './auth.error';
 
 export class AuthService implements IAuthService {
 	constructor(
@@ -36,6 +39,12 @@ export class AuthService implements IAuthService {
 			await this.authTokenService.createAccessTokenAndRefreshToken(
 				user!.id
 			);
+
+		if (user.status === UserStatus.INACTIVE) {
+			throw new IllegalArgumentError(
+				AuthErrorMessages.UNAUTHORIZED_EMAIL_NOT_VERIFIED
+			);
+		}
 
 		return [user, { accessToken, refreshToken }];
 	};

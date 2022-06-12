@@ -24,6 +24,7 @@ export const OfficeItemSocketHandler = () => {
 		>
 	) => {
 		socket.on('office_item:create', data => {
+			console.log('fdgkfjgfj');
 			const fn = socketMiddleware(
 				officeItemSocketReqValidation.validateCreateOfficeItemData,
 				officeItemSocketController.onOfficeItemCreate

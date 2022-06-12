@@ -38,6 +38,7 @@ export const OfficeMemberSocketService = (
 			.queryBuilder()
 			.findByMemberIdAndOfficeId(userId, officeId)
 			.withMember()
+			.withRoles()
 			.withTransform()
 			.build()
 			.getOne();
@@ -63,12 +64,19 @@ export const OfficeMemberSocketService = (
 			}'`
 		);
 		socket.join(`u/${officeMember!.memberId}`);
+		console.log('fgkfjgjkgjkfjk');
+		try {
+			await officeMemberSocketCacheService.setUserSocket(
+				`${userId}`,
+				socket.id
+			);
+		} catch (err) {
+			console.log(err);
+		}
 
-		await officeMemberSocketCacheService.setUserSocket(
-			`${userId}`,
-			socket.id
-		);
+		console.log(mapOfficeMemberToOfficeMemberOverviewDto(officeMember));
 
+		console.log('5656');
 		emitMemberOnlineToOffice(
 			mapOfficeMemberToOfficeMemberOverviewDto(officeMember),
 			officeId

@@ -1,8 +1,14 @@
 import { Pageable } from '../base/@types/FindAllOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
-import { ConversationType } from '../conversations/@types/ConversationType';
 import { mapOfficeItemToOfficeItemOverviewDto } from '../officeItems/officeItem.mapping';
+import { mapOfficeRoleToOfficeRoleDto } from '../officeRoles/officeRole.mapping';
+import { mapOfficeToOfficeOverviewDto } from './office.mapping';
+import { OfficeItemRepository } from '../officeItems/officeItem.repository';
+import { IOfficeMemberCreator } from '../officeMembers/@types/IOfficeMemberCreator';
+import { OfficeMemberRepository } from '../officeMembers/officeMember.repository';
+import { OfficeRoleDto } from '../officeRoles/@types/OfficeRole.dto';
 import { OfficeRoleType } from '../officeRoles/@types/OfficeRoleType';
+import { OfficeRoleRepository } from '../officeRoles/officeRole.repository';
 import { CreateOfficeDto } from './@types/dto/CreateOffice.dto';
 import { OfficeDetailDto } from './@types/dto/OfficeDetail.dto';
 import { OfficeOverviewDto } from './@types/dto/OfficeOverview.dto';
@@ -10,174 +16,166 @@ import { OfficeWithItemsDto } from './@types/dto/OfficeWithItems.dto';
 import { OfficeWithMembersDto } from './@types/dto/OfficeWithMembers.dto';
 import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
 import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
+import { IOfficeCreator } from './@types/IOfficeCreator';
 import { IOfficeService } from './@types/IOfficeService';
-import { OfficeServiceParams } from './@types/OfficeServiceParams';
+import { IOfficeValidate } from './@types/IOfficeValidate';
+import { IOfficeInvitationCodeGenerator } from './components/officeInvitationCodeGenerator/@types/IOfficeInvitationCodeGenerator';
+import { OfficeRepository } from './office.repository';
 
-export const OfficeService = ({
-	officeRepository,
-	officeItemRepository,
-	officeMemberRepository,
-	officeRoleRepository,
-	officeCreator,
-	officeMemberCreator,
-	officeValidate,
-	officeInvitationCodeGenerator,
-	conversationRepository
-}: OfficeServiceParams): IOfficeService => {
-	const createOffice = async (
+export class OfficeService implements IOfficeService {
+	constructor(
+		private readonly officeRepository: OfficeRepository,
+		private readonly officeItemRepository: OfficeItemRepository,
+		private readonly officeMemberRepository: OfficeMemberRepository,
+		private readonly officeRoleRepository: OfficeRoleRepository,
+		private readonly officeCreator: IOfficeCreator,
+		private readonly officeMemberCreator: IOfficeMemberCreator,
+		private readonly officeValidate: IOfficeValidate,
+		private readonly officeInvitationCodeGenerator: IOfficeInvitationCodeGenerator
+	) {}
+
+	async createOffice(
 		createdUserId: number,
 		createOfficeDto: CreateOfficeDto
-	): Promise<OfficeOverviewDto> => {
-		const invitationCode = officeInvitationCodeGenerator.generate();
+	): Promise<OfficeOverviewDto> {
+		const invitationCode = this.officeInvitationCodeGenerator.generate();
 
-		const ownerRole = await officeRoleRepository.findOfficeRoleByName(
+		const ownerRole = await this.officeRoleRepository.findOfficeRoleByName(
 			OfficeRoleType.OWNER
 		);
 
-		const officeMember = officeMemberRepository.create({
-			memberId: createdUserId,
-			roles: [{ officeRole: ownerRole }],
-			transform: {}
-		});
+		const createdOffice = await this.officeRepository.saveOffice(
+			{
+				invitationCode,
+				createdByUserId: createdUserId,
+				name: createOfficeDto.name,
+				description: createOfficeDto.description
+			},
+			[ownerRole!],
+			'general'
+		);
 
-		const conversation = conversationRepository.create({
-			type: ConversationType.OFFICE_LEVEL,
-			creatorId: createdUserId,
-			conversationMembers: [{ memberId: createdUserId }]
-		});
-
-		const office = await officeRepository.save({
-			invitationCode,
-			createdByUserId: createdUserId,
-			name: createOfficeDto.name,
-			officeMembers: [officeMember],
-			conversations: [conversation],
-			numberOfMembers: 1
-		});
-
-		const officeDto = await officeCreator.createOfficeOverviewById(
-			office.id
+		const officeDto = await this.officeCreator.createOfficeOverviewById(
+			createdOffice.id
 		);
 
 		return officeDto;
-	};
+	}
 
-	const updateOfficeById = async (
+	async updateOfficeById(
 		id: number,
 		payload: UpdateOfficeDto
-	): Promise<OfficeOverviewDto> => {
-		await officeValidate.checkOfficeExistsById(id);
+	): Promise<OfficeOverviewDto> {
+		await this.officeValidate.checkOfficeExistsById(id);
 
-		await officeRepository.save({
+		await this.officeRepository.save({
 			id,
 			name: payload.name,
-			avatarUrl: payload.avatar
+			avatarUrl: payload.avatar,
+			description: payload.description
 		});
 
-		return officeCreator.createOfficeOverviewById(id);
-	};
+		return this.officeCreator.createOfficeOverviewById(id);
+	}
 
-	const findOfficeOverviewById = async (
-		id: number
-	): Promise<OfficeOverviewDto> => {
-		await officeValidate.checkOfficeExistsById(id);
-		const officeOverview = await officeCreator.createOfficeOverviewById(id);
+	async findOfficeOverviewById(id: number): Promise<OfficeOverviewDto> {
+		await this.officeValidate.checkOfficeExistsById(id);
+		const officeOverview =
+			await this.officeCreator.createOfficeOverviewById(id);
+
 		return officeOverview;
-	};
+	}
 
-	const findOfficeDetailById = async (
-		id: number
-	): Promise<OfficeDetailDto> => {
-		await officeValidate.checkOfficeExistsById(id);
-		const officeDetail = await officeCreator.createOfficeDetailById(id);
+	async findOfficeDetailById(id: number): Promise<OfficeDetailDto> {
+		await this.officeValidate.checkOfficeExistsById(id);
+
+		const officeDetail = await this.officeCreator.createOfficeDetailById(
+			id
+		);
+		await this.officeMemberRepository.updateLastActiveDateByOfficeId(id);
+
 		return officeDetail;
-	};
+	}
 
-	const findAllOfficesOverview = async (
+	async findAllOfficesOverview(
 		options: FindAllOfficesOptions
-	): Promise<[OfficeOverviewDto[], PaginationInfo]> => {
-		return await officeCreator.createOfficesOverview(options);
-	};
+	): Promise<[OfficeOverviewDto[], PaginationInfo]> {
+		return await this.officeCreator.createOfficesOverview(options);
+	}
 
-	const findAllOfficesOverviewUserIsMemberByUserId = async (
+	async findAllOfficesOverviewUserIsMemberByUserId(
 		userId: number,
-		pageable: Pageable
-	): Promise<[OfficeOverviewDto[], number]> => {
-		const officeMembers = await officeMemberRepository
-			.queryBuilder()
-			.findByMemberId(userId)
-			.build()
-			.getMany();
+		pageable?: Pageable
+	): Promise<[OfficeOverviewDto[], PaginationInfo]> {
+		const limit = pageable?.limit || 10;
+		const page = pageable?.page || 1;
 
-		const totalOfficeMembers = await officeMemberRepository
+		const [offices, totalCount] = await this.officeRepository
 			.queryBuilder()
-			.findByMemberId(userId)
+			.findOfficeOverviewsUserIsMemberByUserId(userId)
+			.withCreator()
+			.withPageable({ limit, page })
 			.build()
-			.getCount();
+			.getManyAndCount();
 
-		const offices = await officeCreator.createOfficesOverviewsByIds(
-			officeMembers.map(om => om.officeId)
+		const officesDto = offices.map(office =>
+			mapOfficeToOfficeOverviewDto(office)
 		);
 
-		return [offices, totalOfficeMembers];
-	};
+		return [officesDto, { page, count: offices.length, totalCount }];
+	}
 
-	const findOfficeItemsById = async (
-		id: number
-	): Promise<OfficeWithItemsDto> => {
-		await officeValidate.checkOfficeExistsById(id);
+	async findOfficeItemsById(id: number): Promise<OfficeWithItemsDto> {
+		await this.officeValidate.checkOfficeExistsById(id);
 
-		const office = await officeCreator.createOfficeOverviewById(id);
+		const office = await this.officeCreator.createOfficeOverviewById(id);
 		const items =
-			await officeItemRepository.findOfficeItemsWithItemByOfficeId(id);
+			await this.officeItemRepository.findOfficeItemsWithItemByOfficeId(
+				id
+			);
 
 		return {
 			office,
 			items: items.map(item => mapOfficeItemToOfficeItemOverviewDto(item))
 		};
-	};
+	}
 
-	const findOfficeMembersById = async (
-		id: number
-	): Promise<OfficeWithMembersDto> => {
-		await officeValidate.checkOfficeExistsById(id);
+	async findOfficeMembersById(id: number): Promise<OfficeWithMembersDto> {
+		await this.officeValidate.checkOfficeExistsById(id);
 
-		const office = await officeCreator.createOfficeOverviewById(id);
+		const office = await this.officeCreator.createOfficeOverviewById(id);
 		const members =
-			await officeMemberCreator.createOfficeMembersOverviewByOfficeId(id);
+			await this.officeMemberCreator.createOfficeMembersOverviewByOfficeId(
+				id
+			);
 
 		return {
 			office,
 			members
 		};
-	};
+	}
 
-	const changeBlockStatusOfOfficeById = async (
+	async changeBlockStatusOfOfficeById(
 		id: number,
 		block: boolean
-	): Promise<void> => {
-		await officeValidate.checkOfficeExistsById(id);
-		await officeRepository.save({
+	): Promise<void> {
+		await this.officeValidate.checkOfficeExistsById(id);
+		await this.officeRepository.save({
 			id,
 			isBlocked: block
 		});
-	};
+	}
 
-	const deleteOfficeById = async (id: number): Promise<void> => {
-		await officeValidate.checkOfficeExistsById(id);
-		await officeRepository.softDelete(id);
-	};
+	async deleteOfficeById(id: number): Promise<void> {
+		await this.officeValidate.checkOfficeExistsById(id);
+		await this.officeRepository.softDelete(id);
+	}
 
-	return {
-		createOffice,
-		findOfficeOverviewById,
-		findOfficeDetailById,
-		findAllOfficesOverview,
-		findAllOfficesOverviewUserIsMemberByUserId,
-		findOfficeItemsById,
-		findOfficeMembersById,
-		updateOfficeById,
-		changeBlockStatusOfOfficeById,
-		deleteOfficeById
-	};
-};
+	async findAllOfficeRoles(): Promise<OfficeRoleDto[]> {
+		const officeRoles = await this.officeRoleRepository.find();
+
+		return officeRoles.map(officeRole =>
+			mapOfficeRoleToOfficeRoleDto(officeRole)
+		);
+	}
+}

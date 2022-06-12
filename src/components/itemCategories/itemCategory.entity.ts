@@ -29,6 +29,6 @@ export class ItemCategory extends BaseEntity {
 	@JoinColumn({ name: 'creator_id' })
 	creator: User;
 
-	@OneToMany(type => Item, item => item.category)
+	@OneToMany(type => Item, item => item.category, { onDelete: 'CASCADE' })
 	items: Item[];
 }

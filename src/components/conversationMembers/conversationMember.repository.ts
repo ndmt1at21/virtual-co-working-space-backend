@@ -1,9 +1,26 @@
-import { EntityRepository } from 'typeorm';
+import { EntityRepository, UpdateResult } from 'typeorm';
 import { ConversationMember } from '@src/components/conversationMembers/conversationMember.entity';
 import { BaseRepository } from '@src/components/base/BaseRepository';
+import { ConversationMemberStatus } from './@types/ConversationMemberStatus';
 
 @EntityRepository(ConversationMember)
 export class ConversationMemberRepository extends BaseRepository<ConversationMember> {
+	async existsByUserIdAndConversationId(
+		userId: number,
+		conversationId: number
+	): Promise<boolean> {
+		const count = await this.createQueryBuilder('conversation_member')
+			.where('conversation_member.member_id = :userId', {
+				userId
+			})
+			.andWhere('conversation_member.conversation_id = :conversationId', {
+				conversationId
+			})
+			.getCount();
+
+		return count === 1;
+	}
+
 	async countConversationMemberByConversationId(
 		conversationId: number
 	): Promise<number> {
@@ -27,7 +44,7 @@ export class ConversationMemberRepository extends BaseRepository<ConversationMem
 				userId
 			})
 			.leftJoinAndSelect('conversation_member.member', 'user_1')
-			.leftJoinAndSelect(
+			.innerJoinAndSelect(
 				'conversation_member.conversation',
 				'conversation',
 				'conversation.office_id = :officeId',
@@ -72,5 +89,29 @@ export class ConversationMemberRepository extends BaseRepository<ConversationMem
 			.getOne();
 
 		return conversationMember;
+	}
+
+	async findAllMembersByConversationId(
+		conversationId: number
+	): Promise<ConversationMember[]> {
+		return await this.createQueryBuilder('conversation_member')
+			.where('conversation_member.conversation_id = :conversationId', {
+				conversationId
+			})
+			.getMany();
+	}
+
+	async updateConversationMemberStatus(
+		id: number,
+		status: ConversationMemberStatus
+	): Promise<UpdateResult> {
+		return await this.createQueryBuilder('conversation_member')
+			.where('conversation_member.id = :id', {
+				id
+			})
+			.update({
+				status
+			})
+			.execute();
 	}
 }

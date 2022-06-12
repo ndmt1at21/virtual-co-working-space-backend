@@ -1,19 +1,12 @@
-import { IsArray, IsDefined, IsNumber } from 'class-validator';
+import { EntityTypeAction } from './EntityTypeAction';
+import { EntityTypeName } from './EntityTypeName';
 
-export class CreateNotificationDto {
-	@IsDefined()
-	@IsNumber()
-	entityTypeId: number;
-
-	@IsDefined()
-	@IsNumber()
-	entityId: number;
-
-	@IsDefined()
-	@IsNumber()
+export type CreateNotificationDto = {
+	entity: {
+		type: EntityTypeName;
+		action: EntityTypeAction;
+		entityId: number;
+	};
 	actorId: number;
-
-	@IsDefined()
-	@IsArray()
-	notifiers: number[];
-}
+	notifierIds: number[];
+};

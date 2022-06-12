@@ -1,17 +1,14 @@
+import { GestureListenerData } from './@types/dto/GestureData';
 import { Server as SocketServer, Socket } from 'socket.io';
 import { OfficeClientToServerEvent } from './@types/OfficeClientToServerEvent';
 import { OfficeServerToClientEvent } from './@types/OfficeServerToClientEvent';
 import { OfficeSocketData } from './@types/OfficeSocketData';
 import { createOfficeMemberSocketService } from '../officeMembers/officeMember.factory';
-import { createOfficeItemSocketService } from '../officeItems/officeItem.factory';
-import { CreateOfficeItemDto } from '../officeItems/@types/dto/CreateOfficeItem.dto';
-import { UpdateOfficeItemTransformDto } from '../officeItems/@types/dto/UpdateOfficeItemTransform.dto';
 import { UpdateOfficeMemberTransformDto } from '../officeMemberTransform/@types/dto/UpdateOfficeMemberTransform';
-import { createMessageSocketService } from '../messages/message.factory';
-import { CreateMessageDto } from '../messages/@types/dto/CreateMessage.dto';
-import { RevokeMessageData } from '../messages/@types/dto/RevokeMessageData.dto copy';
-import { DeleteMessageData } from '../messages/@types/dto/DeleteMessageData.dto';
 import { EmojiListenerData } from './@types/dto/EmojiData';
+import { ConversationSocketHandler } from '../conversations/conversation.socketHandler';
+import { MessageSocketHandler } from '../messages/message.socketHandler';
+import { OfficeItemSocketHandler } from '../officeItems/officeItem.socketHandler';
 
 export const OfficeSocketHandler = (
 	socketNamespace: SocketServer,
@@ -22,17 +19,11 @@ export const OfficeSocketHandler = (
 		OfficeSocketData
 	>
 ) => {
+	const conversationHandler = ConversationSocketHandler();
+	const messageHandler = MessageSocketHandler();
+	const officeItemHandler = OfficeItemSocketHandler();
+
 	const officeMemberSocketService = createOfficeMemberSocketService(
-		socketNamespace,
-		socket
-	);
-
-	const officeItemSocketService = createOfficeItemSocketService(
-		socketNamespace,
-		socket
-	);
-
-	const messageSocketService = createMessageSocketService(
 		socketNamespace,
 		socket
 	);
@@ -42,9 +33,12 @@ export const OfficeSocketHandler = (
 			await officeMemberSocketService.onJoinToOfficeRoom(data);
 
 			handleOfficeMemberEvents(socket);
-			handleOfficeItemsEvents(socket);
-			handleChatEvents(socket);
-			handleEmojiEvent(socket);
+			console.log('fgkjgfjk');
+			conversationHandler.listen(socketNamespace, socket);
+			messageHandler.listen(socketNamespace, socket);
+			officeItemHandler.listen(socketNamespace, socket);
+
+			handleInteractionEvent(socket);
 		} catch (err) {
 			socket.emit('office:error', err);
 		}
@@ -63,54 +57,54 @@ export const OfficeSocketHandler = (
 		);
 	}
 
-	function handleOfficeItemsEvents(socket: Socket) {
-		socket.on('office_item:create', (data: CreateOfficeItemDto) => {
-			officeItemSocketService.onOfficeItemCreate(data);
-		});
+	// function handleOfficeItemsEvents(socket: Socket) {
+	// 	socket.on('office_item:create', (data: CreateOfficeItemDto) => {
+	// 		officeItemSocketService.onOfficeItemCreate(data);
+	// 	});
 
-		socket.on('office_item:move', (data: UpdateOfficeItemTransformDto) => {
-			officeItemSocketService.onOfficeItemMove(data);
-		});
+	// 	socket.on('office_item:move', (data: UpdateOfficeItemTransformDto) => {
+	// 		officeItemSocketService.onOfficeItemMove(data);
+	// 	});
 
-		socket.on('office_item:delete', (id: number) => {
-			officeItemSocketService.onOfficeItemDelete(id);
-		});
-	}
+	// 	socket.on('office_item:delete', (id: number) => {
+	// 		officeItemSocketService.onOfficeItemDelete(id);
+	// 	});
+	// }
 
-	function handleChatEvents(
-		socket: Socket<
-			OfficeClientToServerEvent,
-			OfficeServerToClientEvent,
-			any,
-			OfficeSocketData
-		>
-	) {
-		socket.on('conversation:join', data => {
-			messageSocketService.onJoinToConversation(data.conversationId);
-		});
+	// function handleChatEvents(
+	// 	socket: Socket<
+	// 		OfficeClientToServerEvent,
+	// 		OfficeServerToClientEvent,
+	// 		any,
+	// 		OfficeSocketData
+	// 	>
+	// ) {
+	// 	socket.on('conversation:join', data => {
+	// 		messageSocketService.onJoinToConversation(data.conversationId);
+	// 	});
 
-		socket.on('conversation:leave', data => {
-			messageSocketService.onLeaveFromConversation(data.conversationId);
-		});
+	// 	socket.on('conversation:leave', data => {
+	// 		messageSocketService.onLeaveFromConversation(data.conversationId);
+	// 	});
 
-		socket.on('message:send', (data: CreateMessageDto) => {
-			messageSocketService.onCreateMessage(data);
-		});
+	// 	socket.on('message:send', (data: CreateMessageDto) => {
+	// 		messageSocketService.onCreateMessage(data);
+	// 	});
 
-		socket.on('message:revoke', (data: RevokeMessageData) => {
-			messageSocketService.onRevokeMessage(data);
-		});
+	// 	socket.on('message:revoke', (data: RevokeMessageData) => {
+	// 		messageSocketService.onRevokeMessage(data);
+	// 	});
 
-		socket.on('message:delete', (data: DeleteMessageData) => {
-			messageSocketService.onSelfDeleteMessage(data);
-		});
+	// 	socket.on('message:delete', (data: DeleteMessageData) => {
+	// 		messageSocketService.onSelfDeleteMessage(data);
+	// 	});
 
-		socket.on('message:markAsRead', () => {
-			messageSocketService.onMarkAsRead();
-		});
-	}
+	// 	socket.on('message:markAsRead', () => {
+	// 		messageSocketService.onMarkAsRead();
+	// 	});
+	// }
 
-	function handleEmojiEvent(
+	function handleInteractionEvent(
 		socket: Socket<
 			OfficeClientToServerEvent,
 			OfficeServerToClientEvent,
@@ -122,6 +116,13 @@ export const OfficeSocketHandler = (
 			socket.to(`${socket.data.officeMember!.officeId}`).emit('emoji', {
 				userId: socket.user!.id,
 				emojiId: data.emojiId
+			});
+		});
+
+		socket.on('gesture', (data: GestureListenerData) => {
+			socket.to(`${socket.data.officeMember!.officeId}`).emit('gesture', {
+				userId: socket.user!.id,
+				gestureId: data.gestureId
 			});
 		});
 	}

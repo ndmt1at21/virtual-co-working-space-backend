@@ -14,6 +14,8 @@ import {
 	peerServerLoader
 } from './components/app';
 
+global.__basedir = path.resolve('./');
+
 const startServer = async () => {
 	const app = express();
 	const server = http.createServer(app);

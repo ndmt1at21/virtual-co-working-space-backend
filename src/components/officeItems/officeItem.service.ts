@@ -85,6 +85,6 @@ export class OfficeItemService implements IOfficeItemService {
 
 	deleteOfficeItem = async (id: number) => {
 		await this.officeItemValidate.checkOfficeItemExistsById(id);
-		await this.officeItemRepository.delete(id);
+		await this.officeItemRepository.softDelete(id);
 	};
 }

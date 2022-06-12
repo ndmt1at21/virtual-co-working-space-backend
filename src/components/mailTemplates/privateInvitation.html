@@ -1,7 +1,146 @@
-<div style="margin: 0; padding: 20px; width: 100%">
-	<table border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			<a href="{{invitationUrl}}">Invitation link</a>
-		</tr>
+<div
+	style="
+		margin: 0;
+		width: 100%;
+		background-color: #f3f4f6;
+		padding: 3rem 0;
+		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+			'Lucida Sans', Arial, sans-serif;
+	"
+>
+	<table style="margin: auto; min-width: 20rem; max-width: 35rem">
+		<tbody>
+			<tr>
+				<td style="text-align: center; padding-bottom: 2rem">
+					<img
+						style="height: 3rem"
+						alt="vispace-logo"
+						src="https://res.cloudinary.com/dcm0ibm0b/image/upload/v1654994783/ViSpace.png"
+					/>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<table
+						style="
+							background-color: white;
+							color: #111827;
+							width: 100%;
+							padding: 2rem 4rem;
+							border-radius: 10px;
+							font-size: 16px;
+						"
+					>
+						<tr>
+							<td
+								style="font-size: 1.75rem; padding-bottom: 2rem"
+							>
+								<b>Office Invitation</b>
+							</td>
+						</tr>
+
+						<tr>
+							<td>Hi,</td>
+						</tr>
+
+						<tr>
+							<td><br /></td>
+						</tr>
+
+						<tr style="line-height: 1.25">
+							<td>
+								{{inviterName}} (<a
+									href="mailto:{{inviterEmail}}"
+									>{{inviterEmail}}</a
+								>) invited you to join office
+								<a href="{{invitationUrl}}"
+									>{{invitationOfficeName}}</a
+								>
+							</td>
+						</tr>
+
+						<tr>
+							<td><br /></td>
+						</tr>
+
+						<tr style="line-height: 1.25">
+							<td>
+								You can join the office by clicking the button
+								below. When you agree, your information will be
+								available to all members of the office.
+							</td>
+						</tr>
+
+						<tr>
+							<td><br /></td>
+						</tr>
+
+						<tr style="line-height: 1.25">
+							<td>
+								If you do not know about this invitation, no
+								problem. You can simply ignore this email.
+							</td>
+						</tr>
+
+						<tr>
+							<td><br /></td>
+						</tr>
+
+						<tr style="line-height: 1.25">
+							<td>Sincerely,</td>
+						</tr>
+
+						<tr style="line-height: 1.25">
+							<td>ViSpace Team</td>
+						</tr>
+
+						<tr>
+							<td
+								style="
+									text-align: center;
+									padding: 2rem 0rem 3rem 0rem;
+								"
+							>
+								<a
+									style="
+										padding: 1rem;
+										border-radius: 10px;
+										background-color: #132e48;
+										text-decoration: none;
+										color: white;
+									"
+									role="button"
+									href="{{invitationUrl}}"
+									>Accept Invitation</a
+								>
+							</td>
+						</tr>
+
+						<tr>
+							<td
+								style="
+									color: #aaa;
+									font-size: 13px;
+									line-height: 1.25;
+								"
+							>
+								If clicking the link doesn't work, you can copy
+								and paste the link below into your web browser's
+								address bar.
+							</td>
+						</tr>
+
+						<tr>
+							<td style="font-size: 13px; padding-top: 0.25rem">
+								<a href="{{invitationUrl}}"
+									>{{invitationUrl}}</a
+								>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</tbody>
 	</table>
 </div>

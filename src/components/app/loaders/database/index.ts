@@ -24,6 +24,9 @@ import { MessageReaction } from '@src/components/messages/components/messageReac
 import { ItemCategory } from '@src/components/itemCategories/itemCategory.entity';
 import { CheckIn } from '@src/components/checkin/checkin.entity';
 import { PushToken } from '@src/components/pushTokens/pushToken.entity';
+import { NotificationObject } from '@src/components/notifications/components/notificationObject/notificationObject.entity';
+import { EntityType } from '@src/components/notifications/components/entityType/entityType.entity';
+import { Notification } from '@src/components/notifications/notification.entity';
 
 const ormPostgresOptions: PostgresConnectionOptions = {
 	type: 'postgres',
@@ -32,6 +35,7 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 	username: config.db.pg.DB_USERNAME,
 	password: config.db.pg.DB_PASSWORD,
 	database: config.db.pg.DB_NAME,
+	logging: false,
 	dropSchema: false,
 	synchronize: true,
 	entities: [
@@ -55,7 +59,10 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		Appearance,
 		ItemCategory,
 		CheckIn,
-		PushToken
+		PushToken,
+		Notification,
+		NotificationObject,
+		EntityType
 	]
 };
 

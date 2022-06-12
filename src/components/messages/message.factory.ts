@@ -1,4 +1,3 @@
-import { Server, Socket } from 'socket.io';
 import { getCustomRepository } from 'typeorm';
 import { createConversationService } from '../conversations/conversation.factory';
 import { messageSocketLogger } from '../logger';
@@ -6,7 +5,7 @@ import { createUserMessageStatusRepository } from './components/userMessageStatu
 import { MessageController } from './message.controller';
 import { MessageRepository } from './message.repository';
 import { MessageService } from './message.service';
-import { MessageSocketService } from './message.socketService';
+import { MessageSocketController } from './message.socketController';
 
 export function createMessageController() {
 	const officeService = createMessageService();
@@ -14,13 +13,13 @@ export function createMessageController() {
 	return new MessageController(officeService, conversationService);
 }
 
-export function createMessageSocketService(io: Server, socket: Socket) {
+export function createMessageSocketController() {
 	const messageService = createMessageService();
+	const conversationService = createConversationService();
 
-	return new MessageSocketService(
-		io,
-		socket,
+	return new MessageSocketController(
 		messageService,
+		conversationService,
 		messageSocketLogger
 	);
 }

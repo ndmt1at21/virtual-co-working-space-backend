@@ -12,6 +12,8 @@ export interface IAppearanceService {
 
 	findAllAccessoriesOfUser(userId: number): Promise<AppearanceDto[]>;
 
+	findAllAccessoriesInOffice(officeId: number): Promise<AppearanceDto[]>;
+
 	findAccessories(
 		options: FindAllAccessoriesOptions
 	): Promise<[AppearanceDto[], PaginationInfo]>;

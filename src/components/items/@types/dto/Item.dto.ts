@@ -5,7 +5,7 @@ export type ItemDto = {
 	name: string;
 	modelPath: string;
 	image?: string;
-	category: ItemCategoryOverviewDto;
+	category?: ItemCategoryOverviewDto;
 	createdAt: Date;
 };
 

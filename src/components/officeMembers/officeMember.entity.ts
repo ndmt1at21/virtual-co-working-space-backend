@@ -13,6 +13,7 @@ import { BaseEntity } from '@components/base/BaseEntity';
 import { OfficeMemberTransform } from '@components/officeMemberTransform/officeMemberTransform.entity';
 import { OfficeMemberOnlineStatus } from './@types/OfficeMemberOnlineStatus';
 import { OfficeMemberRole } from '../officeMemberRole/officeMemberRole.entity';
+import { OfficeMemberStatus } from './@types/OfficeMemberStatus';
 
 @Entity({ name: 'office_member' })
 export class OfficeMember extends BaseEntity {
@@ -32,6 +33,17 @@ export class OfficeMember extends BaseEntity {
 		default: OfficeMemberOnlineStatus.OFFLINE
 	})
 	onlineStatus: OfficeMemberOnlineStatus;
+
+	@Column({
+		name: 'status',
+		type: 'enum',
+		enum: OfficeMemberStatus,
+		default: OfficeMemberStatus.ACTIVE
+	})
+	status: OfficeMemberStatus;
+
+	@Column({ name: 'last_active_at', default: () => 'NOW()' })
+	lastActiveAt: Date;
 
 	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'member_id' })

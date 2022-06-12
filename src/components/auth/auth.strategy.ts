@@ -9,7 +9,7 @@ import { UserLoginProvider } from './@types/UserLoginProvider';
 const GoogleStrategy = () => {
 	const strategy = new PassportGoogleStrategy(
 		{
-			callbackURL: '/api/v1/auth/google/callback',
+			callbackURL: `${config.app.SERVER_DOMAIN}/api/v1/auth/google/callback`,
 			clientID: config.auth.GOOGLE_CLIENT_ID,
 			clientSecret: config.auth.GOOGLE_CLIENT_SECRET
 		},
@@ -39,7 +39,7 @@ const GoogleStrategy = () => {
 const FacebookStrategy = () => {
 	const strategy = new PassportFacebookStrategy(
 		{
-			callbackURL: '/api/v1/auth/facebook/callback',
+			callbackURL: `${config.app.SERVER_DOMAIN}/api/v1/auth/facebook/callback`,
 			clientID: config.auth.FACEBOOK_CLIENT_ID,
 			clientSecret: config.auth.FACEBOOK_CLIENT_SECRET,
 			profileFields: ['id', 'email', 'displayName', 'name', 'photos']

@@ -130,6 +130,10 @@ export class ItemController {
 			};
 		}
 
+		if (query.pageable) {
+			options.pageable = query.pageable;
+		}
+
 		return options;
 	}
 }

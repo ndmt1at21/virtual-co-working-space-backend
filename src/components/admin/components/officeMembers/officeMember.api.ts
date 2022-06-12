@@ -9,7 +9,7 @@ export const OfficeMemberRouter = () => {
 	router
 		.route('/:id')
 		.get(officeMemberController.getOfficeMemberById)
-		.delete(officeMemberController.deleteOfficeMember);
+		.delete(officeMemberController.removeOfficeMember);
 
 	router
 		.route('/')

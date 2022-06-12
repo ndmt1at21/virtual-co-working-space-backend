@@ -1,14 +1,14 @@
 import {
-	BaseEntity,
 	Column,
 	Entity,
+	Index,
 	JoinColumn,
 	ManyToOne,
-	OneToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm';
 import { User } from '@components/users/user.entity';
 import { NotificationObject } from './components/notificationObject/notificationObject.entity';
+import { BaseEntity } from '../base/BaseEntity';
 
 @Entity({ name: 'notification' })
 export class Notification extends BaseEntity {
@@ -16,19 +16,18 @@ export class Notification extends BaseEntity {
 	id: number;
 
 	@Column({ name: 'notification_object_id' })
+	@Index()
 	notificationObjectId: number;
 
-	@Column({ name: 'actor_id' })
-	actorId: number;
+	@Column({ name: 'notifier_id' })
+	@Index()
+	notifierId: number;
 
-	@Column({ name: 'notifiers', type: 'array' })
-	notifiers: number[];
-
-	@OneToOne(type => NotificationObject)
+	@ManyToOne(() => NotificationObject, { cascade: true })
 	@JoinColumn({ name: 'notification_object_id' })
 	notificationObject: NotificationObject;
 
 	@ManyToOne(() => User)
-	@JoinColumn({ name: 'actor_id' })
-	actor: User;
+	@JoinColumn({ name: 'notifier_id' })
+	notifier: User;
 }

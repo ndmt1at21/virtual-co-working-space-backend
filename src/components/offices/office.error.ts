@@ -1,5 +1,5 @@
 export const OfficeErrorMessages = {
-	OFFICE_NOT_FOUND: 'Office not found',
-	INVALID_OFFICE_ID: 'Invalid office id',
-	OFFICE_BLOCKED: 'Office is blocked'
+	OFFICE_NOT_FOUND: 'office_not_found',
+	INVALID_OFFICE_ID: 'invalid_office_id',
+	OFFICE_BLOCKED: 'office_blocked'
 };

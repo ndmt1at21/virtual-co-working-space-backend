@@ -1,14 +1,17 @@
+import { ConversationMemberOverviewDto } from '@src/components/conversationMembers/@types/dto/ConversationMemberOverview.dto';
 import { RecentMessagePageable } from '@src/components/messages/@types/RecentMessagePaginate';
 import { ConversationOfUserDetailDto } from './dto/ConversationOfUserDetail.dto';
 import { ConversationOfUserOverviewDto } from './dto/ConversationOfUserOverview.dto';
 import { ConversationOverviewDto } from './dto/ConversationOverview.dto';
 import { CreateConversationDto } from './dto/CreateConversation.dto';
+import { ReadConversationDto } from './dto/ReadConversation.dto';
 import { RecentMessagesDto } from './dto/RecentMessages.dto';
+import { UpdateConversationDto } from './dto/UpdateConversation.dto';
 
 export interface IConversationService {
 	createConversation(
 		createConversationDto: CreateConversationDto
-	): Promise<ConversationOverviewDto>;
+	): Promise<ConversationOfUserDetailDto>;
 
 	findConversationsOverviewsOfUserInOffice(
 		userId: number,
@@ -29,5 +32,21 @@ export interface IConversationService {
 	markAsReadByConversationIdAndUserId(
 		conversationId: number,
 		userId: number
-	): Promise<void>;
+	): Promise<ReadConversationDto>;
+
+	updateConversationById(
+		id: number,
+		updateConversationDto: UpdateConversationDto
+	): Promise<ConversationOverviewDto>;
+
+	addMembersToConversation(
+		id: number,
+		memberIds: number[]
+	): Promise<ConversationMemberOverviewDto[]>;
+
+	findAllMemberIdsByConversationId(conversationId: number): Promise<number[]>;
+
+	deleteConversationById(id: number): Promise<void>;
+
+	removeConversationMemberById(id: number): Promise<void>;
 }

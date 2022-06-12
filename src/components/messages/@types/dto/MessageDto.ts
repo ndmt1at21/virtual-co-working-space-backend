@@ -5,7 +5,7 @@ import { MessageReactionDto } from './MessageReaction.dto';
 export type MessageDto = {
 	id: number;
 	conversationId: number;
-	sender: UserOverviewDto;
+	senderId: number;
 	content?: string;
 	type?: string;
 	readers?: UserMessageReadStatusDto[];

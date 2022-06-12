@@ -2,7 +2,9 @@ import { Server, Socket } from 'socket.io';
 import { getCustomRepository } from 'typeorm';
 import { getCacheConnection } from '../app/loaders/database/cache';
 import { officeMemberSocketLogger } from '../logger';
+import { createOfficeMemberRoleRepository } from '../officeMemberRole/officeMemberRole.factory';
 import { createOfficeMemberTransformService } from '../officeMemberTransform/officeMemberTransform.factory';
+import { createOfficeRoleRepository } from '../officeRoles/officeRole.factory';
 import { OfficeMemberController } from './officeMember.controller';
 import { OfficeMemberCreator } from './officeMember.creator';
 import { OfficeMemberRepository } from './officeMember.repository';
@@ -35,11 +37,15 @@ export function createOfficeMemberSocketService(io: Server, socket: Socket) {
 
 export function createOfficeMemberService() {
 	const officeMemberRepository = createOfficeMemberRepository();
+	const officeRoleRepository = createOfficeRoleRepository();
+	const officeMemberRoleRepository = createOfficeMemberRoleRepository();
 	const officeMemberCreator = createOfficeMemberCreator();
 	const officeMemberValidate = createOfficeMemberValidate();
 
 	return new OfficeMemberService(
 		officeMemberRepository,
+		officeRoleRepository,
+		officeMemberRoleRepository,
 		officeMemberCreator,
 		officeMemberValidate
 	);

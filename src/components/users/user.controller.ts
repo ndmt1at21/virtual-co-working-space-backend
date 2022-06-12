@@ -101,7 +101,7 @@ export class UserController {
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			message: 'User blocked successfully',
+			message: 'user_blocked_successfully',
 			data: {
 				id
 			}
@@ -125,7 +125,7 @@ export class UserController {
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			message: 'User unblocked successfully',
+			message: 'user_unblocked_successfully',
 			data: {
 				id
 			}
@@ -137,7 +137,7 @@ export class UserController {
 		await this.userService.deleteUserById(userId);
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
-			message: 'User deleted successfully'
+			message: 'user_deleted_successfully'
 		});
 	});
 

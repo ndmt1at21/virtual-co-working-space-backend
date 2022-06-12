@@ -40,6 +40,15 @@ export class MessageRepository extends BaseRepository<Message> {
 		return createdMessage;
 	}
 
+	async findMessageWithConversationById(
+		messageId: number
+	): Promise<Message | undefined> {
+		return await this.createQueryBuilder('message')
+			.leftJoinAndSelect('message.conversation', 'conversation')
+			.where('message.id = :messageId', { messageId })
+			.getOne();
+	}
+
 	async findByMessageIdAndSenderId(
 		messageId: number,
 		senderId: number
@@ -78,9 +87,6 @@ export class MessageRepository extends BaseRepository<Message> {
 		const { limit = 10, nextCursor } = pageable;
 
 		const query = this.createQueryBuilder('message')
-			.where('message.conversation_id = :conversationId', {
-				conversationId
-			})
 			.leftJoinAndSelect('message.sender', 'user')
 			.leftJoinAndSelect(
 				'message.userMessageStatuses',
@@ -88,8 +94,11 @@ export class MessageRepository extends BaseRepository<Message> {
 				'user_message_status.user_id = :userId',
 				{ userId }
 			)
+			.where('message.conversation_id = :conversationId', {
+				conversationId
+			})
 			.andWhere(
-				'user_message_status.is_self_deleted = false OR user_message_status.is_self_deleted IS NULL'
+				'(user_message_status.is_self_deleted = false OR user_message_status.is_self_deleted IS NULL)'
 			)
 			.addOrderBy('message.createdAt', 'DESC')
 			.limit(limit);

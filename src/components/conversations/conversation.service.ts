@@ -1,5 +1,4 @@
 import { mapMessageToMessageDto } from '@components/messages/message.mapping';
-import { ConversationServiceParams } from './@types/ConversationServiceParams';
 import { RecentMessagePageable } from '../messages/@types/RecentMessagePaginate';
 import { IConversationService } from './@types/IConversationService';
 import { RecentMessagesDto } from './@types/dto/RecentMessages.dto';
@@ -19,34 +18,93 @@ import { ConversationRepository } from './conversation.repository';
 import { ConversationMemberRepository } from '../conversationMembers/conversationMember.repository';
 import { MessageRepository } from '../messages/message.repository';
 import { UserMessageStatusRepository } from '../messages/components/userMessageStatus/userMessageStatus.repository';
+import { ReadConversationDto } from './@types/dto/ReadConversation.dto';
+import { UpdateConversationDto } from './@types/dto/UpdateConversation.dto';
+import { mapConversationMemberToConversationMemberOverviewDto } from '../conversationMembers/conversationMember.mapping';
+import { ConversationMemberOverviewDto } from '../conversationMembers/@types/dto/ConversationMemberOverview.dto';
+import { IConversationValidate } from './@types/IConversationValidate';
+import { ConversationMemberStatus } from '../conversationMembers/@types/ConversationMemberStatus';
 
 export class ConversationService implements IConversationService {
 	constructor(
 		private readonly conversationRepository: ConversationRepository,
 		private readonly conversationMemberRepository: ConversationMemberRepository,
 		private readonly messageRepository: MessageRepository,
-		private readonly userMessageStatusRepository: UserMessageStatusRepository
+		private readonly userMessageStatusRepository: UserMessageStatusRepository,
+		private readonly conversationValidate: IConversationValidate
 	) {}
 
-	createConversation = async (
+	async createConversation(
 		createConversationDto: CreateConversationDto
-	): Promise<ConversationOverviewDto> => {
-		const { creatorId, officeId } = createConversationDto;
+	): Promise<ConversationOfUserDetailDto> {
+		const { creatorId, officeId, name, userIds } = createConversationDto;
 
 		const conversation = await this.conversationRepository.save({
 			officeId,
 			creatorId,
+			name,
 			type: ConversationType.GROUP_LEVEL,
-			conversationMembers: [{ memberId: creatorId }]
+			conversationMembers: [
+				...userIds.map(id => ({ memberId: id })),
+				{ memberId: creatorId }
+			]
 		});
 
-		return mapConversationToConversationOverviewDto(conversation);
-	};
+		return await this.findConversationDetailByConversationIdAndUserId(
+			conversation.id,
+			creatorId
+		);
+	}
 
-	findConversationsOverviewsOfUserInOffice = async (
+	async updateConversationById(
+		id: number,
+		updateConversationDto: UpdateConversationDto
+	): Promise<ConversationOverviewDto> {
+		await this.conversationValidate.checkConversationExists(id);
+
+		const { name } = updateConversationDto;
+		const conversation = await this.conversationRepository.findById(id);
+		const updatedConversation = await this.conversationRepository.save({
+			...conversation!,
+			name
+		});
+
+		return mapConversationToConversationOverviewDto(updatedConversation);
+	}
+
+	async addMembersToConversation(
+		id: number,
+		memberIds: number[]
+	): Promise<ConversationMemberOverviewDto[]> {
+		await this.conversationValidate.checkConversationExists(id);
+
+		const [conversationMembers, _] =
+			await this.conversationMemberRepository.findConversationMembersByConversationId(
+				id
+			);
+
+		const newMemberIds = memberIds.filter(
+			memberId =>
+				!conversationMembers.some(cm => cm.memberId === memberId)
+		);
+
+		const newConversationMembers =
+			await this.conversationMemberRepository.save(
+				newMemberIds.map(memberId => ({
+					conversationId: id,
+					memberId
+				}))
+			);
+
+		return newConversationMembers.map(ncm =>
+			mapConversationMemberToConversationMemberOverviewDto(ncm)
+		);
+	}
+
+	async findConversationsOverviewsOfUserInOffice(
 		userId: number,
 		officeId: number
-	): Promise<ConversationOfUserOverviewDto[]> => {
+	): Promise<ConversationOfUserOverviewDto[]> {
 		const [conversationMembers, _] =
 			await this.conversationMemberRepository.findConversationMembersByUserIdAndOfficeId(
 				userId,
@@ -64,22 +122,18 @@ export class ConversationService implements IConversationService {
 				joinedAt: cm.createdAt
 			};
 		});
-	};
+	}
 
 	findConversationDetailByConversationIdAndUserId = async (
 		conversationId: number,
 		memberId: number
 	): Promise<ConversationOfUserDetailDto> => {
+		await this.conversationValidate.checkConversationExists(conversationId);
+
 		const conversation =
 			await this.conversationRepository.findConversationByIdWithMembers(
 				conversationId
 			);
-
-		if (!conversation) {
-			throw new NotFoundError(
-				ConversationErrorMessages.CONVERSATION_NOT_FOUND
-			);
-		}
 
 		const conversationMember =
 			await this.conversationMemberRepository.findConversationMemberByConversationIdAndUserId(
@@ -93,8 +147,9 @@ export class ConversationService implements IConversationService {
 			);
 		}
 
-		const conversationDto =
-			mapConversationToConversationDetailDto(conversation);
+		const conversationDto = mapConversationToConversationDetailDto(
+			conversation!
+		);
 
 		return {
 			conversation: conversationDto,
@@ -108,6 +163,8 @@ export class ConversationService implements IConversationService {
 		userId: number,
 		pageable: RecentMessagePageable
 	): Promise<RecentMessagesDto> => {
+		await this.conversationValidate.checkConversationExists(conversationId);
+
 		const [recentMessages, pageInfo] =
 			await this.messageRepository.findRecentMessagesIgnoreSelfDeletedByConversationIdAndUserId(
 				conversationId,
@@ -128,7 +185,9 @@ export class ConversationService implements IConversationService {
 	markAsReadByConversationIdAndUserId = async (
 		conversationId: number,
 		userId: number
-	): Promise<void> => {
+	): Promise<ReadConversationDto> => {
+		await this.conversationValidate.checkConversationExists(conversationId);
+
 		const conversationMember =
 			await this.conversationMemberRepository.findConversationMemberByConversationIdAndUserId(
 				conversationId,
@@ -148,7 +207,13 @@ export class ConversationService implements IConversationService {
 			)
 		).map(message => message.id);
 
-		if (messagesUnreadIds.length == 0) return;
+		if (messagesUnreadIds.length == 0) {
+			return {
+				conversationId,
+				readerId: userId,
+				readMessagesId: []
+			};
+		}
 
 		const messageReaders = messagesUnreadIds.map(messageId =>
 			this.userMessageStatusRepository.create({
@@ -172,5 +237,41 @@ export class ConversationService implements IConversationService {
 				);
 			}
 		);
+
+		return {
+			conversationId,
+			readerId: userId,
+			readMessagesId: messagesUnreadIds
+		};
 	};
+
+	async findAllMemberIdsByConversationId(
+		conversationId: number
+	): Promise<number[]> {
+		const conversationMembers =
+			await this.conversationMemberRepository.findAllMembersByConversationId(
+				conversationId
+			);
+
+		return conversationMembers.map(cm => cm.memberId);
+	}
+
+	async deleteConversationById(id: number): Promise<void> {
+		await this.conversationValidate.checkConversationExists(id);
+		await this.conversationRepository.softDelete(id);
+	}
+
+	async removeConversationMemberById(id: number): Promise<void> {
+		const conversationMember =
+			await this.conversationMemberRepository.updateConversationMemberStatus(
+				id,
+				ConversationMemberStatus.BANNED
+			);
+
+		if (conversationMember?.affected === 0) {
+			throw new NotFoundError(
+				ConversationErrorMessages.USER_NOT_FOUND_IN_CONVERSATION
+			);
+		}
+	}
 }

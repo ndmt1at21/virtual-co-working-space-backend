@@ -1,11 +1,20 @@
 import { EntityRepository } from 'typeorm';
 import { BaseRepository } from '../base/BaseRepository';
-import { Pageable } from '../base/@types/FindAllOptions';
+import { FindAllOptions, Pageable } from '../base/@types/FindAllOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
 import { ItemCategory } from './itemCategory.entity';
+import { FindAllItemCategoriesOptions } from './@types/filter/FindAllItemCategoriesOptions';
 
 @EntityRepository(ItemCategory)
 export class ItemCategoryRepository extends BaseRepository<ItemCategory> {
+	async existsById(id: number): Promise<boolean> {
+		const itemCategory = await this.createQueryBuilder('item_category')
+			.where('item_category.id = :id', { id })
+			.getCount();
+
+		return itemCategory === 1;
+	}
+
 	async findItemCategoryById(id: number): Promise<ItemCategory | undefined> {
 		const itemCategory = await this.createQueryBuilder('item_category')
 			.where('item_category.id = :id', { id })
@@ -16,23 +25,47 @@ export class ItemCategoryRepository extends BaseRepository<ItemCategory> {
 	}
 
 	async findAllItemCategories(
-		pageable?: Pageable
+		options: FindAllItemCategoriesOptions
 	): Promise<[ItemCategory[], PaginationInfo]> {
-		const limit = pageable?.limit || 10;
-		const page = pageable?.page || 1;
-		const offset = limit * (page - 1) || 0;
+		const optionsWithDbFields = this.mapFindAllItemsOptionsToDatabaseField(
+			this.metadata.tableName,
+			options
+		);
 
-		const query = this.createQueryBuilder('item_category')
-			.leftJoinAndSelect('item_category.creator', 'creator')
-			.limit(limit)
-			.offset(offset)
-			.getManyAndCount();
+		const query = this.createFindAllQueryBuilder(
+			this.metadata.tableName,
+			optionsWithDbFields
+		);
 
-		const [categories, total] = await query;
+		query.leftJoinAndSelect(`${this.metadata.tableName}.creator`, 'user');
+
+		const [itemCategories, count] = await query.getManyAndCount();
 
 		return [
-			categories,
-			{ page, count: categories.length, totalCount: total }
+			itemCategories,
+			{
+				page: options.pageable?.page || 1,
+				count: itemCategories.length,
+				totalCount: count
+			}
 		];
+	}
+
+	mapFindAllItemsOptionsToDatabaseField(
+		alias: string,
+		options: FindAllItemCategoriesOptions
+	): FindAllOptions {
+		const { filter, pageable, sort } = options;
+
+		return {
+			filter: {
+				[`${alias}.name`]: filter?.name
+			},
+			sort: {
+				[`${alias}.id`]: sort?.id,
+				[`${alias}.createdAt`]: sort?.createdAt
+			},
+			paginate: pageable
+		};
 	}
 }

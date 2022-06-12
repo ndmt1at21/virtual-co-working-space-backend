@@ -28,7 +28,7 @@ export const OfficeMemberTransformCacheService = (
 			return undefined;
 		}
 
-		return JSON.parse(memberTransform) as OfficeMemberTransformDto;
+		return JSON.parse(memberTransform).memberTransform as OfficeMemberTransformDto;
 	};
 
 	const deleteTransformById = async (id: number) => {

@@ -9,10 +9,21 @@ import { UpdateOfficeDto } from './@types/dto/UpdateOffice.dto';
 import { FindAllOfficesOptions } from './@types/filter/FindAllOfficesOptions';
 import { IOfficeService } from './@types/IOfficeService';
 import { generateResponseData } from '@src/utils/generateResponseData';
+import { IConversationService } from '../conversations/@types/IConversationService';
+import { IOfficeMemberService } from '../officeMembers/@types/IOfficeMemberService';
+import { OfficeMemberErrorMessages } from '../officeMembers/officeMember.error';
+import { IAppearanceService } from '../appearances/@types/IAppearanceService';
+import {
+	AddOfficeMemberRole,
+	RemoveOfficeMemberRole
+} from './@types/dto/ChangeOfficeMemberRole.dto';
 
 export class OfficeController {
 	constructor(
 		private officeService: IOfficeService,
+		private officeMemberService: IOfficeMemberService,
+		private conversationService: IConversationService,
+		private appearanceService: IAppearanceService,
 		private logger: ILogger
 	) {}
 
@@ -140,16 +151,46 @@ export class OfficeController {
 		});
 	});
 
+	getConversationOfUserInOfficeByOfficeId = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			this.logger.info(
+				`Get conversation of user in office by office id ${req.params.id}`
+			);
+
+			const officeId = +req.params.id;
+			const userId = +req.user!.id;
+
+			const conversations =
+				await this.conversationService.findConversationsOverviewsOfUserInOffice(
+					userId,
+					officeId
+				);
+
+			this.logger.info('Get conversation of user in office successfully');
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: {
+					conversations
+				}
+			});
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
+
 	getAllOfficesOverviewCurrentUserIsMember = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			this.logger.info(
 				`Get all offices overview current user id ${req.user?.id} is member`
 			);
 
-			const [offices, total] =
+			const { pageable } = PaginateQueryParser.parse(req.query);
+
+			const [offices, pagination] =
 				await this.officeService.findAllOfficesOverviewUserIsMemberByUserId(
 					req.user!.id,
-					{ limit: 10, page: 10 }
+					pageable || { page: 1, limit: 10 }
 				);
 
 			this.logger.info('Get all offices overview successfully');
@@ -157,15 +198,21 @@ export class OfficeController {
 			res.status(HttpStatusCode.OK).json({
 				status: 'success',
 				code: HttpStatusCode.OK,
-				data: { total, offices }
+				data: { pagination, offices }
 			});
 		}
 	);
 
 	getAllOffices = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(
+			`Get all offices with query: ${JSON.stringify(req.query)}`
+		);
+
 		const query = this.extractQueryFindAllOptions(req.query);
 		const [offices, pagination] =
 			await this.officeService.findAllOfficesOverview(query);
+
+		this.logger.info('Get all offices successfully');
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,
@@ -177,9 +224,9 @@ export class OfficeController {
 	});
 
 	createOffice = catchAsyncRequestHandler(async (req, res, next) => {
-		const errors = await validateRequestBody(CreateOfficeDto, req.body);
-		if (errors.length > 0)
-			throw new IllegalArgumentError('Invalid request body', errors);
+		this.logger.info(
+			`Create office with data: ${JSON.stringify(req.body)}`
+		);
 
 		const createOfficeDto = req.body as CreateOfficeDto;
 		const office = await this.officeService.createOffice(
@@ -187,12 +234,155 @@ export class OfficeController {
 			createOfficeDto
 		);
 
-		res.status(HttpStatusCode.OK).json({
-			status: 'success',
+		this.logger.info(`Create office successfully with id: ${office.id}`);
+
+		const resData = generateResponseData({
 			code: HttpStatusCode.OK,
 			data: { office }
 		});
+
+		res.status(HttpStatusCode.OK).json(resData);
 	});
+
+	removeMemberFromOffice = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			this.logger.info(
+				`Delete member from office by office id ${req.params.id} and user id ${req.params.memberId}`
+			);
+
+			const officeId = +req.params.id;
+			const officeMemberId = +req.params.memberId;
+
+			if (officeMemberId === req.user?.id) {
+				throw new IllegalArgumentError(
+					OfficeMemberErrorMessages.CANNOT_SELF_REMOVE
+				);
+			}
+
+			await this.officeMemberService.removeOfficeMemberById(
+				officeMemberId
+			);
+
+			this.logger.info('Delete member from office successfully');
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: {
+					officeId,
+					officeMemberId
+				}
+			});
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
+
+	getAllAppearancesInOffice = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			this.logger.info(
+				`Get all appearances in office by office id ${req.params.id}`
+			);
+
+			const officeId = +req.params.id;
+
+			const appearances =
+				await this.appearanceService.findAllAccessoriesInOffice(
+					officeId
+				);
+
+			this.logger.info('Get all appearances in office successfully');
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: {
+					appearances
+				}
+			});
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
+
+	addRoleToOfficeMember = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(
+			`Add role to office member by [officeId = ${
+				req.params.id
+			}], [body =  ${JSON.stringify(req.body)}]`
+		);
+
+		const officeId = +req.params.id;
+		const { officeMemberId, officeRoleId } =
+			req.body as AddOfficeMemberRole;
+
+		await this.officeMemberService.addRoleToOfficeMember(
+			officeMemberId,
+			officeRoleId
+		);
+
+		this.logger.info('Add role to office member successfully');
+
+		const resData = generateResponseData({
+			code: HttpStatusCode.OK,
+			data: {
+				officeId,
+				officeMemberId,
+				officeRoleId
+			}
+		});
+
+		res.status(HttpStatusCode.OK).json(resData);
+	});
+
+	getAllOfficeRoles = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(
+			`Get all exists office member roles by [officeId = ${req.params.id}]`
+		);
+
+		const allRoles = await this.officeService.findAllOfficeRoles();
+
+		const resData = generateResponseData({
+			code: HttpStatusCode.OK,
+			data: {
+				roles: allRoles
+			}
+		});
+
+		this.logger.info('Get all exists office member roles successfully');
+
+		res.status(HttpStatusCode.OK).json(resData);
+	});
+
+	removeRoleFromOfficeMember = catchAsyncRequestHandler(
+		async (req, res, next) => {
+			this.logger.info(
+				`Remove role from office member by [officeId = ${
+					req.params.id
+				}], [body =  ${JSON.stringify(req.body)}]`
+			);
+
+			const officeId = +req.params.id;
+			const { officeMemberId, officeRoleId } =
+				req.body as RemoveOfficeMemberRole;
+
+			await this.officeMemberService.removeRoleFromOfficeMember(
+				officeMemberId,
+				officeRoleId
+			);
+
+			this.logger.info('Remove role from office member successfully');
+
+			const resData = generateResponseData({
+				code: HttpStatusCode.OK,
+				data: {
+					officeId,
+					officeMemberId,
+					officeRoleId
+				}
+			});
+
+			res.status(HttpStatusCode.OK).json(resData);
+		}
+	);
 
 	extractQueryFindAllOptions(originalQuery: any): FindAllOfficesOptions {
 		const query = PaginateQueryParser.parse(originalQuery, {

@@ -44,6 +44,7 @@ export const OfficeCreator = (
 			.queryBuilder()
 			.findByOfficeId(id)
 			.withMember()
+			.withRoles()
 			.withTransform()
 			.build()
 			.getMany();
@@ -57,21 +58,6 @@ export const OfficeCreator = (
 			officeMembers: members,
 			conversations: office!.conversations
 		});
-	};
-
-	const createOfficesOverviewsByIds = async (
-		ids: number[]
-	): Promise<OfficeOverviewDto[]> => {
-		if (ids.length === 0) return [];
-
-		const offices = await officeRepository
-			.queryBuilder()
-			.findByIds(ids)
-			.withCreator()
-			.build()
-			.getMany();
-
-		return offices.map(office => mapOfficeToOfficeOverviewDto(office));
 	};
 
 	const createOfficesOverview = async (
@@ -100,7 +86,6 @@ export const OfficeCreator = (
 
 	return {
 		createOfficeOverviewById,
-		createOfficesOverviewsByIds,
 		createOfficeDetailById,
 		createOfficesOverview
 	};

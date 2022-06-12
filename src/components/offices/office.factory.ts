@@ -2,7 +2,8 @@ import { getCustomRepository } from 'typeorm';
 import { createOfficeItemRepository } from '@components/officeItems/officeItem.factory';
 import {
 	createOfficeMemberCreator,
-	createOfficeMemberRepository
+	createOfficeMemberRepository,
+	createOfficeMemberService
 } from '@components/officeMembers/officeMember.factory';
 import { OfficeController } from './office.controller';
 import { OfficeCreator } from './office.creator';
@@ -14,15 +15,35 @@ import generator from '@src/components/offices/components/officeInvitationCodeGe
 import { OfficeSocketHandler } from './office.socketHandler';
 import { Server, Socket } from 'socket.io';
 import { officeLogger } from '../logger';
-import { createConversationRepository } from '../conversations/conversation.factory';
+import {
+	createConversationRepository,
+	createConversationService
+} from '../conversations/conversation.factory';
 import { OfficeMiddleware } from './office.middleware';
+import { createAppearanceService } from '../appearances/appearance.factory';
+import { OfficeReqValidation } from './office.reqValidation';
 
 export function createOfficeController() {
-	return new OfficeController(createOfficeService(), officeLogger);
+	const officeService = createOfficeService();
+	const officeMemberService = createOfficeMemberService();
+	const conversationService = createConversationService();
+	const appearanceService = createAppearanceService();
+
+	return new OfficeController(
+		officeService,
+		officeMemberService,
+		conversationService,
+		appearanceService,
+		officeLogger
+	);
 }
 
 export function createOfficeSocketHandler(io: Server, socket: Socket) {
 	return OfficeSocketHandler(io, socket);
+}
+
+export function createOfficeReqValidation() {
+	return new OfficeReqValidation();
 }
 
 export function createOfficeMiddleware() {
@@ -41,9 +62,8 @@ export function createOfficeService() {
 	const officeMemberCreator = createOfficeMemberCreator();
 	const officeValidate = createOfficeValidate();
 	const generator = createOfficeGenerator();
-	const conversationRepository = createConversationRepository();
 
-	return OfficeService({
+	return new OfficeService(
 		officeRepository,
 		officeItemRepository,
 		officeMemberRepository,
@@ -51,9 +71,8 @@ export function createOfficeService() {
 		officeCreator,
 		officeMemberCreator,
 		officeValidate,
-		officeInvitationCodeGenerator: generator,
-		conversationRepository
-	});
+		generator
+	);
 }
 
 export function createOfficeGenerator() {

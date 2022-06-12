@@ -10,7 +10,7 @@ export interface IOfficeMemberService {
 		createOfficeMemberDto: CreateOfficeMemberDto
 	): Promise<OfficeMemberOverviewDto>;
 
-	deleteOfficeMemberById(id: number): Promise<void>;
+	removeOfficeMemberById(id: number): Promise<void>;
 
 	updateOfficeMemberTransformById(
 		id: number,
@@ -28,5 +28,15 @@ export interface IOfficeMemberService {
 	setOfficeMemberOnlineStatusById(
 		id: number,
 		status: OfficeMemberOnlineStatus
+	): Promise<void>;
+
+	addRoleToOfficeMember(
+		officeMemberId: number,
+		officeRoleId: number
+	): Promise<void>;
+
+	removeRoleFromOfficeMember(
+		officeMemberId: number,
+		officeRoleId: number
 	): Promise<void>;
 }

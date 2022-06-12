@@ -2,6 +2,7 @@ import { SelectQueryBuilder } from 'typeorm';
 import { FindAllOptions } from '../base/@types/FindAllOptions';
 import { RepositoryQueryBuilder } from '../base/RepositoryQueryBuilder';
 import { FindAllOfficeMembersOptions } from './@types/filter/FindAllOfficeMembersOptions';
+import { OfficeMemberStatus } from './@types/OfficeMemberStatus';
 import { OfficeMember } from './officeMember.entity';
 import { OfficeMemberRepository } from './officeMember.repository';
 
@@ -16,16 +17,26 @@ export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<O
 	}
 
 	findByOfficeId(officeId: number): OfficeMemberRepositoryQueryBuilder {
-		this.query.where(`${this.tableAlias}.office_id = :officeId`, {
-			officeId
-		});
+		this.query
+			.where(`${this.tableAlias}.office_id = :officeId`, {
+				officeId
+			})
+			.andWhere(`${this.tableAlias}.status = :status`, {
+				status: OfficeMemberStatus.ACTIVE
+			});
+
 		return this;
 	}
 
 	findByMemberId(memberId: number): OfficeMemberRepositoryQueryBuilder {
-		this.query.where(`${this.tableAlias}.member_id = :memberId`, {
-			memberId
-		});
+		this.query
+			.where(`${this.tableAlias}.member_id = :memberId`, {
+				memberId
+			})
+			.andWhere(`${this.tableAlias}.status = :status`, {
+				status: OfficeMemberStatus.ACTIVE
+			});
+
 		return this;
 	}
 
@@ -73,6 +84,7 @@ export class OfficeMemberRepositoryQueryBuilder extends RepositoryQueryBuilder<O
 		this.query
 			.leftJoinAndSelect(`${this.tableAlias}.roles`, 'office_member_role')
 			.leftJoinAndSelect('office_member_role.officeRole', 'office_role');
+
 		return this;
 	}
 

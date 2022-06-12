@@ -10,6 +10,8 @@ import { OfficeMemberClientToServerEvent } from '../@types/socket/OfficeMemberCl
 import { OfficeMemberServerToClientEvent } from '../@types/socket/OfficeMemberServerToClientEvent';
 import { OfficeMemberSocketData } from '../@types/socket/OfficeMemberSocketData';
 import { OfficeMemberRepository } from '../officeMember.repository';
+import { OfficeMemberOverviewDto } from '../@types/dto/OfficeMemberOverview.dto';
+import { mapOfficeMemberToOfficeMemberOverviewDto } from '../officeMember.mapping';
 
 export const OfficeMemberSocketService = (
 	socketNamespace: SocketServer,
@@ -26,7 +28,7 @@ export const OfficeMemberSocketService = (
 ): IOfficeMemberSocketService => {
 	async function onJoinToOfficeRoom(data: JoinToOfficeRoomDto) {
 		logger.info(
-			`User ${socket.user?.id} joined to office ${data.officeId}`
+			`User ${socket.user?.id} start joining to office ${data.officeId}`
 		);
 
 		const { officeId } = data;
@@ -35,6 +37,9 @@ export const OfficeMemberSocketService = (
 		const officeMember = await officeMemberRepository
 			.queryBuilder()
 			.findByMemberIdAndOfficeId(userId, officeId)
+			.withMember()
+			.withRoles()
+			.withTransform()
 			.build()
 			.getOne();
 
@@ -46,14 +51,37 @@ export const OfficeMemberSocketService = (
 			officeId: officeMember.officeId
 		};
 
+		// await disconnectExistSocketHasSameUserId(userId);
+
+		logger.info(
+			`User ${socket.user?.id} is joining to room '${data.officeId}'`
+		);
 		socket.join(`${officeMember!.officeId}`);
 
-		// await disconnectExistSocketHasSameUserId(userId);
-		emitMemberOnlineToOffice(officeMember.memberId, officeId);
-		setMemberInOfficeOnline(officeMember.memberId);
+		logger.info(
+			`User ${socket.user?.id} is joining to room 'u/${
+				officeMember!.memberId
+			}'`
+		);
+		socket.join(`u/${officeMember!.memberId}`);
+
+		await officeMemberSocketCacheService.setUserSocket(
+			`${userId}`,
+			socket.id
+		);
+
+		emitMemberOnlineToOffice(
+			mapOfficeMemberToOfficeMemberOverviewDto(officeMember),
+			officeId
+		);
 
 		logger.info(
 			`User ${socket.user?.id} joined to office ${officeMember.officeId}`
+		);
+
+		await officeMemberRepository.setOfficeMemberOnlineStatusById(
+			officeMember.id,
+			OfficeMemberOnlineStatus.ONLINE
 		);
 	}
 
@@ -82,54 +110,71 @@ export const OfficeMemberSocketService = (
 
 	async function onMemberDisconnect() {
 		if (socket.data.officeMember) {
+			logger.info(
+				`User ${socket.user?.id} is disconnecting from office ${
+					socket.data.officeMember!.officeId
+				}`
+			);
+
 			const { id, memberId } = socket.data.officeMember!;
 
 			socket
 				.to(`${socket.data.officeMember!.officeId}`)
 				.emit('office_member:offline', memberId);
 
-			setMemberInOfficeOffline(id);
+			socket.leave(`${socket.data.officeMember!.officeId}`);
+			socket.leave(`u/${memberId}`);
+			// remove listener
+
+			await officeMemberRepository.setOfficeMemberOnlineStatusById(
+				id,
+				OfficeMemberOnlineStatus.OFFLINE
+			);
 
 			await officeMemberTransformService.backupTransformFromCacheById(id);
+
+			logger.info(
+				`User ${socket.user?.id} disconnected from office ${
+					socket.data.officeMember!.officeId
+				}`
+			);
 		}
 	}
 
 	async function disconnectExistSocketHasSameUserId(
 		userId: number
 	): Promise<void> {
-		const socketWithSameUserId =
+		logger.info(
+			`Start disconnecting exists sockets of user [id = ${userId}]`
+		);
+
+		const existsSocketOfUser =
 			await officeMemberSocketCacheService.getUserSocket(`${userId}`);
 
-		if (!socketWithSameUserId) return;
+		logger.info(
+			`Start disconnecting exists socket [socketId = ${existsSocketOfUser}]`
+		);
+
+		if (!existsSocketOfUser) return;
 
 		const existSocket =
-			socketNamespace.sockets.sockets.get(socketWithSameUserId);
+			socketNamespace.sockets.sockets.get(existsSocketOfUser);
 
 		existSocket?.emit('office_member:error', 'Multiple socket connection');
 		existSocket?.disconnect();
+
+		logger.info(
+			`Exists socket [socketId = ${existsSocketOfUser} disconnected`
+		);
 
 		await officeMemberSocketCacheService.deleteUserSocket(`${userId}`);
 	}
 
 	async function emitMemberOnlineToOffice(
-		memberId: number,
+		officeMember: OfficeMemberOverviewDto,
 		officeId: number
 	) {
-		socket.to(`${officeId}`).emit('office_member:online', memberId);
-	}
-
-	async function setMemberInOfficeOnline(memberId: number) {
-		await officeMemberRepository.setOfficeMemberOnlineStatusById(
-			memberId,
-			OfficeMemberOnlineStatus.ONLINE
-		);
-	}
-
-	async function setMemberInOfficeOffline(memberId: number) {
-		await officeMemberRepository.setOfficeMemberOnlineStatusById(
-			memberId,
-			OfficeMemberOnlineStatus.OFFLINE
-		);
+		socket.to(`${officeId}`).emit('office_member:online', officeMember);
 	}
 
 	return { onJoinToOfficeRoom, onMemberDisconnect, onMemberMove };

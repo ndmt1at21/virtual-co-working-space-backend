@@ -7,6 +7,12 @@ import { Appearance } from './appearance.entity';
 
 @EntityRepository(Appearance)
 export class AppearanceRepository extends BaseRepository<Appearance> {
+	async findAppearancesByUserIds(userIds: number[]): Promise<Appearance[]> {
+		return await this.createQueryBuilder('appearance')
+			.where('appearance.userId IN (:...userIds)', { userIds })
+			.getMany();
+	}
+
 	async findAppearanceByKeysAndUserId(keys: string[], userId: number) {
 		return await this.createQueryBuilder('appearance')
 			.where('appearance.key IN (:...keys)', { keys })

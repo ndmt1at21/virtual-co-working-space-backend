@@ -31,7 +31,7 @@ export class MessageController {
 		);
 
 		res.status(200).json({
-			message: 'revoked success'
+			message: 'revoked_successfully'
 		});
 	});
 
@@ -44,7 +44,7 @@ export class MessageController {
 		);
 
 		res.status(200).json({
-			message: 'self side deleted success'
+			message: 'self_side_deleted_success'
 		});
 	});
 
@@ -59,7 +59,7 @@ export class MessageController {
 			);
 
 		res.status(200).json({
-			messages
+			...messages
 		});
 	});
 

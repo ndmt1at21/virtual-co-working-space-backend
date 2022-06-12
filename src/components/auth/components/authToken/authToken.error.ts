@@ -1,6 +1,6 @@
 export const AuthTokenErrorMessages = {
-	INVALID_ACCESS_TOKEN: 'Access token is invalid',
-	INVALID_REFRESH_TOKEN: 'Error validating refresh token',
-	REFRESH_TOKEN_EXPIRED: 'Refresh token has expired. Please login again',
-	ACCESS_TOKEN_EXPIRED: 'Access token has expired'
+	INVALID_ACCESS_TOKEN: 'access_token_is_invalid',
+	INVALID_REFRESH_TOKEN: 'error_validating_refresh_token',
+	REFRESH_TOKEN_EXPIRED: 'refresh_token_has_expired',
+	ACCESS_TOKEN_EXPIRED: 'access_token_has_expired'
 };

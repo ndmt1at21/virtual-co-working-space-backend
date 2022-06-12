@@ -1,5 +1,6 @@
 import { NotFoundError } from '@src/utils/appError';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
+import { OfficeMemberRepository } from '../officeMembers/officeMember.repository';
 import { AppearanceDto } from './@types/dto/Appearance.dto';
 import { CreateAppearancesDto } from './@types/dto/CreateAppearance.dto';
 import { FindAllAccessoriesOptions } from './@types/filter/FindAllAppearancesOptions';
@@ -10,7 +11,10 @@ import { mapAppearanceToAppearanceDto } from './appearance.mapping';
 import { AppearanceRepository } from './appearance.repository';
 
 export class AppearanceService implements IAppearanceService {
-	constructor(private appearanceRepository: AppearanceRepository) {}
+	constructor(
+		private appearanceRepository: AppearanceRepository,
+		private officeMemberRepository: OfficeMemberRepository
+	) {}
 
 	createAppearance = async (
 		createAppearancesDto: CreateAppearancesDto
@@ -64,6 +68,27 @@ export class AppearanceService implements IAppearanceService {
 	): Promise<AppearanceDto[]> => {
 		const appearances =
 			await this.appearanceRepository.findAllAccessoriesOfUser(userId);
+
+		const appearancesDto = appearances.map(appearance =>
+			mapAppearanceToAppearanceDto(appearance)
+		);
+
+		return appearancesDto;
+	};
+
+	findAllAccessoriesInOffice = async (
+		officeId: number
+	): Promise<AppearanceDto[]> => {
+		const officeMembers = await this.officeMemberRepository
+			.queryBuilder()
+			.findByOfficeId(officeId)
+			.build()
+			.getMany();
+
+		const memberIds = officeMembers.map(om => om.memberId);
+
+		const appearances =
+			await this.appearanceRepository.findAppearancesByUserIds(memberIds);
 
 		const appearancesDto = appearances.map(appearance =>
 			mapAppearanceToAppearanceDto(appearance)

@@ -5,17 +5,15 @@ import { ActiveUserToken } from './activeUserToken.entity';
 @EntityRepository(ActiveUserToken)
 export class ActiveUserTokenRepository extends BaseRepository<ActiveUserToken> {
 	async findByToken(token: string): Promise<ActiveUserToken | undefined> {
-		return await this.findOne({
-			where: {
-				token
-			}
-		});
+		return await this.createQueryBuilder('active_user_token')
+			.where('active_user_token.token = :token', { token })
+			.getOne();
 	}
 
 	async deleteByToken(token: string): Promise<number> {
-		const result = await this.createQueryBuilder()
+		const result = await this.createQueryBuilder('active_user_token')
+			.where('active_user_token.token = :token', { token })
 			.delete()
-			.where('token = :token', { token })
 			.execute();
 
 		return result.affected || 0;
@@ -25,11 +23,9 @@ export class ActiveUserTokenRepository extends BaseRepository<ActiveUserToken> {
 		userId: number,
 		token: string
 	): Promise<ActiveUserToken | undefined> {
-		return await this.findOne({
-			where: {
-				userId,
-				token
-			}
-		});
+		return await this.createQueryBuilder('active_user_token')
+			.where('active_user_token.token = :token', { token })
+			.andWhere('active_user_token.user_id = :userId', { userId })
+			.getOne();
 	}
 }

@@ -7,4 +7,6 @@ export interface IOfficeMiddleware {
 	restrictTo(requiredRoles: OfficeRoleType[]): RequestHandler;
 
 	restrictToNotBlockedOffice: RequestHandler;
+
+	restrictToNotBlockedMember: RequestHandler;
 }

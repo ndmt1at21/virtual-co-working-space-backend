@@ -3,6 +3,7 @@ import { PaginationInfo } from '@src/components/base/@types/PaginationInfo';
 import { CreateItemCategoryDto } from './dto/CreateItemCategory.dto';
 import { ItemCategoryDetailDto } from './dto/ItemCategoryDetail.dto';
 import { UpdateItemCategoryDto } from './dto/UpdateItemCategory,dto';
+import { FindAllItemCategoriesOptions } from './filter/FindAllItemCategoriesOptions';
 
 export interface IItemCategoryService {
 	create(category: CreateItemCategoryDto): Promise<ItemCategoryDetailDto>;
@@ -15,7 +16,7 @@ export interface IItemCategoryService {
 	): Promise<ItemCategoryDetailDto>;
 
 	findAllItemCategories(
-		pageable?: Pageable
+		options: FindAllItemCategoriesOptions
 	): Promise<[ItemCategoryDetailDto[], PaginationInfo]>;
 
 	deleteItemCategoryById(id: number): Promise<void>;

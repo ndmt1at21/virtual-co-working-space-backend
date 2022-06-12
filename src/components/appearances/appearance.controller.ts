@@ -4,9 +4,10 @@ import { generateResponseData } from '@src/utils/generateResponseData';
 import { PaginateQueryParser } from '@src/utils/paginateQueryParser';
 import { CreateAppearancesDto } from './@types/dto/CreateAppearance.dto';
 import { FindAllAccessoriesOptions } from './@types/filter/FindAllAppearancesOptions';
+import { IAppearanceController } from './@types/IAppearanceController';
 import { IAppearanceService } from './@types/IAppearanceService';
 
-export class AppearanceController {
+export class AppearanceController implements IAppearanceController {
 	constructor(private appearanceService: IAppearanceService) {}
 
 	createAppearance = catchAsyncRequestHandler(async (req, res, next) => {

@@ -14,6 +14,10 @@ import { LocalRegisterDto } from './@types/dto/LocalRegister.dto';
 import { PasswordResetTokenDto } from './components/passwordResetToken/@types/dto/PasswordResetToken.dto';
 import { IPasswordResetTokenService } from './components/passwordResetToken/@types/IPasswordService';
 import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
+import config from '@src/config';
+import { UserStatus } from '../users/@types/UserStatus';
+import { IllegalArgumentError } from '@src/utils/appError';
+import { AuthErrorMessages } from './auth.error';
 
 export class AuthService implements IAuthService {
 	constructor(
@@ -35,6 +39,12 @@ export class AuthService implements IAuthService {
 			await this.authTokenService.createAccessTokenAndRefreshToken(
 				user!.id
 			);
+
+		if (user.status === UserStatus.INACTIVE) {
+			throw new IllegalArgumentError(
+				AuthErrorMessages.UNAUTHORIZED_EMAIL_NOT_VERIFIED
+			);
+		}
 
 		return [user, { accessToken, refreshToken }];
 	};
@@ -59,7 +69,8 @@ export class AuthService implements IAuthService {
 	): Promise<LocalRegisterDto> => {
 		const user = await this.userService.createLocalUser(createUserDto);
 		const { token } = await this.activeUserTokenService.createToken(
-			user.id
+			user.id,
+			config.auth.ACTIVE_USER_TOKEN_LENGTH
 		);
 		return { user, activeToken: token };
 	};

@@ -37,7 +37,11 @@ export const OfficeInvitationMailWorker = (
 					'src/components/mailTemplates/privateInvitation.html'
 				),
 				context: {
-					invitationUrl: `${clientUrl}/invites/token/${officeInvitation.token!}`
+					invitationUrl: `${clientUrl}/invites/token/${officeInvitation.token!}`,
+					inviterName: officeInvitation.inviter?.name,
+					inviterEmail: officeInvitation.inviter?.email,
+					invitationOfficeName: officeInvitation.office?.name,
+					receiver: officeInvitation.invitedEmail
 				}
 			});
 

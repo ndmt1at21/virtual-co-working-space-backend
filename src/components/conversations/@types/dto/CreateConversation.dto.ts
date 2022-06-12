@@ -1,11 +1,18 @@
 import { Expose } from 'class-transformer';
-import { IsDefined } from 'class-validator';
+import { IsArray, IsDefined, Length } from 'class-validator';
 
 export class CreateConversationDto {
-	@IsDefined()
-	@Expose()
 	officeId: number;
 
+	@IsDefined()
+	@Length(1, 255)
 	@Expose()
+	name: string;
+
+	@IsDefined()
+	@IsArray()
+	@Expose()
+	userIds: number[];
+
 	creatorId: number;
 }

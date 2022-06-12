@@ -1,41 +1,130 @@
-<div style="margin: 0; padding: 20px; width: 100%">
-	<table border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			Welcome, {{receiver}}!
-		</tr>
+<div
+	style="
+		margin: 0;
+		width: 100%;
+		background-color: #f3f4f6;
+		padding: 3rem 0;
+		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+			'Lucida Sans', Arial, sans-serif;
+	"
+>
+	<table style="margin: auto; min-width: 20rem; max-width: 35rem">
+		<tbody>
+			<tr>
+				<td style="text-align: center; padding-bottom: 2rem">
+					<img
+						style="height: 3rem"
+						alt="vispace-logo"
+						src="https://res.cloudinary.com/dcm0ibm0b/image/upload/v1654994783/ViSpace.png"
+					/>
+				</td>
+			</tr>
 
-		<br />
-		<br />
+			<tr>
+				<td>
+					<table
+						style="
+							background-color: white;
+							color: #111827;
+							width: 100%;
+							padding: 2rem 4rem;
+							border-radius: 10px;
+							font-size: 16px;
+						"
+					>
+						<tr>
+							<td
+								style="font-size: 1.75rem; padding-bottom: 2rem"
+							>
+								<b>Verify This Email Address</b>
+							</td>
+						</tr>
 
-		<tr>
-			We are excited to have you get started. First, you need to confirm
-			your account by clicking the link below:
-		</tr>
+						<tr>
+							<td>Welcome {{receiver}}!</td>
+						</tr>
 
-		<br />
-		<br />
+						<tr>
+							<td><br /></td>
+						</tr>
 
-		<tr>
-			<a href="{{activationUrl}}">{{activationUrl}}</a>
-		</tr>
+						<tr style="line-height: 1.25">
+							<td>
+								We are excited to have you get started. First,
+								you need to confirm your account by clicking the
+								button below.
+							</td>
+						</tr>
 
-		<br />
-		<br />
+						<tr>
+							<td><br /></td>
+						</tr>
 
-		<tr>
-			If clicking the link doesn't work, you can copy and paste the link
-			into your web browser's address bar. You will be able to create a
-			new password for your ViSpace account after clicking the link above.
-		</tr>
+						<tr style="line-height: 1.25">
+							<td>
+								If you did not request a new account, no
+								problem. You can simply ignore this email.
+							</td>
+						</tr>
 
-		<br />
-		<br />
-		<tr>
-			Sincerely,
-		</tr>
-		<br />
-		<tr>
-			ViSpace Team
-		</tr>
+						<tr>
+							<td><br /></td>
+						</tr>
+
+						<tr style="line-height: 1.25">
+							<td>Sincerely,</td>
+						</tr>
+
+						<tr style="line-height: 1.25">
+							<td>ViSpace Team</td>
+						</tr>
+
+						<tr>
+							<td
+								style="
+									text-align: center;
+									padding: 2rem 0rem 3rem 0rem;
+								"
+							>
+								<a
+									style="
+										padding: 1rem;
+										border-radius: 10px;
+										background-color: #132e48;
+										text-decoration: none;
+										color: white;
+									"
+									role="button"
+									href="{{activationUrl}}"
+									>Verify Email</a
+								>
+							</td>
+						</tr>
+
+						<tr>
+							<td
+								style="
+									color: #aaa;
+									font-size: 13px;
+									line-height: 1.25;
+								"
+							>
+								If clicking the link doesn't work, you can copy
+								and paste the link below into your web browser's
+								address bar.
+							</td>
+						</tr>
+
+						<tr>
+							<td style="font-size: 13px; padding-top: 0.25rem">
+								<a href="{{activationUrl}}"
+									>{{activationUrl}}</a
+								>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</tbody>
 	</table>
 </div>

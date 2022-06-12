@@ -24,7 +24,7 @@ export class AuthMiddleware implements IAuthMiddleware {
 			accessToken
 		);
 
-		if (status !== UserStatus.ACTIVE) {
+		if (status === UserStatus.INACTIVE) {
 			throw new IllegalArgumentError(
 				AuthErrorMessages.UNAUTHORIZED_EMAIL_NOT_VERIFIED
 			);

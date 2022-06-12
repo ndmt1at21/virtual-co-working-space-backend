@@ -30,7 +30,7 @@ export class AuthController {
 		const errors = await validateRequestBody(LoginDto, req.body);
 		if (errors.length > 0) {
 			this.logger.error(`User cannot login: ${errors}`);
-			throw new IllegalArgumentError('Invalid login data', errors);
+			throw new IllegalArgumentError('invalid_login_data', errors);
 		}
 
 		const loginDto = req.body as LoginDto;
@@ -53,7 +53,7 @@ export class AuthController {
 		const errors = await validateRequestBody(RegisterDto, req.body);
 		if (errors.length > 0) {
 			this.logger.error(`User create login: ${errors}`);
-			throw new IllegalArgumentError('Invalid register data', errors);
+			throw new IllegalArgumentError('invalid_register_data', errors);
 		}
 
 		const registerDto = req.body as RegisterDto;

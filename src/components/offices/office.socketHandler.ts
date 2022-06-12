@@ -33,7 +33,7 @@ export const OfficeSocketHandler = (
 			await officeMemberSocketService.onJoinToOfficeRoom(data);
 
 			handleOfficeMemberEvents(socket);
-
+			console.log('fgkjgfjk');
 			conversationHandler.listen(socketNamespace, socket);
 			messageHandler.listen(socketNamespace, socket);
 			officeItemHandler.listen(socketNamespace, socket);
@@ -124,6 +124,6 @@ export const OfficeSocketHandler = (
 				userId: socket.user!.id,
 				gestureId: data.gestureId
 			});
-		})
+		});
 	}
 };

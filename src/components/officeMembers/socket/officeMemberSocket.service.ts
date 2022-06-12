@@ -38,6 +38,7 @@ export const OfficeMemberSocketService = (
 			.queryBuilder()
 			.findByMemberIdAndOfficeId(userId, officeId)
 			.withMember()
+			.withRoles()
 			.withTransform()
 			.build()
 			.getOne();

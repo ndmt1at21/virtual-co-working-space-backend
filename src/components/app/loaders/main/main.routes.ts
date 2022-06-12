@@ -13,6 +13,7 @@ import { ItemCategoryRouter } from '@src/components/itemCategories/itemCategory.
 import { AdminRouter } from '@src/components/admin';
 import { CheckInRouter } from '@src/components/checkin/checkin.api';
 import { createAppearanceRouter } from '@src/components/appearances/appearance.factory';
+import { NotificationRouter } from '@src/components/notifications/notification.api';
 
 export const mainRoutes = (app: Application) => {
 	const API_PREFIX = '/api/v1';
@@ -31,6 +32,7 @@ export const mainRoutes = (app: Application) => {
 	const itemCategoryRouter = ItemCategoryRouter();
 	const adminRouter = AdminRouter();
 	const checkInRouter = CheckInRouter();
+	const notificationRouter = NotificationRouter();
 
 	app.use(`${API_PREFIX}/auth`, authRouter);
 	app.use(`${API_PREFIX}/users`, userRouter);
@@ -46,4 +48,5 @@ export const mainRoutes = (app: Application) => {
 	app.use(`${API_PREFIX}/item-categories`, itemCategoryRouter);
 	app.use(`${API_PREFIX}/admin`, adminRouter);
 	app.use(`${API_PREFIX}/checkin`, checkInRouter);
+	app.use(`${API_PREFIX}/notifications`, notificationRouter);
 };

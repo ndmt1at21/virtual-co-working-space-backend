@@ -40,6 +40,15 @@ export class MessageRepository extends BaseRepository<Message> {
 		return createdMessage;
 	}
 
+	async findMessageWithConversationById(
+		messageId: number
+	): Promise<Message | undefined> {
+		return await this.createQueryBuilder('message')
+			.leftJoinAndSelect('message.conversation', 'conversation')
+			.where('message.id = :messageId', { messageId })
+			.getOne();
+	}
+
 	async findByMessageIdAndSenderId(
 		messageId: number,
 		senderId: number

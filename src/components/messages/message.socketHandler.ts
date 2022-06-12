@@ -8,10 +8,12 @@ import { RevokeMessageData } from './@types/dto/RevokeMessageData.dto';
 import { MessageClientToServerEvent } from './@types/MessageClientToServerEvent';
 import { MessageServerToClientEvent } from './@types/MessageServerToClientEvent';
 import { createMessageSocketController } from './message.factory';
+import EventEmitter from 'events';
 
 export const MessageSocketHandler = () => {
 	const messageSocketController = createMessageSocketController();
 	const handleError = messageSocketController.handleError;
+	const eventEmitter = new EventEmitter();
 
 	const listen = (
 		io: SocketServer,

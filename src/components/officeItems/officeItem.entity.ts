@@ -1,6 +1,7 @@
 import {
 	Column,
 	Entity,
+	Index,
 	JoinColumn,
 	ManyToOne,
 	PrimaryColumn,
@@ -19,6 +20,7 @@ export class OfficeItem extends BaseEntity {
 	itemId: number;
 
 	@Column({ name: 'office_id' })
+	@Index()
 	officeId: number;
 
 	@Column({ name: 'x_rotation', type: 'float', default: 0 })

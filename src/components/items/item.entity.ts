@@ -19,6 +19,7 @@ export class Item extends BaseEntity {
 	name: string;
 
 	@Column({ name: 'category_id' })
+	@Index()
 	categoryId: number;
 
 	@Column({ name: 'model_path' })

@@ -10,7 +10,7 @@ export class PushTokenController {
 	constructor(private readonly pushTokenService: IPushTokenService) {}
 
 	registerPushToken = catchAsyncRequestHandler(async (req, res, next) => {
-		const createPushTokenDto = req.body.pushToken as CreatePushTokenDto;
+		const createPushTokenDto = req.body as CreatePushTokenDto;
 
 		const pushTokenDto =
 			await this.pushTokenService.createOrUpdatePushToken({

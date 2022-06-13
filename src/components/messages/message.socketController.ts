@@ -12,6 +12,7 @@ import { RevokeMessageData } from './@types/dto/RevokeMessageData.dto';
 import { IMessageService } from './@types/IMessageService';
 import { MessageClientToServerEvent } from './@types/MessageClientToServerEvent';
 import { MessageServerToClientEvent } from './@types/MessageServerToClientEvent';
+import EventEmitter from 'events';
 
 export type MessageSocket = Socket<
 	MessageClientToServerEvent,
@@ -21,6 +22,8 @@ export type MessageSocket = Socket<
 >;
 
 export class MessageSocketController {
+	private readonly eventEmitter = new EventEmitter();
+
 	constructor(
 		private readonly messageService: IMessageService,
 		private readonly conversationService: IConversationService,
@@ -47,6 +50,11 @@ export class MessageSocketController {
 				await this.conversationService.findAllMemberIdsByConversationId(
 					message.conversationId
 				);
+
+			this.eventEmitter.emit('message:created', {
+				message: createdMessage,
+				to: memberIds
+			});
 
 			const rooms = memberIds.map(id => `u/${id}`);
 

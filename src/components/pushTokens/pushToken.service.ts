@@ -4,11 +4,12 @@ import { PaginationInfo } from '../base/@types/PaginationInfo';
 import { CreatePushTokenDto } from './@types/dto/CreatePushToken.dto';
 import { PushTokenDto } from './@types/dto/PushToken.dto';
 import { FindAllPushTokensOptions } from './@types/filter/FindAllPushTokensOptions';
+import { IPushTokenService } from './@types/IPushTokenService';
 import { PushToken } from './pushToken.entity';
 import { PushTokenErrorMessages } from './pushToken.error';
 import { PushTokenRepository } from './pushToken.repository';
 
-export class PushTokenService {
+export class PushTokenService implements IPushTokenService {
 	constructor(private readonly pushTokenRepository: PushTokenRepository) {}
 
 	async createOrUpdatePushToken(

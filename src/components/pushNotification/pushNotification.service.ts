@@ -47,11 +47,23 @@ export class PushNotificationService implements IPushNotificationService {
 		userId: number,
 		message: NotificationMessage
 	): Promise<void> {
-		const { title, body, data, imageUrl } = message;
+		this.logger.info('Start pushing notification');
 
+		const { title, body, data, imageUrl } = message;
 		const pushTokens = await this.pushTokenRepository.findTokensByUserId(
 			userId
 		);
+
+		if (pushTokens.length === 0) {
+			return;
+		}
+
+		this.logger.info(`Found ${pushTokens.length} push tokens`);
+
+		const stringifyDataValue: { [key: string]: string } = {};
+		Object.keys(data).forEach(key => {
+			stringifyDataValue[key] = JSON.stringify(data[key]);
+		});
 
 		const pushMessages: Message[] = pushTokens.map((pushToken): Message => {
 			return {
@@ -60,13 +72,18 @@ export class PushNotificationService implements IPushNotificationService {
 					body,
 					imageUrl
 				},
-				data,
+				data: stringifyDataValue,
 				token: pushToken.token
 			};
 		});
 
 		const result = await firebase.messaging().sendAll(pushMessages);
-		console.log(result);
+
+		this.logger.info(
+			`Pushed notifications successfully with result ${JSON.stringify(
+				result
+			)}`
+		);
 	}
 
 	async pushNotifications(

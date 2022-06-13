@@ -1,5 +1,5 @@
 export enum PushTokenDevice {
-	ANDROID,
-	IOS,
-	WEB
+	ANDROID = 'android',
+	IOS = 'ios',
+	WEB = 'web'
 }

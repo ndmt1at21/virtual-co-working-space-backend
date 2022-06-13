@@ -36,8 +36,8 @@ export class PushTokenRepository extends BaseRepository<PushToken> {
 	}
 
 	async findTokensByUserId(userId: number): Promise<PushToken[]> {
-		return await this.createQueryBuilder('pushToken')
-			.where('pushToken.userId = :userId', { userId })
+		return await this.createQueryBuilder('push_token')
+			.where('push_token.userId = :userId', { userId })
 			.getMany();
 	}
 
@@ -45,8 +45,8 @@ export class PushTokenRepository extends BaseRepository<PushToken> {
 		pushToken: string,
 		userId: number
 	): Promise<void> {
-		await this.createQueryBuilder('pushToken')
-			.where('pushToken.token = :token', { token: pushToken })
+		await this.createQueryBuilder('push_token')
+			.where('push_token.token = :token', { token: pushToken })
 			.andWhere('pushToken.userId = :userId', { userId })
 			.softDelete()
 			.execute();

@@ -1,5 +1,5 @@
-import { Expose } from 'class-transformer';
-import { IsDefined, IsString } from 'class-validator';
+import { Expose, Type } from 'class-transformer';
+import { IsDefined, IsEnum, IsString } from 'class-validator';
 import { PushTokenDevice } from '../PushTokenDevice';
 
 export class CreatePushTokenDto {
@@ -8,7 +8,11 @@ export class CreatePushTokenDto {
 	@Expose()
 	pushToken: string;
 
-	userId: number;
-
+	@IsDefined()
+	@IsString()
+	@Expose()
+	@IsEnum(PushTokenDevice)
 	device: PushTokenDevice;
+
+	userId: number;
 }

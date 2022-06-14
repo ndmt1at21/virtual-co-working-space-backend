@@ -35,20 +35,24 @@ export class PushTokenRepository extends BaseRepository<PushToken> {
 		return count === 1;
 	}
 
+	async existsByToken(token: string): Promise<boolean> {
+		const count = await this.createQueryBuilder('pushToken')
+			.where('pushToken.token = :token', { token })
+			.getCount();
+
+		return count === 1;
+	}
+
 	async findTokensByUserId(userId: number): Promise<PushToken[]> {
 		return await this.createQueryBuilder('push_token')
 			.where('push_token.userId = :userId', { userId })
 			.getMany();
 	}
 
-	async softDeletePushTokenByTokenAndUserId(
-		pushToken: string,
-		userId: number
-	): Promise<void> {
+	async deletePushTokenByToken(pushToken: string): Promise<void> {
 		await this.createQueryBuilder('push_token')
 			.where('push_token.token = :token', { token: pushToken })
-			.andWhere('pushToken.userId = :userId', { userId })
-			.softDelete()
+			.delete()
 			.execute();
 	}
 

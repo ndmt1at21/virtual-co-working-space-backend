@@ -28,11 +28,10 @@ export const MessageSubscriber = (
 
 				notification.notifierIds.map(userId => {
 					pushNotificationService.pushNotification(userId, {
-						title: 'New Message',
+						title: message.content!,
 						body: `${message.senderId} sent you a message`,
 						data: {
-							type: 'message',
-							id: message.id
+							message
 						}
 					});
 				});

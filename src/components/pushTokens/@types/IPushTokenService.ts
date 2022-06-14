@@ -8,10 +8,7 @@ export interface IPushTokenService {
 		createPushTokenDto: CreatePushTokenDto
 	): Promise<PushTokenDto>;
 
-	deletePushTokenByTokenAndUserId(
-		pushToken: string,
-		userId: number
-	): Promise<void>;
+	deletePushTokenByToken(pushToken: string): Promise<void>;
 
 	findAllPushTokens(
 		options: FindAllPushTokensOptions

@@ -6,7 +6,6 @@ import { IPushNotificationService } from './@types/IPushNotificationService';
 import { ILogger } from '../logger/@types/ILogger';
 import { NotificationMessage } from './@types/NotificationMessage';
 import { PushTokenRepository } from '../pushTokens/pushToken.repository';
-import { PushTokenDevice } from '../pushTokens/@types/PushTokenDevice';
 
 export class PushNotificationService implements IPushNotificationService {
 	constructor(
@@ -58,7 +57,9 @@ export class PushNotificationService implements IPushNotificationService {
 			return;
 		}
 
-		this.logger.info(`Found ${pushTokens.length} push tokens`);
+		this.logger.info(
+			`Found push tokens [${pushTokens}] of [userId = ${userId}] `
+		);
 
 		const stringifyDataValue: { [key: string]: string } = {};
 		Object.keys(data).forEach(key => {
@@ -84,27 +85,5 @@ export class PushNotificationService implements IPushNotificationService {
 				result
 			)}`
 		);
-	}
-
-	async pushNotifications(
-		notifications: { userId: number; message: NotificationMessage }[]
-	): Promise<void> {
-		// const { title, body, data, imageUrl } = notifications;
-		// const pushTokens = await this.pushTokenRepository.findTokensByUserId(
-		// 	userId
-		// );
-		// const pushMessages: Message[] = pushTokens.map((pushToken): Message => {
-		// 	return {
-		// 		notification: {
-		// 			title,
-		// 			body,
-		// 			imageUrl
-		// 		},
-		// 		data,
-		// 		token: pushToken.token
-		// 	};
-		// });
-		// const result = await firebase.messaging().sendAll(pushMessages);
-		// console.log(result);
 	}
 }

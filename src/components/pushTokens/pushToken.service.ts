@@ -59,13 +59,9 @@ export class PushTokenService implements IPushTokenService {
 		};
 	}
 
-	async deletePushTokenByTokenAndUserId(
-		pushToken: string,
-		userId: number
-	): Promise<void> {
-		const isExisted = await this.pushTokenRepository.existsByTokenAndUserId(
-			pushToken,
-			userId
+	async deletePushTokenByToken(pushToken: string): Promise<void> {
+		const isExisted = await this.pushTokenRepository.existsByToken(
+			pushToken
 		);
 
 		if (!isExisted) {
@@ -74,10 +70,7 @@ export class PushTokenService implements IPushTokenService {
 			);
 		}
 
-		await this.pushTokenRepository.softDeletePushTokenByTokenAndUserId(
-			pushToken,
-			userId
-		);
+		await this.pushTokenRepository.deletePushTokenByToken(pushToken);
 	}
 
 	async findAllPushTokens(

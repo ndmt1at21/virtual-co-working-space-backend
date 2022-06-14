@@ -7,8 +7,4 @@ export interface IPushNotificationService {
 		userId: number,
 		message: NotificationMessage
 	): Promise<void>;
-
-	pushNotifications(
-		data: { userId: number; message: NotificationMessage }[]
-	): Promise<void>;
 }

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { createAuthMiddleware } from '../auth/auth.factory';
 import { createPushTokenController } from '../pushTokens/pushToken.factory';
+import { UserRoleType } from '../users/@types/UserRoleType';
 import { createNotificationController } from './notification.factory';
 
 export const NotificationRouter = (): Router => {
@@ -10,15 +11,22 @@ export const NotificationRouter = (): Router => {
 	const pushTokenController = createPushTokenController();
 	const authMiddleware = createAuthMiddleware();
 
-	router.use(authMiddleware.protect);
+	router.post(
+		'/subscribe',
+		authMiddleware.protect,
+		pushTokenController.registerPushToken
+	);
 
-	router.post('/subscribe', pushTokenController.registerPushToken);
-	router.post('/unsubscribe');
+	router.post('/unsubscribe', pushTokenController.unregisterPushToken);
 
 	router
 		.route('/')
+		.all(authMiddleware.protect)
 		.get(notificationController.getNotificationsOfUser)
-		.post(notificationController.createNotification); // just for testing
+		.post(
+			authMiddleware.restrictTo([UserRoleType.ADMIN]),
+			notificationController.createNotification
+		); // just for testing
 
 	return router;
 };

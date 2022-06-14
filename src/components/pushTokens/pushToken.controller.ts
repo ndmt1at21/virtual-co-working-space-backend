@@ -27,6 +27,19 @@ export class PushTokenController {
 		res.status(HttpStatusCode.OK).json(resData);
 	});
 
+	unregisterPushToken = catchAsyncRequestHandler(async (req, res, next) => {
+		const pushToken = req.body.pushToken as string;
+
+		await this.pushTokenService.deletePushTokenByToken(pushToken);
+
+		const resData = generateResponseData({
+			code: HttpStatusCode.OK,
+			data: { pushToken }
+		});
+
+		res.status(HttpStatusCode.OK).json(resData);
+	});
+
 	getPushTokens = catchAsyncRequestHandler(async (req, res, next) => {
 		const queryOptions = this.extractQueryFindAllOptions(req.query);
 

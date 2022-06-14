@@ -14,10 +14,6 @@ export class PushNotificationWorker {
 	}
 
 	private onPushNotificationJob() {
-		this.queue.process('push', 10, async job => {
-			this.logger.info(`Start sending activation link to email: `);
-
-			this.logger.info(`Activation link sent to email:  successfully`);
-		});
+		this.queue.process('push', 10, async job => {});
 	}
 }

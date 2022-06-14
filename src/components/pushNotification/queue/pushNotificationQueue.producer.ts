@@ -11,11 +11,5 @@ export class PushNotificationQueueProducer
 		user: UserDto,
 		activeToken: string,
 		clientUrl: string
-	) {
-		this.queue.add('push', {
-			user,
-			activeToken,
-			clientUrl
-		});
-	}
+	) {}
 }

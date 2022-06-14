@@ -7,6 +7,7 @@ import { connectDatabase, initDatabase } from './loaders/database';
 import {
 	loadBackgroundJobs,
 	loadServices,
+	loadSubscribers,
 	mainMiddleware,
 	mainRoutes
 } from './loaders/main';
@@ -36,6 +37,9 @@ export const mainAppLoaders = async (
 
 	mainMiddleware(app, logger);
 	logger.info('Middleware has been loaded.');
+
+	loadSubscribers();
+	logger.info('Subscribers have been loaded successfully.');
 
 	mainRoutes(app);
 	logger.info('Routes have been loaded.');

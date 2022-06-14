@@ -140,6 +140,14 @@ export const checkinLogger = createLogger({
 	]
 });
 
+export const pushNotificationLogger = createLogger({
+	defaultMeta: { service: 'push-notification-service' },
+	transports: [
+		new transports.File(commonOptions),
+		new transports.Console(debugOptions)
+	]
+});
+
 export const conversationSocketLogger = createLogger({
 	defaultMeta: { service: 'conversation-socket-service' },
 	transports: [

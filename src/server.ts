@@ -2,6 +2,9 @@ import 'reflect-metadata';
 import http from 'http';
 import path from 'path';
 import express from 'express';
+
+global.__basedir = path.resolve('./');
+
 import { appConfig } from '@src/config/app';
 import { serverLogger } from '@components/logger';
 import {

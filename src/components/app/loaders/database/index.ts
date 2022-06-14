@@ -23,6 +23,7 @@ import { UserMessageStatus } from '@src/components/messages/components/userMessa
 import { MessageReaction } from '@src/components/messages/components/messageReactions/messageReaction.entity';
 import { ItemCategory } from '@src/components/itemCategories/itemCategory.entity';
 import { CheckIn } from '@src/components/checkin/checkin.entity';
+import { PushToken } from '@src/components/pushTokens/pushToken.entity';
 import { NotificationObject } from '@src/components/notifications/components/notificationObject/notificationObject.entity';
 import { EntityType } from '@src/components/notifications/components/entityType/entityType.entity';
 import { Notification } from '@src/components/notifications/notification.entity';
@@ -58,6 +59,7 @@ const ormPostgresOptions: PostgresConnectionOptions = {
 		Appearance,
 		ItemCategory,
 		CheckIn,
+		PushToken,
 		Notification,
 		NotificationObject,
 		EntityType

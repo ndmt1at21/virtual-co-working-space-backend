@@ -9,7 +9,13 @@ export const globalErrorHandlerProd: ErrorRequestHandler = (
 	res,
 	next
 ) => {
-	serverLogger.error(JSON.stringify(err));
+	serverLogger.error(
+		JSON.stringify({
+			message: err?.message,
+			stack: err?.stack,
+			error: err
+		})
+	);
 
 	if (err instanceof AppError) {
 		res.status(HttpStatusCode.OK).json({

@@ -75,8 +75,12 @@ export class AuthService implements IAuthService {
 		return { user, activeToken: token };
 	};
 
-	activeNewUser = async (userId: number, token: string) => {
-		await this.activeUserTokenService.validateToken(userId, token);
+	activeNewUser = async (token: string) => {
+		const userId =
+			await this.activeUserTokenService.validateAndDeserializeToken(
+				token
+			);
+
 		await this.userService.activeNewUser(userId);
 		await this.activeUserTokenService.deleteToken(token);
 	};

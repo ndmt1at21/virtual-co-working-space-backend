@@ -36,12 +36,9 @@ export class ActiveUserTokenService implements IActiveUserTokenService {
 		}
 	}
 
-	async validateToken(userId: number, token: string): Promise<boolean> {
+	async validateAndDeserializeToken(token: string): Promise<number> {
 		const activeUserToken =
-			await this.activeUserTokenRepository.findByUserIdAndToken(
-				userId,
-				token
-			);
+			await this.activeUserTokenRepository.findByToken(token);
 
 		if (!activeUserToken) {
 			throw new IllegalArgumentError(
@@ -49,6 +46,6 @@ export class ActiveUserTokenService implements IActiveUserTokenService {
 			);
 		}
 
-		return true;
+		return activeUserToken.userId;
 	}
 }

@@ -2,7 +2,6 @@ import { HttpStatusCode } from '@src/constant/httpStatusCode';
 import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { generateResponseData } from '@src/utils/generateResponseData';
 import { createPushNotificationService } from '../pushNotification/pushNotification.factory';
-import { PushNotificationService } from '../pushNotification/pushNotification.service';
 import { CreateNotificationDto } from './@types/CreateNotification.dto';
 import { NotificationService } from './notification.service';
 

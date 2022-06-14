@@ -28,7 +28,7 @@ export interface IAuthService {
 
 	resetPassword: (resetPasswordDto: ResetPasswordDto) => Promise<void>;
 
-	activeNewUser: (userId: number, token: string) => Promise<void>;
+	activeNewUser: (token: string) => Promise<void>;
 
 	changePasswordByUserId(
 		id: number,

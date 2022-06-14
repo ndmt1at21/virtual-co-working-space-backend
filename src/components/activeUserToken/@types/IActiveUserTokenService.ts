@@ -5,5 +5,5 @@ export interface IActiveUserTokenService {
 
 	deleteToken: (token: string) => Promise<void>;
 
-	validateToken: (userId: number, token: string) => Promise<boolean>;
+	validateAndDeserializeToken: (token: string) => Promise<number>;
 }

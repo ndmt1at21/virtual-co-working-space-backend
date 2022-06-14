@@ -225,10 +225,9 @@ export class AuthController {
 	});
 
 	activateNewUser = catchAsyncRequestHandler(async (req, res, next) => {
-		const userId = req.user!.id;
 		const token = req.params.token as string;
 
-		await this.authService.activeNewUser(userId, token);
+		await this.authService.activeNewUser(token);
 
 		res.status(HttpStatusCode.OK).json({
 			code: HttpStatusCode.OK,

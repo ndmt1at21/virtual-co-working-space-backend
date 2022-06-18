@@ -6,6 +6,8 @@ export type MessageDto = {
 	id: number;
 	conversationId: number;
 	senderId: number;
+	senderName: string;
+	senderAvatar: string|undefined;
 	content?: string;
 	type?: string;
 	readers?: UserMessageReadStatusDto[];

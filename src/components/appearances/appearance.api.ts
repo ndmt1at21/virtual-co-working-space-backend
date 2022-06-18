@@ -18,7 +18,7 @@ export const AppearanceRouter = (
 			appearanceReqValidation.validateCreateAppearance,
 			appearanceController.createAppearance
 		)
-		.get(appearanceController.getAllAccessoriesOfUser);
+		.get(appearanceController.getAllAppearancesOfUser);
 
 	return router;
 };

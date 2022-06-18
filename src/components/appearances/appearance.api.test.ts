@@ -24,8 +24,8 @@ describe('AppearanceRouter', () => {
 
 		appearanceController = {
 			createAppearance: jest.fn(),
-			getAllAccessories: jest.fn(),
-			getAllAccessoriesOfUser: jest.fn()
+			getAllAppearances: jest.fn(),
+			getAllAppearancesOfUser: jest.fn()
 		};
 
 		appearanceReqValidation = {
@@ -79,7 +79,7 @@ describe('AppearanceRouter', () => {
 		expect(appearanceRouter).toBeDefined();
 		expect(route).toHaveBeenCalledWith('/');
 		expect(get).toHaveBeenCalledWith(
-			appearanceController.getAllAccessoriesOfUser
+			appearanceController.getAllAppearancesOfUser
 		);
 	});
 

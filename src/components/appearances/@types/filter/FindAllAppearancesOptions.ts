@@ -4,17 +4,17 @@ import {
 	SortOrder
 } from '@src/components/base/@types/FindAllOptions';
 
-export type FindAllAccessoriesFilter = {
+export type FindAllAppearancesFilter = {
 	userId?: FilterValue;
 };
 
-export type FindAllAccessoriesSort = {
+export type FindAllAppearancesSort = {
 	key?: SortOrder;
 	createdAt?: SortOrder;
 };
 
-export type FindAllAccessoriesOptions = {
-	filter?: FindAllAccessoriesFilter;
-	sort?: FindAllAccessoriesSort;
+export type FindAllAppearancesOptions = {
+	filter?: FindAllAppearancesFilter;
+	sort?: FindAllAppearancesSort;
 	pageable?: Pageable;
 };

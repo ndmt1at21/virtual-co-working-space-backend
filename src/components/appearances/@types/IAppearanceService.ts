@@ -1,7 +1,7 @@
 import { PaginationInfo } from '@src/components/base/@types/PaginationInfo';
 import { AppearanceDto } from './dto/Appearance.dto';
 import { CreateAppearancesDto } from './dto/CreateAppearance.dto';
-import { FindAllAccessoriesOptions } from './filter/FindAllAppearancesOptions';
+import { FindAllAppearancesOptions } from './filter/FindAllAppearancesOptions';
 
 export interface IAppearanceService {
 	createAppearance(
@@ -10,11 +10,11 @@ export interface IAppearanceService {
 
 	deleteAppearanceById(id: number): Promise<void>;
 
-	findAllAccessoriesOfUser(userId: number): Promise<AppearanceDto[]>;
+	findAllAppearancesOfUser(userId: number): Promise<AppearanceDto[]>;
 
-	findAllAccessoriesInOffice(officeId: number): Promise<AppearanceDto[]>;
+	findAllAppearancesInOffice(officeId: number): Promise<AppearanceDto[]>;
 
-	findAccessories(
-		options: FindAllAccessoriesOptions
+	findAppearances(
+		options: FindAllAppearancesOptions
 	): Promise<[AppearanceDto[], PaginationInfo]>;
 }

@@ -6,5 +6,5 @@ export type ConversationOverviewDto = {
 	officeId: number;
 	name?: string;
 	type: ConversationType;
-	latestMessage?: MessageDto;
+	latestMessage: MessageDto | null;
 };

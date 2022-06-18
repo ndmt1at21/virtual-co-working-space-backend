@@ -17,7 +17,7 @@ export const mapConversationToConversationOverviewDto = (
 		type,
 		latestMessage: latestMessage
 			? mapMessageToMessageDto(latestMessage)
-			: undefined
+			: null
 	};
 };
 

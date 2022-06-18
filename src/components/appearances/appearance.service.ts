@@ -3,7 +3,7 @@ import { PaginationInfo } from '../base/@types/PaginationInfo';
 import { OfficeMemberRepository } from '../officeMembers/officeMember.repository';
 import { AppearanceDto } from './@types/dto/Appearance.dto';
 import { CreateAppearancesDto } from './@types/dto/CreateAppearance.dto';
-import { FindAllAccessoriesOptions } from './@types/filter/FindAllAppearancesOptions';
+import { FindAllAppearancesOptions } from './@types/filter/FindAllAppearancesOptions';
 import { IAppearanceService } from './@types/IAppearanceService';
 import { Appearance } from './appearance.entity';
 import { AppearanceErrorMessages } from './appearance.error';
@@ -63,11 +63,11 @@ export class AppearanceService implements IAppearanceService {
 		);
 	};
 
-	findAllAccessoriesOfUser = async (
+	findAllAppearancesOfUser = async (
 		userId: number
 	): Promise<AppearanceDto[]> => {
 		const appearances =
-			await this.appearanceRepository.findAllAccessoriesOfUser(userId);
+			await this.appearanceRepository.findAllAppearancesOfUser(userId);
 
 		const appearancesDto = appearances.map(appearance =>
 			mapAppearanceToAppearanceDto(appearance)
@@ -76,7 +76,7 @@ export class AppearanceService implements IAppearanceService {
 		return appearancesDto;
 	};
 
-	findAllAccessoriesInOffice = async (
+	findAllAppearancesInOffice = async (
 		officeId: number
 	): Promise<AppearanceDto[]> => {
 		const officeMembers = await this.officeMemberRepository
@@ -97,11 +97,11 @@ export class AppearanceService implements IAppearanceService {
 		return appearancesDto;
 	};
 
-	findAccessories = async (
-		options: FindAllAccessoriesOptions
+	findAppearances = async (
+		options: FindAllAppearancesOptions
 	): Promise<[AppearanceDto[], PaginationInfo]> => {
 		const [appearances, pageInfo] =
-			await this.appearanceRepository.findAccessories(options);
+			await this.appearanceRepository.findAppearances(options);
 
 		const appearancesDto = appearances.map(appearance =>
 			mapAppearanceToAppearanceDto(appearance)

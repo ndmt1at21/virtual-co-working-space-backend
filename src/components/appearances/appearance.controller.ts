@@ -3,7 +3,7 @@ import { catchAsyncRequestHandler } from '@src/utils/catchAsyncRequestHandler';
 import { generateResponseData } from '@src/utils/generateResponseData';
 import { PaginateQueryParser } from '@src/utils/paginateQueryParser';
 import { CreateAppearancesDto } from './@types/dto/CreateAppearance.dto';
-import { FindAllAccessoriesOptions } from './@types/filter/FindAllAppearancesOptions';
+import { FindAllAppearancesOptions } from './@types/filter/FindAllAppearancesOptions';
 import { IAppearanceController } from './@types/IAppearanceController';
 import { IAppearanceService } from './@types/IAppearanceService';
 
@@ -29,15 +29,14 @@ export class AppearanceController implements IAppearanceController {
 			data: { appearances: changedAppearances }
 		});
 
-		console.log(res.status);
 		res.status(HttpStatusCode.OK).json(resData);
 	});
 
-	getAllAccessories = catchAsyncRequestHandler(async (req, res, next) => {
+	getAllAppearances = catchAsyncRequestHandler(async (req, res, next) => {
 		const options = this.extractQueryFindAllOptions(req.query);
 
 		const [appearances, pagination] =
-			await this.appearanceService.findAccessories(options);
+			await this.appearanceService.findAppearances(options);
 
 		const resData = generateResponseData({
 			code: HttpStatusCode.OK,
@@ -47,10 +46,10 @@ export class AppearanceController implements IAppearanceController {
 		res.status(HttpStatusCode.OK).json(resData);
 	});
 
-	getAllAccessoriesOfUser = catchAsyncRequestHandler(
+	getAllAppearancesOfUser = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const appearances =
-				await this.appearanceService.findAllAccessoriesOfUser(
+				await this.appearanceService.findAllAppearancesOfUser(
 					req.user!.id
 				);
 
@@ -80,14 +79,14 @@ export class AppearanceController implements IAppearanceController {
 
 	private extractQueryFindAllOptions(
 		originalQuery: any
-	): FindAllAccessoriesOptions {
+	): FindAllAppearancesOptions {
 		const query = PaginateQueryParser.parse(originalQuery, {
 			filter: {
 				includes: ['user_id']
 			}
 		});
 
-		const options: FindAllAccessoriesOptions = {};
+		const options: FindAllAppearancesOptions = {};
 
 		if (query.filter) {
 			const queryFilter = query.filter;

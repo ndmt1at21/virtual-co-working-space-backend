@@ -2,7 +2,7 @@ import { EntityRepository } from 'typeorm';
 import { FindAllOptions } from '../base/@types/FindAllOptions';
 import { PaginationInfo } from '../base/@types/PaginationInfo';
 import { BaseRepository } from '../base/BaseRepository';
-import { FindAllAccessoriesOptions } from './@types/filter/FindAllAppearancesOptions';
+import { FindAllAppearancesOptions } from './@types/filter/FindAllAppearancesOptions';
 import { Appearance } from './appearance.entity';
 
 @EntityRepository(Appearance)
@@ -20,7 +20,7 @@ export class AppearanceRepository extends BaseRepository<Appearance> {
 			.getMany();
 	}
 
-	async findAllAccessoriesOfUser(userId: number): Promise<Appearance[]> {
+	async findAllAppearancesOfUser(userId: number): Promise<Appearance[]> {
 		const appearances = this.createQueryBuilder('appearance')
 			.where('appearance.user_id = :userId', { userId })
 			.getMany();
@@ -28,8 +28,8 @@ export class AppearanceRepository extends BaseRepository<Appearance> {
 		return appearances;
 	}
 
-	async findAccessories(
-		options: FindAllAccessoriesOptions
+	async findAppearances(
+		options: FindAllAppearancesOptions
 	): Promise<[Appearance[], PaginationInfo]> {
 		const dbOptions = this.mapFindAllAppearanceOptionsToDatabaseField(
 			this.metadata.tableName,
@@ -60,7 +60,7 @@ export class AppearanceRepository extends BaseRepository<Appearance> {
 
 	private mapFindAllAppearanceOptionsToDatabaseField(
 		alias: string,
-		options: FindAllAccessoriesOptions
+		options: FindAllAppearancesOptions
 	): FindAllOptions {
 		const { filter, sort, pageable } = options;
 

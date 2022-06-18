@@ -49,6 +49,8 @@ export const OfficeRouter = () => {
 			officeController.removeMemberFromOffice
 		);
 
+	router.route('/:id/leave').delete(officeController.leaveOffice);
+
 	router.route('/:id/members').get(officeController.getOfficeMembersById);
 
 	router.route('/:id/items').get(officeController.getOfficeItemsById);

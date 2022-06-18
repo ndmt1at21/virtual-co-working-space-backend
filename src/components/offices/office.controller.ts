@@ -277,6 +277,34 @@ export class OfficeController {
 		}
 	);
 
+	leaveOffice = catchAsyncRequestHandler(async (req, res, next) => {
+		this.logger.info(
+			`Leave office by [officeId = ${req.params.id}] and [userId = ${req.params.memberId}]`
+		);
+
+		const officeId = +req.params.id;
+		const userId = req.user!.id;
+
+		await this.officeMemberService.leaveOfficeByOfficeIdAndUserId(
+			officeId,
+			userId
+		);
+
+		this.logger.info(
+			`[userId = ${req.params.memberId}] left office successfully`
+		);
+
+		const resData = generateResponseData({
+			code: HttpStatusCode.OK,
+			data: {
+				officeId,
+				userId
+			}
+		});
+
+		res.status(HttpStatusCode.OK).json(resData);
+	});
+
 	getAllAppearancesInOffice = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			this.logger.info(

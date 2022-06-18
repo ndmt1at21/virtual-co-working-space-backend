@@ -33,25 +33,24 @@ describe('AppearanceController', () => {
 			// const bodyData = reqData.body;
 			// const reqUser = reqData.user;
 			// const req = { body: bodyData, user: reqUser };
-			// const status = jest.fn();
-			// const json = jest.fn();
 			// const res = {
-			// 	status: status.mockReturnThis(),
-			// 	json: json.mockReturnThis()
+			// 	status: jest.fn().mockReturnThis(),
+			// 	json: jest.fn().mockReturnThis()
 			// };
 			// appearanceService.createAppearance = jest
 			// 	.fn()
-			// 	.mockResolvedValue(serviceData.result);
+			// 	.mockResolvedValue(serviceData.result.appearances);
 			// await appearanceController.createAppearance(
-			// 	req as Request,
-			// 	res as any as Response,
+			// 	req as any,
+			// 	res as any,
 			// 	jest.fn()
 			// );
+			// console.log('resData', resData);
 			// expect(appearanceService.createAppearance).toHaveBeenCalledWith(
 			// 	serviceData.arg
 			// );
-			// expect(status).toBeCalled();
-			// // expect(json).toHaveBeenCalledWith(resData.data);
+			// expect(res.status).toHaveBeenCalled();
+			// // expect(res.json).toBeCalledWith(resData);
 		});
 	});
 

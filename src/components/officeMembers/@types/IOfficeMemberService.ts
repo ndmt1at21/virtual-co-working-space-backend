@@ -12,6 +12,11 @@ export interface IOfficeMemberService {
 
 	removeOfficeMemberById(id: number): Promise<void>;
 
+	leaveOfficeByOfficeIdAndUserId(
+		officeId: number,
+		userId: number
+	): Promise<void>;
+
 	updateOfficeMemberTransformById(
 		id: number,
 		transform: UpdateOfficeMemberTransformDto

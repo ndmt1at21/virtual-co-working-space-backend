@@ -59,7 +59,6 @@ export const createAppearanceData = {
 		res: {
 			code: HttpStatusCode.OK,
 			data: {
-				code: HttpStatusCode.OK,
 				appearances: [
 					{
 						id: 1,

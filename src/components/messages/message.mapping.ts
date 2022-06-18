@@ -30,6 +30,8 @@ export const mapMessageToMessageDto = (message: Message): MessageDto => {
 			conversationId,
 			sentAt: createdAt,
 			senderId: senderDto.id,
+			senderName: senderDto.name,
+			senderAvatar: senderDto.avatar,
 			status: 'revoked'
 		};
 	}
@@ -41,6 +43,8 @@ export const mapMessageToMessageDto = (message: Message): MessageDto => {
 		type,
 		sentAt: createdAt,
 		senderId: senderDto.id,
+		senderName: senderDto.name,
+		senderAvatar: senderDto.avatar,
 		readers: readersDto,
 		reactions: [],
 		status

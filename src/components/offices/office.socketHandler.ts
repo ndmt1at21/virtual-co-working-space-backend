@@ -9,6 +9,7 @@ import { EmojiListenerData } from './@types/dto/EmojiData';
 import { ConversationSocketHandler } from '../conversations/conversation.socketHandler';
 import { MessageSocketHandler } from '../messages/message.socketHandler';
 import { OfficeItemSocketHandler } from '../officeItems/officeItem.socketHandler';
+import { ActionListenerData } from './@types/dto/ActionData';
 
 export const OfficeSocketHandler = (
 	socketNamespace: SocketServer,
@@ -33,7 +34,6 @@ export const OfficeSocketHandler = (
 			await officeMemberSocketService.onJoinToOfficeRoom(data);
 
 			handleOfficeMemberEvents(socket);
-			console.log('fgkjgfjk');
 			conversationHandler.listen(socketNamespace, socket);
 			messageHandler.listen(socketNamespace, socket);
 			officeItemHandler.listen(socketNamespace, socket);
@@ -57,53 +57,6 @@ export const OfficeSocketHandler = (
 		);
 	}
 
-	// function handleOfficeItemsEvents(socket: Socket) {
-	// 	socket.on('office_item:create', (data: CreateOfficeItemDto) => {
-	// 		officeItemSocketService.onOfficeItemCreate(data);
-	// 	});
-
-	// 	socket.on('office_item:move', (data: UpdateOfficeItemTransformDto) => {
-	// 		officeItemSocketService.onOfficeItemMove(data);
-	// 	});
-
-	// 	socket.on('office_item:delete', (id: number) => {
-	// 		officeItemSocketService.onOfficeItemDelete(id);
-	// 	});
-	// }
-
-	// function handleChatEvents(
-	// 	socket: Socket<
-	// 		OfficeClientToServerEvent,
-	// 		OfficeServerToClientEvent,
-	// 		any,
-	// 		OfficeSocketData
-	// 	>
-	// ) {
-	// 	socket.on('conversation:join', data => {
-	// 		messageSocketService.onJoinToConversation(data.conversationId);
-	// 	});
-
-	// 	socket.on('conversation:leave', data => {
-	// 		messageSocketService.onLeaveFromConversation(data.conversationId);
-	// 	});
-
-	// 	socket.on('message:send', (data: CreateMessageDto) => {
-	// 		messageSocketService.onCreateMessage(data);
-	// 	});
-
-	// 	socket.on('message:revoke', (data: RevokeMessageData) => {
-	// 		messageSocketService.onRevokeMessage(data);
-	// 	});
-
-	// 	socket.on('message:delete', (data: DeleteMessageData) => {
-	// 		messageSocketService.onSelfDeleteMessage(data);
-	// 	});
-
-	// 	socket.on('message:markAsRead', () => {
-	// 		messageSocketService.onMarkAsRead();
-	// 	});
-	// }
-
 	function handleInteractionEvent(
 		socket: Socket<
 			OfficeClientToServerEvent,
@@ -123,6 +76,13 @@ export const OfficeSocketHandler = (
 			socket.to(`${socket.data.officeMember!.officeId}`).emit('gesture', {
 				userId: socket.user!.id,
 				gestureId: data.gestureId
+			});
+		});
+
+		socket.on('action', (data: ActionListenerData) => {
+			socket.to(`${data.officeId}`).emit('action', {
+				userId: socket.user!.id,
+				action: data.action,
 			});
 		});
 	}

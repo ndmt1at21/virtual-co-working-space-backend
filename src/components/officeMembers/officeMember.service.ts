@@ -63,6 +63,25 @@ export class OfficeMemberService implements IOfficeMemberService {
 		await this.officeMemberRepository.removeOfficeMemberById(id);
 	}
 
+	async leaveOfficeByOfficeIdAndUserId(
+		officeId: number,
+		userId: number
+	): Promise<void> {
+		const officeMember =
+			await this.officeMemberRepository.findOfficeMemberByMemberIdAndOfficeId(
+				userId,
+				officeId
+			);
+
+		if (!officeMember) {
+			throw new NotFoundError(
+				OfficeMemberErrorMessages.OFFICE_MEMBER_NOT_FOUND
+			);
+		}
+
+		await this.removeOfficeMemberById(officeMember.id);
+	}
+
 	async updateOfficeMemberTransformById(
 		id: number,
 		transform: UpdateOfficeMemberTransformDto

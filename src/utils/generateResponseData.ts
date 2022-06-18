@@ -7,11 +7,20 @@ export type ResponseDataOptions = {
 export const generateResponseData = (dataOptions: ResponseDataOptions) => {
 	const { code, data, message } = dataOptions;
 
+	if (message) {
+		return {
+			code,
+			data: {
+				...data
+			},
+			message
+		};
+	}
+
 	return {
 		code,
 		data: {
 			...data
-		},
-		message
+		}
 	};
 };

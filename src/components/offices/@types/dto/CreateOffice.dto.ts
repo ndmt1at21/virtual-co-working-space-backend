@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsDefined, Length } from 'class-validator';
+import { IsDefined, IsNotEmpty, Length, MaxLength } from 'class-validator';
 
 export class CreateOfficeDto {
 	@Expose()
@@ -8,6 +8,6 @@ export class CreateOfficeDto {
 	name: string;
 
 	@Expose()
-	@Length(1, 2000)
+	@MaxLength(2000)
 	description?: string;
 }

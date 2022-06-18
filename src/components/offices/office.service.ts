@@ -49,7 +49,9 @@ export class OfficeService implements IOfficeService {
 				invitationCode,
 				createdByUserId: createdUserId,
 				name: createOfficeDto.name,
-				description: createOfficeDto.description
+				description: createOfficeDto.description?.length
+					? createOfficeDto.description
+					: undefined
 			},
 			[ownerRole!],
 			'general'

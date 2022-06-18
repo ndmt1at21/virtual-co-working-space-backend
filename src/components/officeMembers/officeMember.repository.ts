@@ -157,6 +157,17 @@ export class OfficeMemberRepository extends BaseRepository<OfficeMember> {
 			.execute();
 	}
 
+	async updateOfficeMemberStatusById(
+		id: number,
+		status: OfficeMemberStatus
+	): Promise<void> {
+		await this.createQueryBuilder('office_member')
+			.update()
+			.where('office_member.id = :id', { id })
+			.set({ status })
+			.execute();
+	}
+
 	async findOfficeMemberByMemberEmailAndOfficeId(
 		email: string,
 		officeId: number

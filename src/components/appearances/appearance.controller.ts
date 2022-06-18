@@ -29,6 +29,7 @@ export class AppearanceController implements IAppearanceController {
 			data: { appearances: changedAppearances }
 		});
 
+		console.log(res.status);
 		res.status(HttpStatusCode.OK).json(resData);
 	});
 

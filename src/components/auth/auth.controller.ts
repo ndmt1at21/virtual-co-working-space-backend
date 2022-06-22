@@ -18,13 +18,17 @@ import { RegisterDto } from './@types/dto/Register.dto';
 import { IAuthMailQueueProducer } from './@types/IAuthMailQueueProducer';
 import { appConfig } from '@src/config/app';
 import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
+import { getAuth, UserRecord } from 'firebase-admin/auth';
+import { UserLoginProvider } from './@types/UserLoginProvider';
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export class AuthController {
 	constructor(
 		private authMailQueueProducer: IAuthMailQueueProducer,
 		private authService: IAuthService,
 		private logger: ILogger
-	) {}
+	) { }
 
 	localLogin = catchAsyncRequestHandler(async (req, res, next) => {
 		const errors = await validateRequestBody(LoginDto, req.body);
@@ -90,6 +94,26 @@ export class AuthController {
 		})(req, res, next);
 
 		this.logger.info('Success redirect to google login page');
+	});
+
+	googleLoginHandler = catchAsyncRequestHandler(async (req, res, next) => {
+		const ticket = await client.verifyIdToken({
+			idToken: req.body.token,
+			audience: process.env.GOOGLE_CLIENT_ID,
+		});
+		const payload = ticket.getPayload();
+		const [user, { accessToken, refreshToken }] = await this.authService.googleLogin({
+			...payload,
+			avatar: payload.picture,
+			externalId: payload.sub,
+			provider: UserLoginProvider.GOOGLE,
+		});
+
+		res.status(HttpStatusCode.OK).json({
+			code: HttpStatusCode.OK,
+			data: { user, accessToken, refreshToken },
+			message: 'user_logged_in_successfully'
+		});
 	});
 
 	facebookLogin = catchAsyncRequestHandler(async (req, res, next) => {
@@ -306,8 +330,7 @@ export class AuthController {
 						});
 
 						this.logger.info(
-							`User with id ${
-								user!.id
+							`User with id ${user!.id
 							} logged in (oauth2, provider: ${provider}) successfully`
 						);
 

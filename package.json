@@ -83,11 +83,7 @@
 		"@types/uuid": "^8.3.4",
 		"clean-webpack-plugin": "^4.0.0",
 		"cross-env": "^7.0.3",
-<<<<<<< HEAD
 		"jest": "^28.1.0",
-=======
-		"jest": "^28.1.1",
->>>>>>> 49dc4d53723305729b3d7f2b61a3d89e4b9eb5b5
 		"nodemon": "^2.0.15",
 		"pm2": "^5.1.2",
 		"reflect-metadata": "^0.1.13",

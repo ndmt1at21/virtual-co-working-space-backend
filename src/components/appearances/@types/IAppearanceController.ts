@@ -3,9 +3,9 @@ import { RequestHandler } from 'express';
 export interface IAppearanceController {
 	createAppearance: RequestHandler;
 
-	getAllAccessories: RequestHandler;
+	getAllAppearances: RequestHandler;
 
-	getAllAccessoriesOfUser: RequestHandler;
+	getAllAppearancesOfUser: RequestHandler;
 
 	deleteAppearance: RequestHandler;
 }

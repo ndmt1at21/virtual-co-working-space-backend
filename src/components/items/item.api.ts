@@ -1,13 +1,14 @@
 import { Router } from 'express';
-import { createAuthMiddleware } from '../auth/auth.factory';
+import { IAuthMiddleware } from '../auth/@types/IAuthMiddleware';
 import { UserRoleType } from '../users/@types/UserRoleType';
-import { createItemController, createItemReqValidation } from './item.factory';
+import { IItemController } from './@types/IItemController';
+import { IItemReqValidation } from './@types/IItemReqValidation';
 
-export const ItemRouter = (): Router => {
-	const itemController = createItemController();
-	const itemReqValidation = createItemReqValidation();
-	const authMiddleware = createAuthMiddleware();
-
+export const ItemRouter = (
+	itemController: IItemController,
+	itemReqValidation: IItemReqValidation,
+	authMiddleware: IAuthMiddleware
+): Router => {
 	const router = Router();
 
 	router.use(authMiddleware.protect);

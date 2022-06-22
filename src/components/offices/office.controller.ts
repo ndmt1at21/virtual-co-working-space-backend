@@ -314,7 +314,7 @@ export class OfficeController {
 			const officeId = +req.params.id;
 
 			const appearances =
-				await this.appearanceService.findAllAccessoriesInOffice(
+				await this.appearanceService.findAllAppearancesInOffice(
 					officeId
 				);
 

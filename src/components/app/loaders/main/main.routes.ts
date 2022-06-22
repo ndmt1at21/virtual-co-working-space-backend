@@ -14,13 +14,14 @@ import { AdminRouter } from '@src/components/admin';
 import { CheckInRouter } from '@src/components/checkin/checkin.api';
 import { createAppearanceRouter } from '@src/components/appearances/appearance.factory';
 import { NotificationRouter } from '@src/components/notifications/notification.api';
+import { createItemRouter } from '@src/components/items/item.factory';
 
 export const mainRoutes = (app: Application) => {
 	const API_PREFIX = '/api/v1';
 
 	const authRouter = AuthRouter();
 	const userRouter = UserRouter();
-	const itemRouter = ItemRouter();
+	const itemRouter = createItemRouter();
 	const officeRouter = OfficeRouter();
 	const officeItemRouter = OfficeItemRouter();
 	const officeMemberRouter = OfficeMemberRouter();

@@ -133,8 +133,8 @@ export const appearanceEntityToAppearanceMapping = {
 		value: 1,
 		userId: 1,
 		user: null,
-		createdAt: new Date(),
-		updatedAt: new Date(),
+		createdAt: new Date('01-01-2022'),
+		updatedAt: new Date('01-01-2022'),
 		deletedAt: null
 	},
 	output: {
@@ -142,7 +142,7 @@ export const appearanceEntityToAppearanceMapping = {
 		key: 'hair',
 		value: 1,
 		userId: 1,
-		createdAt: new Date(),
-		updatedAt: new Date()
+		createdAt: new Date('01-01-2022'),
+		updatedAt: new Date('01-01-2022')
 	}
 };

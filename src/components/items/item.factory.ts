@@ -1,12 +1,22 @@
 import { getCustomRepository } from 'typeorm';
+import { createAuthMiddleware } from '../auth/auth.factory';
 import { createItemCategoryRepository } from '../itemCategories/itemCategory.factory';
 import { itemLogger } from '../logger';
+import { ItemRouter } from './item.api';
 import { ItemController } from './item.controller';
 import { ItemCreator } from './item.creator';
 import { ItemRepository } from './item.repository';
 import { ItemReqValidation } from './item.reqValidation';
 import { ItemService } from './item.service';
 import { ItemValidate } from './item.validate';
+
+export function createItemRouter() {
+	const itemController = createItemController();
+	const itemReqValidation = createItemReqValidation();
+	const authMiddleware = createAuthMiddleware();
+
+	return ItemRouter(itemController, itemReqValidation, authMiddleware);
+}
 
 export function createItemController() {
 	const itemService = createItemService();

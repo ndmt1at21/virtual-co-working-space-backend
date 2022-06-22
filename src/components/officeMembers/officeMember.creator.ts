@@ -50,6 +50,7 @@ export class OfficeMemberCreator implements IOfficeMemberCreator {
 			.findByOfficeId(officeId)
 			.withMember()
 			.withTransform()
+			.withRoles()
 			.build()
 			.getMany();
 

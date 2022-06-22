@@ -3,18 +3,22 @@ export const createAppearance = {
 		input: {
 			appearances: [
 				{ key: 'hair', value: 1, userId: 1 },
-				{ key: 'hair', value: 1, userId: 1 },
-				{ key: 'hair', value: 1, userId: 1 }
+				{ key: 'eye', value: 5, userId: 1 }
 			],
 
 			userId: 1
 		},
-		output: {},
+		output: {
+			appearances: [
+				{ key: 'hair', value: 1, userId: 1 },
+				{ key: 'eye', value: 5, userId: 1 },
+				{ key: 'head', value: 9, userId: 1 }
+			]
+		},
 		repo: {
 			appearancesByKeysAndUserId: [
-				{ key: 'hair', value: 1, userId: 1 },
-				{ key: 'hair', value: 1, userId: 1 },
-				{ key: 'hair', value: 1, userId: 1 }
+				{ key: 'eye', value: 1, userId: 1 },
+				{ key: 'head', value: 1, userId: 1 }
 			]
 		}
 	}

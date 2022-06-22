@@ -11,6 +11,9 @@ export const catchAsyncRequestHandler = (
 	fn: AsyncRequestHandler
 ): RequestHandler => {
 	return (req, res, next) => {
-		fn(req, res, next).catch(err => next(err));
+		fn(req, res, next).catch(err => {
+			console.log('next calll');
+			next(err);
+		});
 	};
 };

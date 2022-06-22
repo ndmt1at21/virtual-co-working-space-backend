@@ -6,14 +6,16 @@ import { ILogger } from '../logger/@types/ILogger';
 import { CreateItemDto } from './@types/dto/CreateItem.dto';
 import { UpdateItemDto } from './@types/dto/UpdateItem.dto';
 import { FindAllItemsOptions } from './@types/filter/FindAllItemsOptions';
+import { IItemController } from './@types/IItemController';
 import { IItemService } from './@types/IItemService';
 
-export class ItemController {
+export class ItemController implements IItemController {
 	constructor(private itemService: IItemService, private logger: ILogger) {}
 
 	getById = catchAsyncRequestHandler(async (req, res, next) => {
 		this.logger.info(`Get item with id = ${req.params.id}`);
 
+		console.log('get item by id');
 		const item = await this.itemService.findItemById(+req.params.id);
 
 		const resData = generateResponseData({
@@ -52,6 +54,7 @@ export class ItemController {
 		this.logger.info(`Create item with data = ${JSON.stringify(req.body)}`);
 
 		const createItemDto = req.body as CreateItemDto;
+
 		const item = await this.itemService.createItem(createItemDto);
 
 		const resData = generateResponseData({

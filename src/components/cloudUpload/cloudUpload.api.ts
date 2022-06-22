@@ -24,8 +24,6 @@ export const CloudUploadRouter = () => {
 	router.post(
 		'/image',
 		(req, res, next) => {
-			console.log('Mamp');
-			console.log(req);
 			next();
 		},
 		cloudUploadMiddleware.imageUpload.single('image'),

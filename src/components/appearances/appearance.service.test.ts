@@ -2,6 +2,7 @@ import { OfficeMemberRepository } from '../officeMembers/officeMember.repository
 import { IAppearanceService } from './@types/IAppearanceService';
 import { AppearanceRepository } from './appearance.repository';
 import { AppearanceService } from './appearance.service';
+import { createAppearance } from './test/data/service';
 
 jest.mock('./appearance.repository');
 
@@ -20,10 +21,12 @@ describe('AppearanceService', () => {
 	});
 
 	describe('createAppearance', () => {
-		it('should create appearances if create data is valid', async () => {
+		it('should create or update appearances if data is valid', async () => {
+			const { input, output, repo } = createAppearance.valid;
+
 			appearanceRepository.findAppearanceByKeysAndUserId = jest
 				.fn()
-				.mockReturnValue(1);
+				.mockReturnValue(repo.appearancesByKeysAndUserId);
 
 			appearanceRepository.save = jest.fn().mockReturnValue(1);
 		});

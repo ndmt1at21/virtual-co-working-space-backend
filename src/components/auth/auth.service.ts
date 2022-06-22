@@ -18,6 +18,7 @@ import config from '@src/config';
 import { UserStatus } from '../users/@types/UserStatus';
 import { IllegalArgumentError } from '@src/utils/appError';
 import { AuthErrorMessages } from './auth.error';
+import { CreateUserExternalDto } from '../users/@types/dto/CreateUserExternal.dto';
 
 export class AuthService implements IAuthService {
 	constructor(
@@ -26,7 +27,7 @@ export class AuthService implements IAuthService {
 		private readonly passwordResetTokenService: IPasswordResetTokenService,
 		private readonly activeUserTokenService: IActiveUserTokenService,
 		private readonly authValidate: IAuthValidate
-	) {}
+	) { }
 
 	localLogin = async (
 		loginDto: LoginDto
@@ -34,6 +35,25 @@ export class AuthService implements IAuthService {
 		await this.authValidate.validateLocalUserCanLogin(loginDto);
 
 		const user = await this.userService.findUserByEmail(loginDto.email);
+
+		const [accessToken, refreshToken] =
+			await this.authTokenService.createAccessTokenAndRefreshToken(
+				user!.id
+			);
+
+		if (user.status === UserStatus.INACTIVE) {
+			throw new IllegalArgumentError(
+				AuthErrorMessages.UNAUTHORIZED_EMAIL_NOT_VERIFIED
+			);
+		}
+
+		return [user, { accessToken, refreshToken }];
+	};
+
+	googleLogin = async (
+		loginDto: CreateUserExternalDto
+	): Promise<[UserDto, CredentialsDto]> => {
+		const user = await this.userService.findOrCreateUserByExternal(loginDto);
 
 		const [accessToken, refreshToken] =
 			await this.authTokenService.createAccessTokenAndRefreshToken(

@@ -8,9 +8,12 @@ import { OAuth2ProfileDto } from './dto/OAuth2Profile.dto';
 import { ResetPasswordDto } from './dto/ResetPassword.dto';
 import { PasswordResetTokenDto } from '../components/passwordResetToken/@types/dto/PasswordResetToken.dto';
 import { ChangePasswordDto } from './dto/ChangePassword.dto';
+import { CreateUserExternalDto } from '@src/components/users/@types/dto/CreateUserExternal.dto';
 
 export interface IAuthService {
 	localLogin: (loginDto: LoginDto) => Promise<[UserDto, CredentialsDto]>;
+
+	googleLogin: (loginDto: CreateUserExternalDto) => Promise<[UserDto, CredentialsDto]>;
 
 	oauth2LoginCallback: (
 		profile: OAuth2ProfileDto

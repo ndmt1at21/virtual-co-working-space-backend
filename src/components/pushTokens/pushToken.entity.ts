@@ -26,7 +26,6 @@ export class PushToken extends BaseEntity {
 
 	@Column({
 		name: 'device_type',
-		unique: true,
 		type: 'enum',
 		enum: PushTokenDevice
 	})

@@ -14,6 +14,8 @@ import { MessageClientToServerEvent } from './@types/MessageClientToServerEvent'
 import { MessageServerToClientEvent } from './@types/MessageServerToClientEvent';
 import EventEmitter from 'events';
 
+export const messageEventEmitter = new EventEmitter();
+
 export type MessageSocket = Socket<
 	MessageClientToServerEvent,
 	MessageServerToClientEvent,
@@ -22,8 +24,6 @@ export type MessageSocket = Socket<
 >;
 
 export class MessageSocketController {
-	private readonly eventEmitter = new EventEmitter();
-
 	constructor(
 		private readonly messageService: IMessageService,
 		private readonly conversationService: IConversationService,
@@ -51,7 +51,7 @@ export class MessageSocketController {
 					message.conversationId
 				);
 
-			this.eventEmitter.emit('message:created', {
+			messageEventEmitter.emit('message:created', {
 				message: createdMessage,
 				to: memberIds
 			});

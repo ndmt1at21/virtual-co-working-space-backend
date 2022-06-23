@@ -5,16 +5,15 @@ import { EntityTypeName } from '../notifications/@types/EntityTypeName';
 import { NotificationService } from '../notifications/notification.service';
 import { PushNotificationService } from '../pushNotification/pushNotification.service';
 import { CreatedMessageEventData } from './@types/dto/CreatedMessageEventData';
+import { messageEventEmitter } from './message.socketController';
 
 export const MessageSubscriber = (
 	notificationService: NotificationService,
 	pushNotificationService: PushNotificationService,
 	logger: ILogger
 ) => {
-	const eventEmitter = new EventEmitter();
-
 	const listen = () => {
-		eventEmitter.on(
+		messageEventEmitter.on(
 			'message:created',
 			async ({ message, to }: CreatedMessageEventData) => {
 				logger.info(

@@ -8,6 +8,8 @@ import { AddUsersToConversationDto } from './@types/dto/AddUsersToConversation.d
 import { CreateConversationDto } from './@types/dto/CreateConversation.dto';
 import { UpdateConversationDto } from './@types/dto/UpdateConversation.dto';
 import { IConversationService } from './@types/IConversationService';
+import { ConversationClientToServerEvent } from './@types/socket/ConversationClientToServerEvent';
+import { ConversationServerToClientEvent } from './@types/socket/ConversationServerToClientEvent';
 import { ConversationSocket } from './@types/socket/ConversationSocket';
 
 export class ConversationSocketController {
@@ -273,7 +275,17 @@ export class ConversationSocketController {
 	);
 
 	onRemoveMemberFromConversation = catchAsyncSocketHandler(
-		async (io: Server, socket: ConversationSocket, context: any, next) => {
+		async (
+			io: Server<
+				ConversationClientToServerEvent,
+				ConversationServerToClientEvent,
+				any,
+				any
+			>,
+			socket: ConversationSocket,
+			context: any,
+			next
+		) => {
 			this.logger.info(
 				`User ${socket.user!.id} start deleting user ${
 					context.body.userId
@@ -300,11 +312,16 @@ export class ConversationSocketController {
 
 			// emit
 			this.logger.info(
-				`Start emitting event 'conversation:delete' to rooms: ${rooms}`
+				`Start emitting event 'conversation:member_removed' to rooms: ${rooms}`
 			);
 
+			io.to(rooms).emit('conversation:member_removed', {
+				conversationId,
+				userId: context.body.userId
+			});
+
 			this.logger.info(
-				`End emitting event 'conversation:delete' to rooms: ${rooms}`
+				`End emitting event 'conversation:member_removed' to rooms: ${rooms}`
 			);
 		}
 	);

@@ -28,6 +28,8 @@ export class ConversationController {
 		}
 	);
 
+	updateConversation = catchAsyncRequestHandler(async (req, res, next) => {});
+
 	getConversationDetailOfUser = catchAsyncRequestHandler(
 		async (req, res, next) => {
 			const conversationId = +req.params.id;

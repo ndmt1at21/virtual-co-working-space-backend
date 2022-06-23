@@ -32,13 +32,9 @@ export const OfficeSocketHandler = (
 	socket.on('office_member:join', async data => {
 		try {
 			await officeMemberSocketService.onJoinToOfficeRoom(data);
-
-			handleOfficeMemberEvents(socket);
 			conversationHandler.listen(socketNamespace, socket);
 			messageHandler.listen(socketNamespace, socket);
 			officeItemHandler.listen(socketNamespace, socket);
-
-			handleInteractionEvent(socket);
 		} catch (err) {
 			socket.emit('office:error', err);
 		}
@@ -48,42 +44,31 @@ export const OfficeSocketHandler = (
 		officeMemberSocketService.onMemberDisconnect();
 	});
 
-	function handleOfficeMemberEvents(socket: Socket) {
-		socket.on(
-			'office_member:move',
-			(transform: UpdateOfficeMemberTransformDto) => {
-				officeMemberSocketService.onMemberMove(transform);
-			}
-		);
-	}
+	socket.on(
+		'office_member:move',
+		(transform: UpdateOfficeMemberTransformDto) => {
+			officeMemberSocketService.onMemberMove(transform);
+		}
+	);
 
-	function handleInteractionEvent(
-		socket: Socket<
-			OfficeClientToServerEvent,
-			OfficeServerToClientEvent,
-			any,
-			OfficeSocketData
-		>
-	) {
-		socket.on('emoji', (data: EmojiListenerData) => {
-			socket.to(`${socket.data.officeMember!.officeId}`).emit('emoji', {
-				userId: socket.user!.id,
-				emojiId: data.emojiId
-			});
+	socket.on('emoji', (data: EmojiListenerData) => {
+		socket.to(`${socket.data.officeMember!.officeId}`).emit('emoji', {
+			userId: socket.user!.id,
+			emojiId: data.emojiId
 		});
+	});
 
-		socket.on('gesture', (data: GestureListenerData) => {
-			socket.to(`${socket.data.officeMember!.officeId}`).emit('gesture', {
-				userId: socket.user!.id,
-				gestureId: data.gestureId
-			});
+	socket.on('gesture', (data: GestureListenerData) => {
+		socket.to(`${socket.data.officeMember!.officeId}`).emit('gesture', {
+			userId: socket.user!.id,
+			gestureId: data.gestureId
 		});
+	});
 
-		socket.on('action', (data: ActionListenerData) => {
-			socket.to(`${data.officeId}`).emit('action', {
-				userId: socket.user!.id,
-				action: data.action,
-			});
+	socket.on('action', (data: ActionListenerData) => {
+		socket.to(`${data.officeId}`).emit('action', {
+			userId: socket.user!.id,
+			action: data.action,
 		});
-	}
+	});
 };

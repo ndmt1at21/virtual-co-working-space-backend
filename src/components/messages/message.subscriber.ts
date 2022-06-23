@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import { ILogger } from '../logger/@types/ILogger';
 import { EntityTypeAction } from '../notifications/@types/EntityTypeAction';
 import { EntityTypeName } from '../notifications/@types/EntityTypeName';
 import { NotificationService } from '../notifications/notification.service';
@@ -7,7 +8,8 @@ import { CreatedMessageEventData } from './@types/dto/CreatedMessageEventData';
 
 export const MessageSubscriber = (
 	notificationService: NotificationService,
-	pushNotificationService: PushNotificationService
+	pushNotificationService: PushNotificationService,
+	logger: ILogger
 ) => {
 	const eventEmitter = new EventEmitter();
 
@@ -15,6 +17,22 @@ export const MessageSubscriber = (
 		eventEmitter.on(
 			'message:created',
 			async ({ message, to }: CreatedMessageEventData) => {
+				logger.info(
+					`[Subscriber] Received message:created event for message ${message.id}`
+				);
+
+				logger.info(
+					`[Subscriber] Notification data: ${JSON.stringify({
+						actorId: message.senderId,
+						entity: {
+							action: EntityTypeAction.CREATE,
+							type: EntityTypeName.MESSAGE,
+							entityId: message.id
+						},
+						notifierIds: to
+					})}`
+				);
+
 				const notification =
 					await notificationService.createNotification({
 						actorId: message.senderId,
@@ -35,6 +53,10 @@ export const MessageSubscriber = (
 						}
 					});
 				});
+
+				logger.info(
+					`[Subscriber] Sent push notification for message ${message.id}`
+				);
 			}
 		);
 	};

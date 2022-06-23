@@ -31,7 +31,11 @@ export function createMessageSubscriber() {
 	const notificationService = createNotificationService();
 	const pushNotificationService = createPushNotificationService();
 
-	return MessageSubscriber(notificationService, pushNotificationService);
+	return MessageSubscriber(
+		notificationService,
+		pushNotificationService,
+		messageSocketLogger
+	);
 }
 
 export function createMessageService() {

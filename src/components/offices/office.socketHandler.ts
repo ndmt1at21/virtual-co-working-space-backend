@@ -32,18 +32,15 @@ export const OfficeSocketHandler = (
 	socket.on('office_member:join', async data => {
 		try {
 			await officeMemberSocketService.onJoinToOfficeRoom(data);
-			conversationHandler.listen(socketNamespace, socket);
-			messageHandler.listen(socketNamespace, socket);
-			officeItemHandler.listen(socketNamespace, socket);
 		} catch (err) {
 			socket.emit('office:error', err);
 		}
 	});
 
-	socket.on('disconnect', () => {
-		officeMemberSocketService.onMemberDisconnect();
-	});
-
+	conversationHandler.listen(socketNamespace, socket);
+	messageHandler.listen(socketNamespace, socket);
+	officeItemHandler.listen(socketNamespace, socket);
+	
 	socket.on(
 		'office_member:move',
 		(transform: UpdateOfficeMemberTransformDto) => {
@@ -70,5 +67,9 @@ export const OfficeSocketHandler = (
 			userId: socket.user!.id,
 			action: data.action,
 		});
+	});
+
+	socket.on('disconnect', () => {
+		officeMemberSocketService.onMemberDisconnect();
 	});
 };

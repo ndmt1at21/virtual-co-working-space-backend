@@ -47,7 +47,7 @@ export const MessageSubscriber = (
 					});
 
 				notification.notifierIds.map(async userId => {
-					const user = await userService.findUserById(userId);
+					const user = await userService.findUserById(message.senderId);
 					pushNotificationService.pushNotification(userId, {
 						title: user.name,
 						body: message.content!,

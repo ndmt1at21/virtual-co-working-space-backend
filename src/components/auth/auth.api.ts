@@ -27,6 +27,7 @@ export const AuthRouter = () => {
 		.post('/register', restrictToGuest, authController.localRegister)
 		.get('/google', restrictToGuest, authController.googleLogin)
 		.post('/google-login', restrictToGuest, authController.googleLoginHandler)
+		.post('/facebook-login', restrictToGuest, authController.facebookLoginHandler)
 		.get('/facebook', restrictToGuest, authController.facebookLogin)
 		.post('/forgot', restrictToGuest, authController.forgotPassword)
 		.post(

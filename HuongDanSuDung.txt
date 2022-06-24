@@ -1,0 +1,5 @@
+1. Chạy unit test:
+        npm run test:unit
+
+2. Chạy chương trình bằng lệnh:
+        npm run start

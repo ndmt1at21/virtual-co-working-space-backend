@@ -50,7 +50,7 @@ export class AuthService implements IAuthService {
 		return [user, { accessToken, refreshToken }];
 	};
 
-	googleLogin = async (
+	externalLogin = async (
 		loginDto: CreateUserExternalDto
 	): Promise<[UserDto, CredentialsDto]> => {
 		const user = await this.userService.findOrCreateUserByExternal(loginDto);

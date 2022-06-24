@@ -13,7 +13,7 @@ import { CreateUserExternalDto } from '@src/components/users/@types/dto/CreateUs
 export interface IAuthService {
 	localLogin: (loginDto: LoginDto) => Promise<[UserDto, CredentialsDto]>;
 
-	googleLogin: (loginDto: CreateUserExternalDto) => Promise<[UserDto, CredentialsDto]>;
+	externalLogin: (loginDto: CreateUserExternalDto) => Promise<[UserDto, CredentialsDto]>;
 
 	oauth2LoginCallback: (
 		profile: OAuth2ProfileDto

@@ -4,6 +4,7 @@ import { EntityTypeAction } from '../notifications/@types/EntityTypeAction';
 import { EntityTypeName } from '../notifications/@types/EntityTypeName';
 import { NotificationService } from '../notifications/notification.service';
 import { PushNotificationService } from '../pushNotification/pushNotification.service';
+import { createUserService } from '../users/user.factory';
 import { CreatedMessageEventData } from './@types/dto/CreatedMessageEventData';
 import { messageEventEmitter } from './message.socketController';
 
@@ -12,6 +13,8 @@ export const MessageSubscriber = (
 	pushNotificationService: PushNotificationService,
 	logger: ILogger
 ) => {
+	const userService = createUserService();
+
 	const listen = () => {
 		messageEventEmitter.on(
 			'message:created',
@@ -43,9 +46,12 @@ export const MessageSubscriber = (
 						notifierIds: to
 					});
 
-				notification.notifierIds.map(userId => {
+				notification.notifierIds.map(async userId => {
+					const user = await userService.findUserById(
+						message.senderId
+					);
 					pushNotificationService.pushNotification(userId, {
-						title: `${message.senderId} sent you a message`,
+						title: user.name,
 						body: message.content!,
 						data: {
 							message

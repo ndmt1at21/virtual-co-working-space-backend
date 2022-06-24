@@ -20,6 +20,8 @@ import { appConfig } from '@src/config/app';
 import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
 import { getAuth, UserRecord } from 'firebase-admin/auth';
 import { UserLoginProvider } from './@types/UserLoginProvider';
+import axios from "axios";
+
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -97,23 +99,55 @@ export class AuthController {
 	});
 
 	googleLoginHandler = catchAsyncRequestHandler(async (req, res, next) => {
-		const ticket = await client.verifyIdToken({
-			idToken: req.body.token,
-			audience: process.env.GOOGLE_CLIENT_ID,
-		});
-		const payload = ticket.getPayload();
-		const [user, { accessToken, refreshToken }] = await this.authService.googleLogin({
-			...payload,
-			avatar: payload.picture,
-			externalId: payload.sub,
-			provider: UserLoginProvider.GOOGLE,
-		});
+		try {
+			const ticket = await client.verifyIdToken({
+				idToken: req.body.token,
+				audience: process.env.GOOGLE_CLIENT_ID,
+			});
+			const payload = ticket.getPayload();
+			const [user, { accessToken, refreshToken }] = await this.authService.externalLogin({
+				...payload,
+				avatar: payload.picture,
+				externalId: payload.sub,
+				provider: UserLoginProvider.GOOGLE,
+			});
 
-		res.status(HttpStatusCode.OK).json({
-			code: HttpStatusCode.OK,
-			data: { user, accessToken, refreshToken },
-			message: 'user_logged_in_successfully'
-		});
+			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
+				data: { user, accessToken, refreshToken },
+				message: 'user_logged_in_successfully'
+			});
+		} catch (err) {
+			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
+				message: 'this_email_is_login_with_other_provider'
+			});
+		}
+	});
+
+	facebookLoginHandler = catchAsyncRequestHandler(async (req, res, next) => {
+		try {
+			const { data } = await axios.get(`https://graph.facebook.com/v13.0/me?access_token=${req.body.token}&fields=id%2Cname%2Cemail%2Cpicture.type(large)`)
+			console.log(data);
+			const [user, { accessToken, refreshToken }] = await this.authService.externalLogin({
+				name: data.name,
+				email: data.email,
+				avatar: data?.picture?.data.url,
+				externalId: data.id,
+				provider: UserLoginProvider.FACEBOOK,
+			});
+
+			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
+				data: { user, accessToken, refreshToken },
+				message: 'user_logged_in_successfully'
+			});
+		} catch (err) {
+			res.status(HttpStatusCode.OK).json({
+				code: HttpStatusCode.OK,
+				message: 'this_email_is_login_with_other_provider'
+			});
+		}
 	});
 
 	facebookLogin = catchAsyncRequestHandler(async (req, res, next) => {

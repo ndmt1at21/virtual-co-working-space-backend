@@ -2,7 +2,10 @@ import { OfficeMemberRepository } from '../officeMembers/officeMember.repository
 import { IAppearanceService } from './@types/IAppearanceService';
 import { AppearanceRepository } from './appearance.repository';
 import { AppearanceService } from './appearance.service';
-import { createAppearance } from './test/data/service';
+import {
+	createAppearance,
+	findAllAppearancesOfUserData
+} from './test/data/service';
 
 jest.mock('./appearance.repository');
 
@@ -22,13 +25,37 @@ describe('AppearanceService', () => {
 
 	describe('createAppearance', () => {
 		it('should create or update appearances if data is valid', async () => {
-			const { input, output, repo } = createAppearance.valid;
+			// const { input, output, repo } = createAppearance.valid;
+			// appearanceRepository.findAppearanceByKeysAndUserId = jest
+			// 	.fn()
+			// 	.mockReturnValue(repo.appearancesByKeysAndUserId);
+			// appearanceRepository.save = jest.fn().mockReturnValue(1);
+		});
+	});
 
-			appearanceRepository.findAppearanceByKeysAndUserId = jest
-				.fn()
-				.mockReturnValue(repo.appearancesByKeysAndUserId);
+	describe('findAllAppearancesOfUser', () => {
+		it('should create or update appearances if data is valid', async () => {
+			// const { input, output, repo } = findAllAppearancesOfUserData.valid;
+			// appearanceRepository.findAllAppearancesOfUser = jest
+			// 	.fn()
+			// 	.mockReturnValue(repo.findAllAppearancesOfUser.appearances);
+			// const result = await appearanceService.findAllAppearancesOfUser(
+			// 	input.userId
+			// );
+			// expect(appearanceService.findAllAppearancesOfUser).toBeCalledWith(
+			// 	input.userId
+			// );
+			// expect(result).toMatchObject(output.appearances);
+		});
+	});
 
-			appearanceRepository.save = jest.fn().mockReturnValue(1);
+	describe('deleteAppearanceById', () => {
+		it('should delete appearance id if appearance exists', async () => {
+			// const { input, output, repo } = createAppearance.valid;
+			// appearanceRepository.findAppearanceByKeysAndUserId = jest
+			// 	.fn()
+			// 	.mockReturnValue(repo.appearancesByKeysAndUserId);
+			// appearanceRepository.save = jest.fn().mockReturnValue(1);
 		});
 	});
 });

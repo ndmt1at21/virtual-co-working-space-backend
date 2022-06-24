@@ -17,7 +17,7 @@ export const MessageSubscriber = (
 			'message:created',
 			async ({ message, to }: CreatedMessageEventData) => {
 				logger.info(
-					`[Subscriber] Received message:created event for message ${message.id}`
+					`[Subscriber] Received message:created event for message [id = ${message.id}]`
 				);
 
 				logger.info(
@@ -45,8 +45,8 @@ export const MessageSubscriber = (
 
 				notification.notifierIds.map(userId => {
 					pushNotificationService.pushNotification(userId, {
-						title: message.content!,
-						body: `${message.senderId} sent you a message`,
+						title: `${message.senderId} sent you a message`,
+						body: message.content!,
 						data: {
 							message
 						}

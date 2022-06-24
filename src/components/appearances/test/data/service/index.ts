@@ -19,7 +19,56 @@ export const createAppearance = {
 			appearancesByKeysAndUserId: [
 				{ key: 'eye', value: 1, userId: 1 },
 				{ key: 'head', value: 1, userId: 1 }
+			],
+			save: {}
+		}
+	}
+};
+
+export const findAllAppearancesOfUserData = {
+	valid: {
+		input: { userId: 1 },
+		output: {
+			appearances: [
+				{
+					id: 1,
+					key: 'hairColor',
+					value: 1,
+					userId: 1,
+					createdAt: new Date('01-01-2022'),
+					updatedAt: new Date('01-01-2022')
+				},
+				{
+					id: 2,
+					key: 'hairColor',
+					value: 10,
+					userId: 1,
+					createdAt: new Date('01-01-2022'),
+					updatedAt: new Date('01-01-2022')
+				}
 			]
+		},
+		repo: {
+			findAllAppearancesOfUser: {
+				appearances: [
+					{
+						id: 1,
+						key: 'hairColor',
+						value: 1,
+						userId: 1,
+						createdAt: new Date('01-01-2022'),
+						updatedAt: new Date('01-01-2022')
+					},
+					{
+						id: 2,
+						key: 'hairColor',
+						value: 10,
+						userId: 1,
+						createdAt: new Date('01-01-2022'),
+						updatedAt: new Date('01-01-2022')
+					}
+				]
+			}
 		}
 	}
 };

@@ -1,3 +1,11 @@
+import dotenv from 'dotenv';
+
+console.log('in doent 1');
+
+dotenv.config({ path: '.env' });
+
+console.log('aftett enmv');
+
 import dbConfig from './database';
 import { appConfig } from './app';
 import { authConfig } from './auth';

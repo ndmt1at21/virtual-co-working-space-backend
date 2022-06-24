@@ -1,7 +1,3 @@
-import dotenv from 'dotenv';
-
-dotenv.config({ path: '.env' });
-
 export const emailConfig = {
 	EMAIL_SERVICE_NAME: process.env.EMAIL_SERVICE_NAME!,
 	EMAIL_SERVICE_HOST: process.env.EMAIL_SERVICE_HOST!,

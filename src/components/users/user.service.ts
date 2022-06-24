@@ -16,6 +16,7 @@ import { PaginationInfo } from '../base/@types/PaginationInfo';
 import { NotFoundError } from '@src/utils/appError';
 import { UserErrorMessage } from './user.error';
 import { mapUserToUserDto } from './user.mapping';
+import { UserRoleType } from './@types/UserRoleType';
 
 export class UserService implements IUserService {
 	constructor(
@@ -24,6 +25,21 @@ export class UserService implements IUserService {
 		private readonly userCreator: IUserCreator,
 		private readonly passwordEncoder: IPasswordEncoder
 	) {}
+
+	createLocalUserWithRole = async (
+		payload: CreateUserDto,
+		role: UserRoleType
+	): Promise<UserDto> => {
+		const encryptedPassword = this.passwordEncoder.encode(payload.password);
+
+		const userCreated = await this.userRepository.save({
+			...payload,
+			password: encryptedPassword,
+			type: role
+		});
+
+		return mapUserToUserDto(userCreated);
+	};
 
 	createLocalUser = async (payload: CreateUserDto): Promise<UserDto> => {
 		await this.userValidate.checkCreateUserData(payload);

@@ -1,7 +1,3 @@
-import dotenv from 'dotenv';
-
-dotenv.config({ path: '.env' });
-
 export const cloudConfig = {
 	IMAGE_CLOUDINARY_CLOUD_NAME: process.env.IMAGE_CLOUDINARY_CLOUD_NAME!,
 	IMAGE_CLOUDINARY_API_KEY: process.env.IMAGE_CLOUDINARY_API_KEY!,

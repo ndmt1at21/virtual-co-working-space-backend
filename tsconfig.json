@@ -11,7 +11,7 @@
 		"esModuleInterop": true,
 		"isolatedModules": false,
 		"resolveJsonModule": true,
-		"noImplicitAny": true,
+		"noImplicitAny": false,
 		"forceConsistentCasingInFileNames": true,
 		"strictPropertyInitialization": false,
 		"strict": true,
@@ -26,7 +26,7 @@
 		},
 		"typeRoots": ["./src/@types", "./node_modules/@types"]
 	},
-	"include": ["./**/*.ts", "src/**/*.ts"],
+	"include": ["./**/*.ts", "src/**/*.ts", "scripts/setup.ts"],
 	"exclude": ["node_modules", "build/**/*"],
 	"ts-node": {
 		"files": true

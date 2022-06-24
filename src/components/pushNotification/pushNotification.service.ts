@@ -58,7 +58,9 @@ export class PushNotificationService implements IPushNotificationService {
 		}
 
 		this.logger.info(
-			`Found push tokens [${pushTokens}] of [userId = ${userId}] `
+			`Found push tokens [${JSON.stringify(
+				pushTokens
+			)}] of [userId = ${userId}] `
 		);
 
 		const stringifyDataValue: { [key: string]: string } = {};

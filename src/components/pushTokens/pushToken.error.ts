@@ -1,3 +1,3 @@
 export const PushTokenErrorMessages = {
-	PUSH_TOKEN_NOT_FOUND: 'Push token not found'
+	PUSH_TOKEN_NOT_FOUND: 'push_token_not_found'
 };

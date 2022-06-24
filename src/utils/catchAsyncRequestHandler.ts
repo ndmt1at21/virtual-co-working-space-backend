@@ -10,10 +10,11 @@ type AsyncRequestHandler = (
 export const catchAsyncRequestHandler = (
 	fn: AsyncRequestHandler
 ): RequestHandler => {
-	return (req, res, next) => {
-		fn(req, res, next).catch(err => {
-			console.log('next calll');
+	return async (req, res, next) => {
+		try {
+			await fn(req, res, next);
+		} catch (err) {
 			next(err);
-		});
+		}
 	};
 };

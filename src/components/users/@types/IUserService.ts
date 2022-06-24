@@ -5,10 +5,16 @@ import { UpdatePasswordDto } from './dto/UpdatePassword.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { UserDto } from './dto/User.dto';
 import { FindAllUsersOptions } from './filter/FindAllUsersOptions';
+import { UserRoleType } from './UserRoleType';
 import { UserStatus } from './UserStatus';
 
 export interface IUserService {
 	createLocalUser: (payload: CreateUserDto) => Promise<UserDto>;
+
+	createLocalUserWithRole: (
+		payload: CreateUserDto,
+		role: UserRoleType
+	) => Promise<UserDto>;
 
 	findOrCreateUserByExternal: (
 		payload: CreateUserExternalDto

@@ -15,7 +15,6 @@ export class ItemController implements IItemController {
 	getById = catchAsyncRequestHandler(async (req, res, next) => {
 		this.logger.info(`Get item with id = ${req.params.id}`);
 
-		console.log('get item by id');
 		const item = await this.itemService.findItemById(+req.params.id);
 
 		const resData = generateResponseData({

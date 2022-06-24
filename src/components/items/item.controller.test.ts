@@ -73,18 +73,22 @@ describe('ItemController', () => {
 		});
 
 		test('should throw not found error when item is not exist', async () => {
-			// const { req: reqData, service: serviceData } =
-			// 	getItemByIdData.notExists;
-			// const req = reqData;
-			// const nextFn = jest.fn();
-			// itemService.findItemById = jest
-			// 	.fn()
-			// 	.mockRejectedValue(new NotFoundError('item_not_found'));
-			// await itemController.getById(req as any, {} as any, nextFn);
-			// expect(itemService.findItemById).toHaveBeenCalledWith(
-			// 	req.params.id
-			// );
-			// expect(nextFn).toBeCalledWith(NotFoundError);
+			const { req: reqData, service: serviceData } =
+				getItemByIdData.notExists;
+			const req = reqData;
+			const nextFn = jest.fn();
+
+			itemService.findItemById = jest
+				.fn()
+				.mockRejectedValue(new NotFoundError('item_not_found'));
+
+			await itemController.getById(req as any, {} as any, nextFn);
+
+			expect(itemService.findItemById).toHaveBeenCalledWith(
+				req.params.id
+			);
+			expect(itemController.getById).not.toThrowError();
+			expect(nextFn).toBeCalledWith(expect.any(NotFoundError));
 		});
 	});
 
@@ -117,28 +121,26 @@ describe('ItemController', () => {
 			expect(res.json).toBeCalledWith(resData);
 		});
 
-		// test('should throw not found error when item is not exist', async () => {
-		// 	const { req: reqData, service: serviceData } =
-		// 		getItemByIdData.notExists;
-		// 	const req = reqData;
-		// 	const nextFn = jest.fn();
+		test('should throw not found error when item is not exist', async () => {
+			const { req: reqData, service: serviceData } =
+				getItemByIdData.notExists;
+			const req = reqData;
+			const nextFn = jest.fn();
 
-		// 	itemService.findItemById = jest
-		// 		.fn()
-		// 		.mockRejectedValue(
-		// 			new NotFoundError(serviceData.findItemById.throw)
-		// 		);
+			itemService.findItemById = jest
+				.fn()
+				.mockRejectedValue(
+					new NotFoundError(serviceData.findItemById.throw)
+				);
 
-		// 	await itemController.getById(req as any, {} as any, nextFn);
+			await itemController.getById(req as any, {} as any, nextFn);
 
-		// 	expect(itemService.findItemById).toHaveBeenCalledWith(
-		// 		req.params.id
-		// 	);
+			expect(itemService.findItemById).toHaveBeenCalledWith(
+				req.params.id
+			);
 
-		// 	await itemController.getById(req as any, {} as any, nextFn);
-
-		// 	console.log('calll nextFn toBeCalled');
-		// 	expect(nextFn).toBeCalledWith(NotFoundError);
-		// });
+			expect(itemController.getById).not.toThrowError();
+			expect(nextFn).toBeCalledWith(expect.any(NotFoundError));
+		});
 	});
 });

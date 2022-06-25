@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env' });
+
 export const authConfig = {
 	JWT_ISSUER: 'virtualspace.com',
 	JWT_SECRET: process.env.JWT_SECRET!,

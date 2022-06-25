@@ -7,6 +7,7 @@ import { AuthErrorMessages } from './auth.error';
 import { UserLoginProvider } from './@types/UserLoginProvider';
 
 const GoogleStrategy = () => {
+	console.log(`${config.app.SERVER_DOMAIN}/api/v1/auth/google/callback`);
 	const strategy = new PassportGoogleStrategy(
 		{
 			callbackURL: `${config.app.SERVER_DOMAIN}/api/v1/auth/google/callback`,

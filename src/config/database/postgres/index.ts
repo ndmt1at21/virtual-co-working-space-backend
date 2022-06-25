@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env' });
+
 const databaseConfig = {
 	DB_HOST: process.env.DB_POSTGRES_HOST,
 	DB_USERNAME: process.env.DB_POSTGRES_USERNAME,

@@ -7,7 +7,6 @@ import { IAppearanceValidation } from './@types/IAppearanceReqValidation';
 export class AppearanceReqValidation implements IAppearanceValidation {
 	validateCreateAppearance = catchAsyncRequestHandler(
 		async (req, res, next) => {
-			console.log(req);
 			const errors = await validateRequestBody(
 				CreateAppearancesDto,
 				req.body
@@ -19,7 +18,6 @@ export class AppearanceReqValidation implements IAppearanceValidation {
 					errors
 				);
 
-			console.log('next in fn call');
 			next();
 		}
 	);

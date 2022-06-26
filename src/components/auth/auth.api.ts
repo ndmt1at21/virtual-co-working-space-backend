@@ -22,12 +22,20 @@ export const AuthRouter = () => {
 			authController.facebookLoginCallback
 		)
 		.patch('/reset/:token', restrictToGuest, authController.resetPassword)
-		.get('/activate/:token', protect, authController.activateNewUser)
+		.get('/activate/:token', authController.activateNewUser)
 		.post('/login', restrictToGuest, authController.localLogin)
 		.post('/register', restrictToGuest, authController.localRegister)
 		.get('/google', restrictToGuest, authController.googleLogin)
-		.post('/google-login', restrictToGuest, authController.googleLoginHandler)
-		.post('/facebook-login', restrictToGuest, authController.facebookLoginHandler)
+		.post(
+			'/google-login',
+			restrictToGuest,
+			authController.googleLoginHandler
+		)
+		.post(
+			'/facebook-login',
+			restrictToGuest,
+			authController.facebookLoginHandler
+		)
 		.get('/facebook', restrictToGuest, authController.facebookLogin)
 		.post('/forgot', restrictToGuest, authController.forgotPassword)
 		.post(

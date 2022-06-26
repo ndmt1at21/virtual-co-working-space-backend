@@ -20,7 +20,7 @@ import { appConfig } from '@src/config/app';
 import { ChangePasswordDto } from './@types/dto/ChangePassword.dto';
 import { getAuth, UserRecord } from 'firebase-admin/auth';
 import { UserLoginProvider } from './@types/UserLoginProvider';
-import axios from "axios";
+import axios from 'axios';
 
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -30,7 +30,7 @@ export class AuthController {
 		private authMailQueueProducer: IAuthMailQueueProducer,
 		private authService: IAuthService,
 		private logger: ILogger
-	) { }
+	) {}
 
 	localLogin = catchAsyncRequestHandler(async (req, res, next) => {
 		const errors = await validateRequestBody(LoginDto, req.body);
@@ -102,15 +102,16 @@ export class AuthController {
 		try {
 			const ticket = await client.verifyIdToken({
 				idToken: req.body.token,
-				audience: process.env.GOOGLE_CLIENT_ID,
+				audience: process.env.GOOGLE_CLIENT_ID
 			});
 			const payload = ticket.getPayload();
-			const [user, { accessToken, refreshToken }] = await this.authService.externalLogin({
-				...payload,
-				avatar: payload.picture,
-				externalId: payload.sub,
-				provider: UserLoginProvider.GOOGLE,
-			});
+			const [user, { accessToken, refreshToken }] =
+				await this.authService.externalLogin({
+					...payload,
+					avatar: payload.picture,
+					externalId: payload.sub,
+					provider: UserLoginProvider.GOOGLE
+				});
 
 			res.status(HttpStatusCode.OK).json({
 				code: HttpStatusCode.OK,
@@ -127,15 +128,18 @@ export class AuthController {
 
 	facebookLoginHandler = catchAsyncRequestHandler(async (req, res, next) => {
 		try {
-			const { data } = await axios.get(`https://graph.facebook.com/v13.0/me?access_token=${req.body.token}&fields=id%2Cname%2Cemail%2Cpicture.type(large)`)
-			console.log(data);
-			const [user, { accessToken, refreshToken }] = await this.authService.externalLogin({
-				name: data.name,
-				email: data.email,
-				avatar: data?.picture?.data.url,
-				externalId: data.id,
-				provider: UserLoginProvider.FACEBOOK,
-			});
+			const { data } = await axios.get(
+				`https://graph.facebook.com/v13.0/me?access_token=${req.body.token}&fields=id%2Cname%2Cemail%2Cpicture.type(large)`
+			);
+
+			const [user, { accessToken, refreshToken }] =
+				await this.authService.externalLogin({
+					name: data.name,
+					email: data.email,
+					avatar: data?.picture?.data.url,
+					externalId: data.id,
+					provider: UserLoginProvider.FACEBOOK
+				});
 
 			res.status(HttpStatusCode.OK).json({
 				code: HttpStatusCode.OK,
@@ -364,7 +368,8 @@ export class AuthController {
 						});
 
 						this.logger.info(
-							`User with id ${user!.id
+							`User with id ${
+								user!.id
 							} logged in (oauth2, provider: ${provider}) successfully`
 						);
 

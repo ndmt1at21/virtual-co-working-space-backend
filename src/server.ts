@@ -30,4 +30,14 @@ const startServer = async () => {
 	}
 };
 
+process.on('uncaughtException', function (err) {
+	console.error("------------");
+	console.error("------------");
+	console.error("------------");
+	console.error("UNCAUGHT Exception", err);
+	console.error("------------");
+	console.error("------------");
+	console.error("------------");
+});
+
 startServer();

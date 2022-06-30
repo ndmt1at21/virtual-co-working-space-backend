@@ -25,14 +25,17 @@ const commonOptions = {
 
 const debugOptions = {
 	format: debugFormat,
-	level: 'debug'
+	level: 'error'
 };
 
 export const serverLogger = createLogger({
 	defaultMeta: { service: 'server' },
 	transports: [
 		new transports.File(commonOptions),
-		new transports.Console(debugOptions)
+		new transports.Console({
+			format: debugFormat,
+			level: 'production',
+		})
 	]
 });
 

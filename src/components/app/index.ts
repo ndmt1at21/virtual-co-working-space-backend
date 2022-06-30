@@ -57,13 +57,6 @@ export const httpServerLoader = (
 		logger.info(`Http server is listening on port ${port}`);
 	});
 
-	process.on('uncaughtException', err => {
-		logger.error('UNCAUGHT EXCEPTION: ' + err.message);
-		server.close(() => {
-			process.exit(1);
-		});
-	});
-
 	return server;
 };
 

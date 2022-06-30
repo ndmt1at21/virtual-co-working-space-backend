@@ -346,11 +346,17 @@ export class AuthController {
 					this.logger.error(
 						`Invalid external user information. Message ${err.message}`
 					);
-					throw new UnauthorizedError(
-						AuthErrorMessages.UNAUTHORIZED_INCORRECT_EXTERNAL
-					);
+					const redirectUrl = queryString.stringifyUrl({
+						url: config.auth.BASE_FRONTEND_URL,
+						query: {
+							code: HttpStatusCode.BAD_REQUEST,
+							error: err.message.toLowerCase()
+						}
+					});
+					res.redirect(redirectUrl);
+					return;
 				}
-
+				
 				this.logger.info(
 					`External user with provider ${provider} [email = ${profile.email}] authenticated successfully`
 				);

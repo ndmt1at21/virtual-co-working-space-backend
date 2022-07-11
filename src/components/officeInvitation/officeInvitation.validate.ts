@@ -59,6 +59,17 @@ export const OfficeInvitationValidate = ({
 			);
 		}
 
+		// check number of members in office doesn't exceed max
+		const office = await officeRepository.findById(
+			officeInvitation.officeId
+		);
+
+		if (office?.numberOfMembers === 20) {
+			throw new IllegalArgumentError(
+				OfficeInvitationErrorMessages.OFFICE_IS_FULL
+			);
+		}
+
 		// user is not already member of the office
 		await checkUserIsNotMember(userId, officeInvitation.officeId);
 	};
@@ -78,6 +89,13 @@ export const OfficeInvitationValidate = ({
 			throw new NotFoundError(
 				OfficeInvitationErrorMessages.INVITATION_NOT_FOUND
 			);
+
+		// check number of members in office doesn't exceed max
+		if (office.numberOfMembers === 20) {
+			throw new IllegalArgumentError(
+				OfficeInvitationErrorMessages.OFFICE_IS_FULL
+			);
+		}
 
 		// check user is not already member of the office
 		await checkUserIsNotMember(userId, office.id);

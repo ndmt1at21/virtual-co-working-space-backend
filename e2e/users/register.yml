@@ -1,0 +1,29 @@
+config:
+    target: 'http://localhost:8000/api/v1'
+    http:
+        timeout: 10
+    payload:
+        path: ./../data/users/userData.csv
+        fields:
+            - email
+            - name
+            - password
+        order: sequence
+        skipHeader: true
+    phases:
+        - Duration: 10
+          arrivalRate: 2
+
+scenarios:
+    - name: Register a new user
+      flow:
+          - post:
+                url: '/auth/register'
+                json:
+                    email: '{{ email }}'
+                    name: '{{ name }}'
+                    password: '{{ password }}'
+                    passwordConfirm: '{{ password }}'
+                # capture:
+                #     - json: $.data.user
+                #       as: user

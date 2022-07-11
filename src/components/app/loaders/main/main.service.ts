@@ -3,7 +3,7 @@ import { createMailService } from '@src/components/mail/mail.factory';
 import { createPushNotificationService } from '@src/components/pushNotification/pushNotification.factory';
 
 export const loadServices = async () => {
-	await initMailService();
+	// await initMailService();
 	await initCloudUploadService();
 	await initPushNotificationService();
 };

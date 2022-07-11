@@ -14,6 +14,7 @@ export class AuthSocketMiddleware implements IAuthSocketMiddleware {
 	) {}
 
 	protect = catchAsyncSocketMiddleware(async (socket, next) => {
+		console.log(socket.handshake);
 		const accessToken = socket.handshake.auth.accessToken;
 		if (!accessToken) {
 			throw new UnauthorizedError(

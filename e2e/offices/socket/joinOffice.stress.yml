@@ -1,0 +1,42 @@
+config:
+    target: 'ws://localhost:8000'
+    processor: 'index.js'
+    socketio:
+        transports: ['polling']
+    payload:
+        path: e2e/data/users/userData.csv
+        fields:
+            - email
+            - password
+        order: sequence
+        skipHeader: true
+
+    phases:
+        - duration: 1000
+        - arrivalRate: 20
+
+before:
+    flow:
+        - log: 'Login to get access token'
+        - post:
+              url: 'http://localhost:8000/api/v1/auth/login'
+              json:
+                  email: '{{ email }}'
+                  password: '{{ password }}'
+              capture:
+                  - json: $.data.accessToken
+                    as: accessToken
+
+scenarios:
+    - name: Join Office
+      engine: socketio
+      socketio:
+          auth: { accessToken: '{{ accessToken }}' }
+      flow:
+          - log: 'Emit office_member:join'
+          - emit:
+                channel: 'office_member:join'
+                data:
+                response:
+                    channel: 'office_member:joined'
+                    data:

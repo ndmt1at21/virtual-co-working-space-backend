@@ -1,0 +1,31 @@
+config:
+    target: 'ws://localhost:8000'
+    processor: 'index.js'
+    socketio:
+        transports: ['polling']
+    payload:
+        path: e2e/data/users/userData.csv
+        fields:
+            - email
+            - password
+        order: sequence
+        skipHeader: true
+
+    phases:
+        - duration: 1000
+        - arrivalRate: 20
+
+scenarios:
+    - name: Login
+      engine: socketio
+      socketio:
+          auth: { accessToken: '{{ accessToken }}' }
+      flow:
+          - post:
+                url: 'http://localhost:8000/api/v1/auth/login'
+                json:
+                    email: '{{ email }}'
+                    password: '{{ password }}'
+                capture:
+                    - json: $.data.accessToken
+                      as: accessToken

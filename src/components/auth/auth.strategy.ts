@@ -14,22 +14,27 @@ const GoogleStrategy = () => {
 			clientSecret: config.auth.GOOGLE_CLIENT_SECRET
 		},
 		(accessToken, refreshToken, profile: any, done) => {
-			if (profile.emails.length === 0)
-				return done(
-					AuthErrorMessages.LOGIN_EXTERNAL_USER_NOT_FOUND,
-					null
-				);
+			try {
+				if (profile.emails.length === 0)
+					return done(
+						AuthErrorMessages.LOGIN_EXTERNAL_USER_NOT_FOUND,
+						null
+					);
 
-			const convertedProfile: OAuth2ProfileDto = {
-				email: profile.emails[0].value,
-				avatar: profile.picture,
-				profileId: profile.id,
-				phone: profile.phone,
-				name: profile.displayName,
-				provider: UserLoginProvider.GOOGLE
-			};
+				const convertedProfile: OAuth2ProfileDto = {
+					email: profile.emails[0].value,
+					avatar: profile.picture,
+					profileId: profile.id,
+					phone: profile.phone,
+					name: profile.displayName,
+					provider: UserLoginProvider.GOOGLE
+				};
 
-			return done(null, convertedProfile);
+				return done(null, convertedProfile);
+			}
+			catch (err) {
+				return done(err, null);
+			}
 		}
 	);
 
@@ -45,22 +50,26 @@ const FacebookStrategy = () => {
 			profileFields: ['id', 'email', 'displayName', 'name', 'photos']
 		},
 		(accessToken, refreshToken, profile: any, done) => {
-			if (profile.emails.length === 0)
-				return done(
-					AuthErrorMessages.LOGIN_EXTERNAL_USER_NOT_FOUND,
-					null
-				);
+			try {
+				if (profile.emails.length === 0)
+					return done(
+						AuthErrorMessages.LOGIN_EXTERNAL_USER_NOT_FOUND,
+						null
+					);
 
-			const convertedProfile: OAuth2ProfileDto = {
-				email: profile.emails[0].value,
-				avatar: profile.photos[0].value,
-				profileId: profile.id,
-				phone: profile.phone,
-				name: profile.displayName,
-				provider: UserLoginProvider.FACEBOOK
-			};
+				const convertedProfile: OAuth2ProfileDto = {
+					email: profile.emails.length > 0 ? profile.emails[0].value : `facebook@${profile.id}`,
+					avatar: profile.photos[0].value,
+					profileId: profile.id,
+					phone: profile.phone,
+					name: profile.displayName,
+					provider: UserLoginProvider.FACEBOOK
+				};
 
-			return done(null, convertedProfile);
+				return done(null, convertedProfile);
+			} catch (err) {
+				return done(err, null);
+			}
 		}
 	);
 
